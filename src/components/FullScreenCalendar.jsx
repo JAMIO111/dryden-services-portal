@@ -147,9 +147,23 @@ export default function FullScreenCalendar() {
                   key={job.id}
                   className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                   <div className="bg-blue-500 rounded-full w-0.75 h-full"></div>
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col py-2 gap-1">
                     <p className="font-semibold text-sm">Changeover</p>
                     <p className="text-xs">{job.propertyDetails.name}</p>
+                    <p className="text-xs text-secondary-text">
+                      {`Next Arrival: ${
+                        job.nextArrival
+                          ? new Date(job.nextArrival).toLocaleString(
+                              "default",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "2-digit",
+                              }
+                            )
+                          : "N/A"
+                      }`}
+                    </p>
                   </div>
                 </span>
               ))
@@ -166,14 +180,14 @@ export default function FullScreenCalendar() {
               {meetingsForDay.length > 1 ? "s" : ""}
             </span>
           ) : (
-            jobsForDay.length > 0 &&
+            meetingsForDay.length > 0 &&
             view === "Weekly" &&
             meetingsForDay.map((meeting) => (
               <span
                 key={meeting.id}
                 className="bg-green-400/30 p-1 rounded flex flex-row gap-2">
                 <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col py-2 gap-1">
                   <p className="text-sm font-semibold text-primary-text">
                     Meeting
                   </p>

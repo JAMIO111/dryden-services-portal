@@ -14,8 +14,9 @@ const TextInput = forwardRef(
       icon: Icon,
       error,
       prefix,
+      maxLength,
       suffix,
-      textTransform = "none", // ⬅️ new prop
+      textTransform = "none",
       ...rest
     },
     ref
@@ -40,8 +41,11 @@ const TextInput = forwardRef(
       }
     };
 
+    const remainingChars =
+      typeof maxLength === "number" ? maxLength - (value?.length || 0) : null;
+
     return (
-      <div className="flex flex-col gap-1 h-17 min-w-0">
+      <div className="flex flex-col gap-1 h-fit min-w-0 relative">
         {label && (
           <div className="flex items-center gap-1">
             <label className="block font-medium text-primary-text">
@@ -54,6 +58,7 @@ const TextInput = forwardRef(
             )}
           </div>
         )}
+
         <div
           className={`flex border flex-row relative items-center shadow-s hover:shadow-m rounded-lg pl-2 pr-10 py-2 bg-text-input-color
              focus-within:border-brand-primary focus-within:hover:border-brand-primary min-w-0
@@ -86,13 +91,14 @@ const TextInput = forwardRef(
             value={value}
             onChange={onChange}
             placeholder={placeholder}
+            maxLength={maxLength}
             className={`placeholder:normal-case input-no-arrows flex-grow w-full min-w-0 bg-transparent outline-none text-primary-text placeholder:text-sm placeholder:text-muted
               ${prefix ? "pl-5" : ""}
               ${suffix ? "pr-4 text-right" : ""}
               ${textTransform !== "none" ? `capitalize-${textTransform}` : ""}
             `}
             style={{
-              textTransform: textTransform, // apply css transform
+              textTransform: textTransform,
             }}
             {...rest}
           />
@@ -106,13 +112,26 @@ const TextInput = forwardRef(
           {value !== "" && (
             <button
               type="button"
-              onClick={() => onChange({ target: { value: undefined } })} // ⬅️ fixed from undefined
+              onClick={() => onChange({ target: { value: "" } })}
               className="absolute right-2 text-primary-text hover:bg-secondary-bg rounded-sm p-0.5"
               aria-label="Clear">
               <HiMiniXMark className="w-5 h-5" />
             </button>
           )}
         </div>
+
+        {maxLength && (
+          <div
+            className={`text-xs text-right mt-0.5 ${
+              remainingChars <= 0
+                ? "text-error-color"
+                : remainingChars <= maxLength * 0.1
+                ? "text-warning-color"
+                : "text-muted"
+            }`}>
+            {remainingChars} characters remaining
+          </div>
+        )}
       </div>
     );
   }

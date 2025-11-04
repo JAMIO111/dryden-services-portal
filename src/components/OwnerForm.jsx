@@ -1,4 +1,4 @@
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OwnerFormSchema } from "../validationSchema";
 import { useEffect } from "react";

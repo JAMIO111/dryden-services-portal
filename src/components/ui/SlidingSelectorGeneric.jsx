@@ -12,7 +12,7 @@ export default function SlidingSelector({
   const containerRef = useRef(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
-  useEffect(() => {
+  const updateIndicator = () => {
     const container = containerRef.current;
     if (!container) return;
 
@@ -23,8 +23,27 @@ export default function SlidingSelector({
       const { offsetLeft, offsetWidth } = activeButton;
       setIndicatorStyle({ left: offsetLeft, width: offsetWidth });
     }
+  };
+
+  useEffect(() => {
+    updateIndicator();
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Observe container size changes (responsive recalculation)
+    const resizeObserver = new ResizeObserver(() => updateIndicator());
+    resizeObserver.observe(container);
+
+    // Also recalc on window resize just in case layout context changes
+    window.addEventListener("resize", updateIndicator);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateIndicator);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, options]); // omit getValue
+  }, [value, options]); // run on value or options change
 
   return (
     <div

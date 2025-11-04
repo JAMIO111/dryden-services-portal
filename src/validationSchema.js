@@ -206,3 +206,21 @@ export const BookingFormSchema = z.object({
     .or(z.literal("")), // ✅ allow blank strings
   is_owner_booking: z.boolean(),
 });
+
+export const CorrespondenceFormSchema = z.object({
+  title: z.string().max(50, { message: "Title must not exceed 50 characters" }),
+  content: z
+    .string()
+    .max(500, { message: "Content must not exceed 500 characters" }),
+  tag: z.string().max(15, { message: "Tag must not exceed 15 characters" }),
+});
+
+export const MeetingFormSchema = z.object({
+  title: z.string().max(50, { message: "Title must not exceed 50 characters" }),
+  date: z.date({ required_error: "Date is required" }),
+  start_time: z.date({ required_error: "Start time is required" }),
+  end_time: z.date({ required_error: "End time is required" }),
+  location: z
+    .string()
+    .max(25, { message: "Location must not exceed 25 characters" }),
+});
