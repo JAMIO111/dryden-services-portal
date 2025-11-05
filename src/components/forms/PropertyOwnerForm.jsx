@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import CTAButton from "./CTAButton";
-import RHFComboBox from "./ui/RHFComboBox";
+import CTAButton from "../CTAButton";
+import RHFComboBox from "../ui/RHFComboBox";
 import { IoTrashOutline } from "react-icons/io5";
 import { useOwners } from "@/hooks/useOwners";
 import { FaUser } from "react-icons/fa6";

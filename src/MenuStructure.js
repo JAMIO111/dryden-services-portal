@@ -58,25 +58,6 @@ export const menuStructure = [
     subMenu: [],
   },
   {
-    name: "Inventory",
-    icon: BsBoxes,
-    path: "/Inventory",
-    subMenu: [
-      {
-        name: "Stock",
-        path: "/Inventory/Stock",
-      },
-      {
-        name: "Stock Adjustment",
-        path: "/Inventory/Stock-Adjustment",
-      },
-      {
-        name: "Item",
-        path: "/Inventory/Item",
-      },
-    ],
-  },
-  {
     name: "Human Resources",
     icon: BsPeople,
     path: "/Human-Resources",
@@ -84,10 +65,6 @@ export const menuStructure = [
       {
         name: "Employees",
         path: "/Human-Resources/Employees",
-      },
-      {
-        name: "Payroll",
-        path: "/Human-Resources/Payroll",
       },
       {
         name: "Holidays",

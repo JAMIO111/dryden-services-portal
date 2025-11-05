@@ -60,12 +60,12 @@ const PropertyDetails = ({ property, selectedProperty }) => {
                 </p>
               </div>
               <PackagePill
-                className="absolute top-5 left-5"
+                className="absolute z-10 bottom-0 right-5"
                 maintPackage={property?.Packages}
               />
               <div className="absolute flex px-4 flex-col justify-end h-1/2 bottom-0 left-0 w-full z-0 bg-gradient-to-b from-transparent via-secondary-bg/80 to-secondary-bg py-1"></div>
             </div>
-            <div className="p-4 pt-3 flex flex-col">
+            <div className="p-4 pt-6 flex flex-col">
               <div className="flex flex-row mb-3 items-start gap-2">
                 <IoLocationOutline className="text-primary-text mt-0.5 w-6 h-6 shrink-0" />
                 <a

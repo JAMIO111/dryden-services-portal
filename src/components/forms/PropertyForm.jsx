@@ -1,6 +1,6 @@
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PropertyFormSchema } from "../validationSchema";
+import { PropertyFormSchema } from "../../validationSchema";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { IoIosMan, IoIosUndo } from "react-icons/io";
@@ -9,10 +9,10 @@ import { IoTrashOutline, IoLocation, IoHome } from "react-icons/io5";
 import { BsMailbox2Flag, BsFillBuildingsFill, BsPencil } from "react-icons/bs";
 import { PiNumberThreeFill } from "react-icons/pi";
 import { GiMagicBroom } from "react-icons/gi";
-import NumericInputGroup from "./NumericInputGroup";
-import TextInput from "./ui/TextInput";
+import NumericInputGroup from "../NumericInputGroup";
+import TextInput from "../ui/TextInput";
 import { usePropertyById } from "@/hooks/usePropertyById";
-import CTAButton from "./CTAButton";
+import CTAButton from "../CTAButton";
 import { useModal } from "@/contexts/ModalContext";
 import KeyCodeForm from "./KeyCodeForm";
 import PropertyOwnerForm from "./PropertyOwnerForm";
@@ -27,9 +27,9 @@ import {
   MdPublishedWithChanges,
 } from "react-icons/md";
 import Spinner from "@components/LoadingSpinner";
-import { useToast } from "../contexts/ToastProvider";
-import ToggleButton from "./ui/ToggleButton";
-import ProfileImageSection from "./ProfileImageSection";
+import { useToast } from "../../contexts/ToastProvider";
+import ToggleButton from "../ui/ToggleButton";
+import ProfileImageSection from "../ProfileImageSection";
 import { useQueryClient } from "@tanstack/react-query";
 
 const defaultFormData = {
@@ -172,7 +172,7 @@ const PropertyForm = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex justify-center flex-1 w-full">
         <Spinner />
       </div>
     );

@@ -32,15 +32,15 @@ const BookingsDashboard = () => {
   const pageSize = parseInt(searchParams.get("pageSize") || "25", 10);
   const modalRef = useRef(null);
   const today = useMemo(() => new Date(), []);
-  const start = useMemo(() => {
+  const end = useMemo(() => {
     const s = new Date(today);
-    s.setDate(today.getDate() - (profile?.dashboard_range ?? 7));
+    s.setDate(today.getDate() + 14);
     return s;
-  }, [profile?.dashboard_range, today]);
+  }, [today]);
 
   const [selectedRange, setSelectedRange] = useState({
-    startDate: start,
-    endDate: today,
+    startDate: today,
+    endDate: end,
   });
 
   const memoisedRange = useMemo(
@@ -226,6 +226,16 @@ const BookingsDashboard = () => {
               width="w-80"
               onChange={setSelectedRange}
               value={memoisedRange}
+              presets={[
+                "Last Week",
+                "This Week",
+                "Next Week",
+                "Last Month",
+                "This Month",
+                "Next Month",
+                "Next 7 Days",
+                "Next 30 Days",
+              ]}
             />
           </div>
         </div>

@@ -17,20 +17,20 @@ import { BsHouse } from "react-icons/bs";
 import { MdChildFriendly } from "react-icons/md";
 import { IoReceiptOutline } from "react-icons/io5";
 import { LuFence } from "react-icons/lu";
-import NumericInputGroup from "./NumericInputGroup";
-import TextInput from "./ui/TextInput";
-import { BookingFormSchema } from "../validationSchema";
-import RHFComboBox from "./ui/RHFComboBox";
-import RHFTextArea from "./ui/RHFTextArea";
+import NumericInputGroup from "../NumericInputGroup";
+import TextInput from "../ui/TextInput";
+import { BookingFormSchema } from "../../validationSchema";
+import RHFComboBox from "../ui/RHFComboBox";
+import RHFTextArea from "../ui/RHFTextArea";
 import { useProperties } from "@/hooks/useProperties";
 import { useBookingById } from "@/hooks/useBookingById";
-import DateRangePicker from "./ui/DateRangePicker";
-import CTAButton from "./CTAButton";
+import DateRangePicker from "../ui/DateRangePicker";
+import CTAButton from "../CTAButton";
 import { FaCheck } from "react-icons/fa";
 import { TiArrowLoop } from "react-icons/ti";
 import { useUpsertBooking } from "@/hooks/useUpsertBooking";
-import ToggleButton from "./ui/ToggleButton";
-import { useToast } from "../contexts/ToastProvider";
+import ToggleButton from "../ui/ToggleButton";
+import { useToast } from "../../contexts/ToastProvider";
 
 const defaultFormData = {
   booking_ref: "",

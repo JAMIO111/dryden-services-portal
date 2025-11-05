@@ -1,14 +1,28 @@
-import { useState } from "react";
-import { MdPeopleOutline } from "react-icons/md";
-import { BsHouseAdd, BsHouses } from "react-icons/bs";
-import CTAButton from "./CTAButton";
+import { BsHouses, BsHouseAdd } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import CTAButton from "./CTAButton";
 
 const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
   const navigate = useNavigate();
 
   const handleNewEntry = () => {
     navigate(`/Client-Management/Properties/New-Property`);
+  };
+
+  const getPackageStyles = (packageName) => {
+    if (!packageName) return "";
+
+    const name = packageName.toLowerCase();
+
+    if (name.includes("gold"))
+      return "bg-yellow-500/15 text-yellow-500 border border-yellow-500/30";
+    if (name.includes("silver"))
+      return "bg-gray-400/15 text-gray-400 border border-gray-400/30";
+    if (name.includes("bronze"))
+      return "bg-amber-700/15 text-amber-700 border border-amber-700/30";
+
+    // fallback for any other package
+    return "bg-brand-primary/10 text-brand-primary border border-brand-primary/30";
   };
 
   return (
@@ -44,21 +58,17 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
                 <img
                   src={property.avatar}
                   alt={property?.name}
-                  className="aspect-video h-28 border-r border-border-color object-cover mr-4"
+                  className="aspect-video h-36 border-r border-border-color object-cover mr-4"
                 />
               ) : (
                 <div
-                  className={`${
-                    selectedProperty?.id === property.id
-                      ? "bg-primary-bg"
-                      : "bg-primary-bg"
-                  } aspect-video h-28 flex items-center justify-center border-r border-border-color mr-4`}>
+                  className={`aspect-video h-36 flex items-center justify-center border-r border-border-color mr-4 bg-primary-bg`}>
                   <span className="text-secondary-text">No Image</span>
                 </div>
               )}
 
               {/* Property Details */}
-              <div>
+              <div className="flex flex-col flex-1 py-4 gap-2">
                 <p className={`text-primary-text font-semibold text-lg`}>
                   {property.name}
                 </p>
@@ -70,9 +80,17 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
                     property?.county,
                     property?.postcode,
                   ]
-                    .filter(Boolean) // removes null, undefined, and empty strings
+                    .filter(Boolean)
                     .join(", ")}
                 </p>
+                {property?.Packages && (
+                  <div
+                    className={`mt-1 w-fit text-xs font-medium px-2 py-1 rounded-lg ${getPackageStyles(
+                      property.Packages.name
+                    )}`}>
+                    {property.Packages.name}
+                  </div>
+                )}
               </div>
             </li>
           ))}

@@ -1,22 +1,22 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { OwnerFormSchema } from "../validationSchema";
+import { OwnerFormSchema } from "../../validationSchema";
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useOwnerById } from "@/hooks/useOwnerById";
-import TextInput from "./ui/TextInput";
+import TextInput from "../ui/TextInput";
 import { IoText } from "react-icons/io5";
 import { HiOutlinePhone } from "react-icons/hi2";
 import { TfiEmail } from "react-icons/tfi";
-import ToggleButton from "./ui/ToggleButton";
+import ToggleButton from "../ui/ToggleButton";
 import { BsActivity } from "react-icons/bs";
-import ProfileImageSection from "./ProfileImageSection";
-import CTAButton from "./CTAButton";
+import ProfileImageSection from "../ProfileImageSection";
+import CTAButton from "../CTAButton";
 import { IoIosUndo } from "react-icons/io";
 import { FaCheck } from "react-icons/fa";
 import { useUpsertOwner } from "@/hooks/useUpsertOwner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useToast } from "../contexts/ToastProvider";
+import { useToast } from "../../contexts/ToastProvider";
 
 const defaultFormData = {
   id: null,

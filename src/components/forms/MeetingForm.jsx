@@ -1,14 +1,14 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MeetingFormSchema } from "../validationSchema";
-import TextInput from "./ui/TextInput";
+import { MeetingFormSchema } from "../../validationSchema";
+import TextInput from "../ui/TextInput";
 import { IoText } from "react-icons/io5";
-import { useToast } from "../contexts/ToastProvider";
+import { useToast } from "../../contexts/ToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
-import CTAButton from "./CTAButton";
+import CTAButton from "../CTAButton";
 import { useInsertMeeting } from "@/hooks/useInsertMeeting";
 import { useUser } from "@/contexts/UserProvider";
-import DatePicker from "./ui/DatePicker";
+import DatePicker from "../ui/DatePicker";
 import { IoLocationOutline } from "react-icons/io5";
 
 const defaultFormData = {

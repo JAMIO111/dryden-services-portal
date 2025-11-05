@@ -1,15 +1,15 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CorrespondenceFormSchema } from "../validationSchema";
-import TextInput from "./ui/TextInput";
+import { CorrespondenceFormSchema } from "../../validationSchema";
+import TextInput from "../ui/TextInput";
 import { VscTag } from "react-icons/vsc";
 import { IoText } from "react-icons/io5";
 import { TbListDetails } from "react-icons/tb";
-import { useToast } from "../contexts/ToastProvider";
+import { useToast } from "../../contexts/ToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
-import TextAreaInput from "./ui/TextArea";
-import CTAButton from "./CTAButton";
+import TextAreaInput from "../ui/TextArea";
+import CTAButton from "../CTAButton";
 import { useInsertCorrespondence } from "@/hooks/useInsertCorrespondence";
 import { useUser } from "@/contexts/UserProvider";
 

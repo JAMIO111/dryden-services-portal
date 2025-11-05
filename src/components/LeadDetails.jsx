@@ -5,8 +5,8 @@ import { HiOutlinePhone } from "react-icons/hi2";
 import { TfiEmail } from "react-icons/tfi";
 import { useLeadById } from "@/hooks/useLeadById.jsx";
 import { useNavigate, useParams } from "react-router-dom";
-import CorrespondenceForm from "./CorrespondenceForm.jsx";
-import MeetingForm from "./MeetingForm.jsx";
+import CorrespondenceForm from "./forms/CorrespondenceForm.jsx";
+import MeetingForm from "./forms/MeetingForm.jsx";
 import SlidingSelector from "./ui/SlidingSelectorGeneric.jsx";
 
 const LeadDetails = () => {

@@ -1,7 +1,7 @@
 import styles from "./LoadingSpinner.module.css";
 
 const Spinner = () => (
-  <div className="w=full h-full bg-primary-bg flex justify-center items-center">
+  <div className="w-full h-full bg-primary-bg flex justify-center items-center">
     <div className={styles.spinnerContainer}>
       <div className={styles.spinner}></div>
       <div className={styles.loader}>

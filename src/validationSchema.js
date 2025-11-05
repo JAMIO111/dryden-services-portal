@@ -224,3 +224,22 @@ export const MeetingFormSchema = z.object({
     .string()
     .max(25, { message: "Location must not exceed 25 characters" }),
 });
+
+export const EmployeeFormSchema = z.object({
+  first_name: z.string({ required_error: "First name is required" }),
+  surname: z.string({ required_error: "Surname is required" }),
+  email: z
+    .string({ required_error: "Email is required" })
+    .email("Invalid email format"),
+  phone: z
+    .string()
+    .regex(/^[+()\-0-9\s]{6,20}$/, { message: "Invalid phone number format" }),
+  dob: z.date({ required_error: "Date of birth is required" }),
+  gender: z.enum(["Male", "Female"], { required_error: "Gender is required" }),
+  job_title: z.string({ required_error: "Job title is required" }),
+  start_date: z.date({ required_error: "Start date is required" }),
+  ni_number: z
+    .string()
+    .max(15, { message: "NI Number must not exceed 15 characters" }),
+  is_active: z.boolean().default(true),
+});

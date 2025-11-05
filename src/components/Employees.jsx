@@ -6,8 +6,11 @@ import { useGlobalSearch } from "../contexts/SearchProvider";
 import CTAButton from "./CTAButton";
 import { IoAddOutline } from "react-icons/io5";
 import { HiOutlinePencil } from "react-icons/hi2";
+import { useModal } from "@/contexts/ModalContext";
+import EmployeeForm from "./forms/EmployeeForm.jsx";
 
 const Employees = () => {
+  const { openModal } = useModal();
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   console.log("Selected Employee:", selectedEmployee);
   const { data, error, isLoading } = useQuery({
@@ -33,6 +36,20 @@ const Employees = () => {
     setSelectedEmployee((prev) => (prev === employeeId ? null : employeeId));
   };
 
+  const handleAddEmployee = () => {
+    openModal({
+      title: "Add New Employee",
+      content: <EmployeeForm />,
+    });
+  };
+
+  const handleEditEmployee = (updatedEmployee) => {
+    openModal({
+      title: "Edit Employee Details",
+      content: <EmployeeForm />,
+    });
+  };
+
   return (
     <div className="flex bg-primary-bg flex-1 overflow-auto flex-col gap-5 p-5">
       <div className="flex flex-row justify-between h-7 items-center">
@@ -45,9 +62,15 @@ const Employees = () => {
               text={"Edit Details"}
               icon={HiOutlinePencil}
               type={"neutral"}
+              callbackFn={handleEditEmployee}
             />
           )}
-          <CTAButton text={"Add Employee"} icon={IoAddOutline} type={"main"} />
+          <CTAButton
+            text={"Add Employee"}
+            icon={IoAddOutline}
+            type={"main"}
+            callbackFn={handleAddEmployee}
+          />
         </div>
       </div>
       <div

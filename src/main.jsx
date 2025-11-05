@@ -13,7 +13,9 @@ import "./index.css";
 
 const App = lazy(() => import("./App.jsx"));
 const Dashboard = lazy(() => import("./components/dashboard/Dashboard.jsx"));
-const NonConformance = lazy(() => import("./components/NonConformance.jsx"));
+const HRDashboard = lazy(() =>
+  import("./components/dashboard/HRDashboard.jsx")
+);
 const BookingsDashboard = lazy(() =>
   import("./components/dashboard/BookingsDashboard.jsx")
 );
@@ -21,8 +23,8 @@ const ClientManagementDashboard = lazy(() =>
   import("./components/dashboard/ClientManagementDashboard.jsx")
 );
 const Properties = lazy(() => import("./components/Properties.jsx"));
-const PropertyForm = lazy(() => import("./components/PropertyForm.jsx"));
-const OwnerForm = lazy(() => import("./components/OwnerForm.jsx"));
+const PropertyForm = lazy(() => import("./components/forms/PropertyForm.jsx"));
+const OwnerForm = lazy(() => import("./components/forms/OwnerForm.jsx"));
 const Owners = lazy(() => import("./components/Owners.jsx"));
 const NotFound = lazy(() => import("./components/NotFound.jsx"));
 const Settings = lazy(() => import("./components/Settings/Settings.jsx"));
@@ -36,7 +38,7 @@ const SettingsAccount = lazy(() =>
   import("./components/Settings/SettingsAccount.jsx")
 );
 const Employees = lazy(() => import("./components/Employees.jsx"));
-const BookingForm = lazy(() => import("./components/BookingForm.jsx"));
+const BookingForm = lazy(() => import("./components/forms/BookingForm.jsx"));
 const FullScreenCalendar = lazy(() =>
   import("./components/FullScreenCalendar.jsx")
 );
@@ -164,7 +166,14 @@ const router = createBrowserRouter([
               { path: "Admin", element: <div>Admin Settings</div> },
             ],
           },
-          { path: "Human-Resources", element: <Employees /> },
+          {
+            path: "Human-Resources",
+            element: <HRDashboard />,
+          },
+          {
+            path: "Human-Resources/Employees",
+            element: <Employees />,
+          },
           { path: "Calendar", element: <FullScreenCalendar /> },
         ],
       },

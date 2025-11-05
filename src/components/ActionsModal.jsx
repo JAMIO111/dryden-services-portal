@@ -12,7 +12,6 @@ import { useConfirm } from "../contexts/ConfirmationModalProvider";
 
 const ActionsModal = ({ item, position }) => {
   const queryClient = useQueryClient();
-
   const { showToast } = useToast();
   const confirm = useConfirm();
 

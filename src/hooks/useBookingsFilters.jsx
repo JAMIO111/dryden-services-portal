@@ -9,7 +9,7 @@ export function useBookingsFilters() {
   const leadGuest = searchParams.get("leadGuest") || "";
   const bookingRef = searchParams.get("bookingRef") || "";
   const property = searchParams.get("property") || "";
-  const managementPackage = searchParams.get("package") || "";
+  const managementPackage = searchParams.get("managementPackage") || "";
   const type = searchParams.get("type") || "";
 
   // updateFilters uses only prevParams passed in setter callback!
@@ -25,7 +25,7 @@ export function useBookingsFilters() {
                 leadGuest: prevParams.get("leadGuest") || "",
                 bookingRef: prevParams.get("bookingRef") || "",
                 property: prevParams.get("property") || "",
-                managementPackage: prevParams.get("package") || "",
+                managementPackage: prevParams.get("managementPackage") || "",
                 type: prevParams.get("type") || "",
                 page: prevParams.get("page") || "1",
                 pageSize: prevParams.get("pageSize") || "25",
@@ -35,7 +35,7 @@ export function useBookingsFilters() {
                 leadGuest: prevParams.get("leadGuest") || "",
                 bookingRef: prevParams.get("bookingRef") || "",
                 property: prevParams.get("property") || "",
-                managementPackage: prevParams.get("package") || "",
+                managementPackage: prevParams.get("managementPackage") || "",
                 type: prevParams.get("type") || "",
                 page: prevParams.get("page") || "1",
                 pageSize: prevParams.get("pageSize") || "25",

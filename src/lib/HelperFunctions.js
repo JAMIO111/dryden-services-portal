@@ -121,6 +121,17 @@ export const datePresets = [
     range: () => [getStartOfWeek(new Date(), 1), getEndOfWeek(new Date(), 1)],
   },
   {
+    label: "Next Week",
+    range: () => {
+      const startOfThisWeek = getStartOfWeek(new Date(), 1);
+      const start = new Date(startOfThisWeek);
+      start.setDate(start.getDate() + 7);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return [normalize(start), normalize(end)];
+    },
+  },
+  {
     label: "Last Month",
     range: () => {
       const now = new Date();
@@ -131,6 +142,14 @@ export const datePresets = [
   {
     label: "This Month",
     range: () => [getStartOfMonth(new Date()), getEndOfMonth(new Date())],
+  },
+  {
+    label: "Next Month",
+    range: () => {
+      const now = new Date();
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      return [getStartOfMonth(nextMonth), getEndOfMonth(nextMonth)];
+    },
   },
   {
     label: "Last Quarter",
@@ -157,8 +176,21 @@ export const datePresets = [
     },
   },
   {
+    label: "Next Quarter",
+    range: () => {
+      const now = new Date();
+      const currentQuarter = Math.floor(now.getMonth() / 3);
+      const startMonth = ((currentQuarter + 1) % 4) * 3;
+      const year =
+        currentQuarter === 3 ? now.getFullYear() + 1 : now.getFullYear();
+      const start = new Date(year, startMonth, 1);
+      const end = new Date(year, startMonth + 3, 0);
+      return [normalize(start), normalize(end)];
+    },
+  },
+  {
     label: "Last Year",
-    prevoius: () => {
+    previous: () => {
       const previousYear = new Date().getFullYear() - 2;
       return [new Date(previousYear, 0, 1), new Date(previousYear, 11, 31)];
     },
@@ -169,12 +201,19 @@ export const datePresets = [
   },
   {
     label: "This Year",
-    prevoius: "Last Year",
+    previous: "Last Year",
     range: () => [getStartOfYear(new Date()), getEndOfYear(new Date())],
   },
   {
-    label: "Rolling 7 Days",
-    previous: "Previous 7 Days",
+    label: "Next Year",
+    range: () => {
+      const nextYear = new Date().getFullYear() + 1;
+      return [new Date(nextYear, 0, 1), new Date(nextYear, 11, 31)];
+    },
+  },
+  {
+    label: "Last 7 Days",
+    previous: "Last 7 Days",
     range: () => {
       const end = normalize(new Date());
       const start = new Date(end);
@@ -183,8 +222,17 @@ export const datePresets = [
     },
   },
   {
-    label: "Rolling 30 Days",
-    previous: "Previous 30 Days",
+    label: "Next 7 Days",
+    range: () => {
+      const start = normalize(new Date());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return [start, normalize(end)];
+    },
+  },
+  {
+    label: "Last 30 Days",
+    previous: "Last 30 Days",
     range: () => {
       const end = normalize(new Date());
       const start = new Date(end);
@@ -193,8 +241,17 @@ export const datePresets = [
     },
   },
   {
-    label: "Rolling 90 Days",
-    previous: "Previous 90 Days",
+    label: "Next 30 Days",
+    range: () => {
+      const start = normalize(new Date());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 29);
+      return [start, normalize(end)];
+    },
+  },
+  {
+    label: "Last 90 Days",
+    previous: "Last 90 Days",
     range: () => {
       const end = normalize(new Date());
       const start = new Date(end);

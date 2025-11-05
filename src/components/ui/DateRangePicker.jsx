@@ -55,6 +55,7 @@ export default function DateRangePicker({
   rangeCounter = true,
   rangeCounterText = "nights",
   error,
+  presets = [],
 }) {
   const triggerRef = useRef(null);
   const containerRef = useRef(null);
@@ -70,6 +71,12 @@ export default function DateRangePicker({
 
   const startDate = value.startDate ? normalize(value.startDate) : null;
   const endDate = value.endDate ? normalize(value.endDate) : null;
+
+  const visiblePresets = presets.length
+    ? presets
+        .map((label) => datePresets.find((preset) => preset.label === label))
+        .filter(Boolean) // removes any labels that don’t exist in datePresets
+    : datePresets;
 
   // ---- Handle clicks outside ----
   useEffect(() => {
@@ -292,7 +299,7 @@ export default function DateRangePicker({
             <>
               <div className="w-0.25 bg-border-color"></div>
               <div className="w-40 p-3">
-                {datePresets.map(({ label, range }) => {
+                {visiblePresets.map(({ label, range }) => {
                   const [presetStart, presetEnd] = range();
                   const isSelected =
                     startDate &&

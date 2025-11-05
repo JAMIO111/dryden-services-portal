@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import CTAButton from "./CTAButton";
-import TextInput from "./ui/TextInput";
+import CTAButton from "../CTAButton";
+import TextInput from "../ui/TextInput";
 import { PiPassword } from "react-icons/pi";
-import ToggleButton from "./ui/ToggleButton";
+import ToggleButton from "../ui/ToggleButton";
 import { SlLock, SlLockOpen } from "react-icons/sl";
 import { GrLocationPin } from "react-icons/gr";
 

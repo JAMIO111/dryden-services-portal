@@ -114,7 +114,7 @@ export default function FullScreenCalendar() {
         key={idx}
         onClick={() => openDailyItemsModal(date)}
         className={`relative border border-border-color flex flex-col cursor-pointer
-        transition-all duration-200 hover:shadow-md hover:bg-cta-color/5 
+        hover:bg-cta-color/5 
         ${
           formattedDate === dateKey
             ? "bg-blue-100 border-blue-400 shadow-md"

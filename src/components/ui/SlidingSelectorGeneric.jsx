@@ -77,7 +77,7 @@ export default function SlidingSelector({
             data-value={optionValue}
             onClick={() => onChange(option)}
             className={clsx(
-              "group flex gap-3 justify-center items-center relative z-10 py-1 px-3 text-primary-text transition-colors duration-200 flex-1",
+              "group flex gap-3 justify-center items-center relative z-10 py-1 px-3 text-primary-text transition-all not:transition-colors duration-200 flex-1",
               {
                 "text-primary-text": isActive,
                 "cursor-pointer": !isActive,

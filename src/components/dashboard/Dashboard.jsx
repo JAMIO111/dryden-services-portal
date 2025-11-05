@@ -16,15 +16,15 @@ const Dashboard = () => {
   const { profile } = useUser();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const today = useMemo(() => new Date(), []);
-  const start = useMemo(() => {
+  const end = useMemo(() => {
     const s = new Date(today);
-    s.setDate(today.getDate() - (profile?.dashboard_range ?? 7));
+    s.setDate(today.getDate() + 14);
     return s;
-  }, [profile?.dashboard_range, today]);
+  }, [today]);
 
   const [selectedRange, setSelectedRange] = useState({
-    startDate: start,
-    endDate: today,
+    startDate: today,
+    endDate: end,
   });
 
   const memoisedRange = useMemo(
@@ -48,12 +48,10 @@ const Dashboard = () => {
   console.log("Booking Volume Data:", data);
 
   useEffect(() => {
-    if (profile) {
-      const s = new Date(today);
-      s.setDate(today.getDate() - (profile.dashboard_range ?? 7));
-      setSelectedRange({ startDate: s, endDate: today });
-    }
-  }, [profile, today]);
+    const end = new Date();
+    end.setDate(today.getDate() + 14);
+    setSelectedRange({ startDate: today, endDate: end });
+  }, [today]);
 
   return (
     <div className="h-full w-full">
@@ -106,6 +104,16 @@ const Dashboard = () => {
                 width="w-80"
                 onChange={setSelectedRange}
                 value={memoisedRange}
+                presets={[
+                  "Last Week",
+                  "This Week",
+                  "Next Week",
+                  "Last Month",
+                  "This Month",
+                  "Next Month",
+                  "Next 7 Days",
+                  "Next 30 Days",
+                ]}
               />
             </div>
           </div>
