@@ -11,6 +11,7 @@ const TextAreaInput = forwardRef(
       icon: Icon,
       rows = 5,
       maxLength = 500,
+      required = false,
     },
     ref
   ) => {
@@ -18,7 +19,14 @@ const TextAreaInput = forwardRef(
 
     return (
       <div className="w-full h-full flex flex-col gap-1">
-        {label && <label className="block text-primary-text">{label}</label>}
+        <div className="flex items-center gap-1">
+          {label && <label className="block text-primary-text">{label}</label>}
+          {required && (
+            <span className="text-error-color text-sm ml-1" title="Required">
+              *
+            </span>
+          )}
+        </div>
 
         <div
           className="relative flex border border-border-color rounded-lg px-2 py-2 bg-text-input-color

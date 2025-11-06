@@ -1,4 +1,3 @@
-import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CorrespondenceFormSchema } from "../../validationSchema";
@@ -8,18 +7,15 @@ import { IoText } from "react-icons/io5";
 import { TbListDetails } from "react-icons/tb";
 import { useToast } from "../../contexts/ToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
-import TextAreaInput from "../ui/TextArea";
+import TextAreaInput from "../ui/RHFTextArea";
 import CTAButton from "../CTAButton";
 import { useInsertCorrespondence } from "@/hooks/useInsertCorrespondence";
 import { useUser } from "@/contexts/UserProvider";
 
 const defaultFormData = {
-  id: null,
-  lead_id: null,
-  created_by: null,
+  title: "",
   content: "",
   tag: "",
-  created_at: null,
 };
 
 const CorrespondenceForm = ({ leadId }) => {

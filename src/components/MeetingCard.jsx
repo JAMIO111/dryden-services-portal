@@ -36,7 +36,7 @@ const MeetingCard = ({ meeting }) => {
         <div className="rounded-md shadow-s flex flex-row items-center justify-between py-1 px-2 bg-tertiary-bg">
           <IoLocationOutline className="w-4 h-4 text-secondary-text" />
           <p className="text-xs text-secondary-text">
-            {meeting?.location || "Starbucks"}
+            {meeting?.location || "Unknown"}
           </p>
         </div>
       </div>

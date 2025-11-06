@@ -84,7 +84,6 @@ const ModalImageUploader = ({
 
   const handleRemove = async () => {
     if (!preview) return;
-
     setLoading(true);
 
     try {
@@ -101,13 +100,12 @@ const ModalImageUploader = ({
       setPreview(null);
       setFile(null);
 
-      // Notify parent AFTER closing
+      // Notify parent
       if (onUploadComplete) onUploadComplete(null);
     } catch (error) {
       console.error("Error removing avatar:", error);
       alert("Failed to remove avatar: " + error.message);
     } finally {
-      setPreview(existingUrl || null);
       setLoading(false);
     }
   };

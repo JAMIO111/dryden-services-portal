@@ -208,22 +208,45 @@ export const BookingFormSchema = z.object({
 });
 
 export const CorrespondenceFormSchema = z.object({
-  title: z.string().max(50, { message: "Title must not exceed 50 characters" }),
+  title: z
+    .string()
+    .trim()
+    .min(1, { message: "Title is required" })
+    .max(50, { message: "Title must not exceed 50 characters" }),
+
   content: z
     .string()
+    .trim()
+    .min(1, { message: "Content is required" })
     .max(500, { message: "Content must not exceed 500 characters" }),
-  tag: z.string().max(15, { message: "Tag must not exceed 15 characters" }),
+
+  tag: z
+    .string()
+    .trim()
+    .min(1, { message: "Tag is required" })
+    .max(15, { message: "Tag must not exceed 15 characters" }),
 });
 
-export const MeetingFormSchema = z.object({
-  title: z.string().max(50, { message: "Title must not exceed 50 characters" }),
-  date: z.date({ required_error: "Date is required" }),
-  start_time: z.date({ required_error: "Start time is required" }),
-  end_time: z.date({ required_error: "End time is required" }),
-  location: z
-    .string()
-    .max(25, { message: "Location must not exceed 25 characters" }),
-});
+export const MeetingFormSchema = z
+  .object({
+    title: z
+      .string()
+      .trim()
+      .min(1, { message: "Title is required" })
+      .max(50, { message: "Title must not exceed 50 characters" }),
+    date: z.date({ required_error: "Date is required" }),
+    start_time: z.date({ required_error: "Start time is required" }),
+    end_time: z.date({ required_error: "End time is required" }),
+    location: z
+      .string()
+      .trim()
+      .min(1, { message: "Location is required" })
+      .max(25, { message: "Location must not exceed 25 characters" }),
+  })
+  .refine((data) => data.end_time > data.start_time, {
+    path: ["end_time"],
+    message: "End time must be later than start time",
+  });
 
 export const EmployeeFormSchema = z.object({
   first_name: z.string({ required_error: "First name is required" }),
@@ -235,7 +258,7 @@ export const EmployeeFormSchema = z.object({
     .string()
     .regex(/^[+()\-0-9\s]{6,20}$/, { message: "Invalid phone number format" }),
   dob: z.date({ required_error: "Date of birth is required" }),
-  gender: z.enum(["Male", "Female"], { required_error: "Gender is required" }),
+  gender: z.string({ required_error: "Gender is required" }),
   job_title: z.string({ required_error: "Job title is required" }),
   start_date: z.date({ required_error: "Start date is required" }),
   ni_number: z
