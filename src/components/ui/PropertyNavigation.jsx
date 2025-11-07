@@ -1,4 +1,5 @@
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import CTAButton from "../CTAButton";
 
 const PropertyNavigation = ({ onPrev, onNext, currentIndex, total }) => {
   const isPrevDisabled = total === 0 || currentIndex <= 1;
@@ -13,14 +14,12 @@ const PropertyNavigation = ({ onPrev, onNext, currentIndex, total }) => {
   return (
     <div className="flex items-center p-2 flex-row justify-between rounded-2xl border border-border-color bg-tertiary-bg">
       {/* Prev Button */}
-      <button
-        onClick={!isPrevDisabled ? onPrev : undefined}
+      <CTAButton
+        type="main"
+        icon={IoChevronBack}
+        callbackFn={onPrev}
         disabled={isPrevDisabled}
-        className={`${baseButtonClasses} ${
-          isPrevDisabled ? disabledClasses : activeClasses
-        }`}>
-        <IoChevronBack className="text-primary-bg w-5 h-5" />
-      </button>
+      />
 
       {/* Counter */}
       <div className="flex-1 text-center">
@@ -31,15 +30,12 @@ const PropertyNavigation = ({ onPrev, onNext, currentIndex, total }) => {
         </p>
       </div>
 
-      {/* Next Button */}
-      <button
-        onClick={!isNextDisabled ? onNext : undefined}
+      <CTAButton
+        type="main"
+        icon={IoChevronForward}
+        callbackFn={onNext}
         disabled={isNextDisabled}
-        className={`${baseButtonClasses} ${
-          isNextDisabled ? disabledClasses : activeClasses
-        }`}>
-        <IoChevronForward className="text-primary-bg w-5 h-5" />
-      </button>
+      />
     </div>
   );
 };

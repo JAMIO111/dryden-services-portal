@@ -6,6 +6,9 @@ export const useUpsertProperty = () => {
 
   return useMutation({
     mutationFn: async ({ propertyData, keyCodesForm, ownersForm }) => {
+      console.log("Upserting property with data:", {
+        propertyData,
+      });
       const { KeyCodes = [], Owners = [], ...property } = propertyData;
       let propertyId = property.id;
       let result;

@@ -17,6 +17,7 @@ import { FaCheck } from "react-icons/fa";
 import { useUpsertOwner } from "@/hooks/useUpsertOwner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../contexts/ToastProvider";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 
 const defaultFormData = {
   id: null,
@@ -38,6 +39,7 @@ const OwnerForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { showToast } = useToast();
+  const { createNotification } = useCreateNotification();
   const { data: owner, isLoading } = useOwnerById(
     id !== "New-Owner" ? id : null
   );
@@ -257,6 +259,18 @@ const OwnerForm = () => {
                   message: id
                     ? "The owner has been successfully updated."
                     : "New owner successfully created.",
+                });
+
+                const notif = await createNotification({
+                  title: id ? `Existing Owner Updated.` : `New Owner Created.`,
+                  body: id
+                    ? `updated the account of owner:`
+                    : `added a new owner:`,
+                  metaData: {
+                    url: `/Client-Management/Owners/${id}`,
+                    buttonText: "View Owner",
+                  },
+                  docRef: id,
                 });
               } catch (error) {
                 console.error("Save failed:", error.message);

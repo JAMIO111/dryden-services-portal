@@ -31,6 +31,7 @@ import { TiArrowLoop } from "react-icons/ti";
 import { useUpsertBooking } from "@/hooks/useUpsertBooking";
 import ToggleButton from "../ui/ToggleButton";
 import { useToast } from "../../contexts/ToastProvider";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 
 const defaultFormData = {
   booking_ref: "",
@@ -53,10 +54,13 @@ const defaultFormData = {
 
 const BookingForm = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const { data: booking } = useBookingById(id !== "New-Booking" ? id : null);
+  const { bookingId } = useParams();
+  const { data: booking } = useBookingById(
+    bookingId !== "New-Booking" ? bookingId : null
+  );
   const { data: properties } = useProperties();
   const { showToast } = useToast();
+  const { createNotification } = useCreateNotification();
 
   const upsertBooking = useUpsertBooking();
 
@@ -72,15 +76,16 @@ const BookingForm = () => {
   } = useForm({
     resolver: zodResolver(BookingFormSchema),
     mode: "all",
-    defaultValues: defaultFormData,
+    defaultValues: { ...defaultFormData, booking },
     delayError: 250,
   });
 
   useEffect(() => {
-    if (id === "New-Booking") {
+    if (bookingId === "New-Booking") {
       reset(defaultFormData);
     } else if (booking) {
       reset({
+        ...defaultFormData,
         ...booking,
         bookingDates: {
           startDate: booking.arrival_date
@@ -92,13 +97,7 @@ const BookingForm = () => {
         },
       });
     }
-  }, [id, booking, reset]);
-
-  console.log("Form Errors:", errors);
-  console.log("Form Dirty:", isDirty);
-  console.log("Form Valid:", isValid);
-
-  console.log("Form Values:", watch());
+  }, [bookingId, booking, reset]);
 
   return (
     <div className="flex bg-primary-bg flex-1 flex-row p-4 gap-4">
@@ -194,99 +193,32 @@ const BookingForm = () => {
         />
       </div>
 
-      <div className="flex shadow-m h-full justify-between p-3 flex-col bg-secondary-bg rounded-2xl">
-        <Controller
-          name="adults"
-          control={control}
-          render={({ field, fieldState }) => (
-            <NumericInputGroup
-              label="Adults"
-              required={true}
-              value={field.value}
-              onChange={field.onChange}
-              icon={IoIosMan}
-              error={fieldState.error}
-            />
-          )}
-        />
-        <Controller
-          name="children"
-          control={control}
-          render={({ field, fieldState }) => (
-            <NumericInputGroup
-              label="Children"
-              value={field.value}
-              onChange={field.onChange}
-              icon={FaChildren}
-              error={fieldState.error}
-            />
-          )}
-        />
-        <Controller
-          name="infants"
-          control={control}
-          render={({ field, fieldState }) => (
-            <NumericInputGroup
-              label="Infants"
-              value={field.value}
-              onChange={field.onChange}
-              icon={MdChildFriendly}
-              error={fieldState.error}
-            />
-          )}
-        />
-        <Controller
-          name="pets"
-          control={control}
-          render={({ field, fieldState }) => (
-            <NumericInputGroup
-              label="Pets"
-              value={field.value}
-              onChange={field.onChange}
-              icon={FaDog}
-              error={fieldState.error}
-            />
-          )}
-        />
-        <Controller
-          name="highchairs"
-          control={control}
-          render={({ field, fieldState }) => (
-            <NumericInputGroup
-              label="Highchairs"
-              value={field.value}
-              onChange={field.onChange}
-              icon={TbChairDirector}
-              error={fieldState.error}
-            />
-          )}
-        />
-        <Controller
-          name="cots"
-          control={control}
-          render={({ field, fieldState }) => (
-            <NumericInputGroup
-              label="Cots"
-              value={field.value}
-              onChange={field.onChange}
-              icon={FaBed}
-              error={fieldState.error}
-            />
-          )}
-        />
-        <Controller
-          name="stairgates"
-          control={control}
-          render={({ field, fieldState }) => (
-            <NumericInputGroup
-              label="Stairgates"
-              value={field.value}
-              onChange={field.onChange}
-              icon={LuFence}
-              error={fieldState.error}
-            />
-          )}
-        />
+      <div className="flex flex-1 shadow-m h-full justify-between p-3 px-5 flex-col bg-secondary-bg rounded-2xl">
+        {[
+          ["adults", "Adults", IoIosMan, true],
+          ["children", "Children", FaChildren],
+          ["infants", "Infants", MdChildFriendly],
+          ["pets", "Pets", FaDog],
+          ["highchairs", "Highchairs", TbChairDirector],
+          ["cots", "Cots", FaBed],
+          ["stairgates", "Stairgates", LuFence],
+        ].map(([name, label, Icon, required]) => (
+          <Controller
+            key={name}
+            name={name}
+            control={control}
+            render={({ field, fieldState }) => (
+              <NumericInputGroup
+                label={label}
+                required={required}
+                value={field.value}
+                onChange={field.onChange}
+                icon={Icon}
+                error={fieldState.error}
+              />
+            )}
+          />
+        ))}
       </div>
 
       <div className="flex flex-1 gap-4 flex-col">
@@ -328,7 +260,7 @@ const BookingForm = () => {
             text="Revert Changes"
             icon={IoIosUndo}
             callbackFn={() =>
-              id === "New-Booking"
+              bookingId === "New-Booking"
                 ? reset(defaultFormData)
                 : reset({
                     ...booking,
@@ -362,9 +294,9 @@ const BookingForm = () => {
                     : null;
 
                 const payload =
-                  id !== "New-Booking"
+                  bookingId !== "New-Booking"
                     ? {
-                        id,
+                        id: watch("id"),
                         ...rest,
                         arrival_date: bookingDates?.startDate || null,
                         departure_date: bookingDates?.endDate || null,
@@ -378,16 +310,29 @@ const BookingForm = () => {
                       };
 
                 console.log("Submitting payload:", payload);
-                await upsertBooking.mutateAsync(payload);
+                const result = await upsertBooking.mutateAsync(payload);
+                console.log("Upsert result:", result);
 
                 navigate("/Bookings");
 
                 showToast({
                   type: "success",
-                  title: id ? "Booking Updated" : "Booking Created",
-                  message: id
+                  title: bookingId ? "Booking Updated" : "Booking Created",
+                  message: bookingId
                     ? "The booking has been successfully updated."
                     : "New booking successfully entered.",
+                });
+
+                createNotification({
+                  title: bookingId ? "Booking Updated" : "Booking Created",
+                  body: bookingId
+                    ? "has made ammendments to a booking:"
+                    : "has entered a new booking:",
+                  metaData: {
+                    url: `/Bookings/${bookingId}`,
+                    buttonText: "View Booking",
+                  },
+                  docRef: bookingId || result.booking_id,
                 });
               } catch (error) {
                 console.error("Save failed:", error.message);

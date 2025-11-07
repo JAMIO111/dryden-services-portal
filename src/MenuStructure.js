@@ -1,18 +1,10 @@
 import { RxDashboard } from "react-icons/rx";
-import { PiWarning } from "react-icons/pi";
-import {
-  BsFolder,
-  BsGear,
-  BsBoxes,
-  BsQuestionCircle,
-  BsPeople,
-  BsHouse,
-} from "react-icons/bs";
-import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
+import { BsPeople } from "react-icons/bs";
 import { IoReceiptOutline } from "react-icons/io5";
-import { BsHouseGear } from "react-icons/bs";
+import { BsHouseGear, BsBuildingGear } from "react-icons/bs";
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { IoCalendarOutline } from "react-icons/io5";
+import { MdOutlineHolidayVillage } from "react-icons/md";
 
 export const menuStructure = [
   {
@@ -38,7 +30,7 @@ export const menuStructure = [
   },
   {
     name: "Client Management",
-    icon: BsHouseGear,
+    icon: BsBuildingGear,
     path: "/Client-Management",
     subMenu: [
       {

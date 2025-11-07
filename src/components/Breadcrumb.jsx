@@ -1,20 +1,30 @@
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import { BiHome } from "react-icons/bi";
-import { IoFolderOpenOutline } from "react-icons/io5";
-import { PiWarning } from "react-icons/pi";
-import { BsBoxes, BsGear, BsPeople } from "react-icons/bs";
+import { IoFolderOpenOutline, IoReceiptOutline } from "react-icons/io5";
+import { BsBoxes, BsGear, BsPeople, BsBuildingGear } from "react-icons/bs";
+import { LuLayoutDashboard } from "react-icons/lu";
+import { MdOutlineHolidayVillage } from "react-icons/md";
+import { FiUsers } from "react-icons/fi";
 
 const iconMap = {
-  Dashboard: <BiHome />,
-  "Non-Conformance": <PiWarning />,
+  Dashboard: <LuLayoutDashboard />,
+  Bookings: <IoReceiptOutline />,
   Inventory: <BsBoxes />,
   "Human-Resources": <BsPeople />,
   Settings: <BsGear />,
+  Properties: <MdOutlineHolidayVillage />,
+  Owners: <FiUsers />,
+  "Client-Management": <BsBuildingGear />,
 };
 
-// Utility: convert "non-conformance" → "Non Conformance"
+// Utility: format normal route segments only
 function formatSegment(segment) {
+  // If it contains digits or looks like a booking ID, skip formatting
+  if (/\d/.test(segment) || /^BKG-\d{2}-\d+$/i.test(segment)) {
+    return segment; // leave as is
+  }
+
   return segment
     .replace(/-/g, " ")
     .split(" ")

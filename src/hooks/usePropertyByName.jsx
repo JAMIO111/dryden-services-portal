@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
 
-const fetchPropertiesById = async (propertyId) => {
+const fetchPropertyByName = async (propertyName) => {
   const { data, error } = await supabase
     .from("Properties")
     .select(
@@ -14,7 +14,7 @@ const fetchPropertiesById = async (propertyId) => {
       )
     `
     )
-    .eq("id", propertyId)
+    .eq("name", propertyName)
     .single();
 
   if (error) throw new Error(error.message);
@@ -25,11 +25,11 @@ const fetchPropertiesById = async (propertyId) => {
   return { ...data, Owners: owners };
 };
 
-export const usePropertyById = (propertyId) => {
+export const usePropertyByName = (propertyName) => {
   return useQuery({
-    queryKey: ["Property", propertyId],
-    queryFn: () => fetchPropertiesById(propertyId),
+    queryKey: ["Property", propertyName],
+    queryFn: () => fetchPropertyByName(propertyName),
     staleTime: 1000 * 60 * 5, // optional: 5 min cache
-    enabled: !!propertyId,
+    enabled: !!propertyName,
   });
 };

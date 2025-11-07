@@ -37,7 +37,7 @@ const ProfileImageSection = ({
           {imageUrl ? (
             <MdOutlineEdit className="h-6 w-6 text-primary-text m-2" />
           ) : (
-            <IoAdd className="h-7 w-7 text-primary-text m-1" />
+            <IoAdd className="h-7 w-7 text-primary-text m-1 transition-transform duration-500 hover:rotate-[180deg]" />
           )}
         </div>
         {imageUrl ? (

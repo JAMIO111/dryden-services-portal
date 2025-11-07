@@ -5,7 +5,7 @@ const fetchBookingById = async (bookingId) => {
   const { data, error } = await supabase
     .from("Bookings")
     .select("*")
-    .eq("id", bookingId)
+    .eq("booking_id", bookingId)
     .single();
   if (error) throw new Error(error.message);
   return data;

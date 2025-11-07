@@ -12,21 +12,17 @@ export const useUpsertBooking = () => {
         throw new Error("Property and valid booking dates are required.");
       }
 
-      // Build base query
+      // === Check for overlaps ===
       let query = supabase
         .from("Bookings")
-        .select("id, arrival_date, departure_date, booking_ref")
+        .select("id, arrival_date, departure_date, booking_ref, booking_id")
         .eq("property_id", property_id);
 
-      // Only exclude current booking if updating
-      if (id) {
-        query = query.neq("id", id);
-      }
+      if (id) query = query.neq("id", id);
 
       const { data: existingBookings, error: fetchError } = await query;
       if (fetchError) throw fetchError;
 
-      // Check for overlap
       const newStart = new Date(arrival_date);
       const newEnd = new Date(departure_date);
 
@@ -57,15 +53,45 @@ export const useUpsertBooking = () => {
         throw error;
       }
 
-      // Upsert logic
+      // === Generate sequential booking_id on INSERT only ===
+      let booking_id = bookingData.booking_id;
+      if (!id) {
+        const currentYear = new Date().getFullYear();
+        const yearSuffix = String(currentYear).slice(-2);
+
+        const { data: lastBooking, error: refError } = await supabase
+          .from("Bookings")
+          .select("booking_id")
+          .like("booking_id", `BKG-${yearSuffix}-%`)
+          .order("booking_id", { ascending: false })
+          .limit(1)
+          .single();
+
+        if (refError && refError.code !== "PGRST116") throw refError;
+
+        let nextNumber = 1;
+        if (lastBooking?.booking_id) {
+          const match = lastBooking.booking_id.match(/BKG-\d{2}-(\d{3})/);
+          if (match) nextNumber = parseInt(match[1], 10) + 1;
+        }
+
+        const nextNumberStr = String(nextNumber).padStart(3, "0");
+        booking_id = `BKG-${yearSuffix}-${nextNumberStr}`;
+      }
+
+      // === Upsert ===
       const { data, error } = id
         ? await supabase
             .from("Bookings")
-            .update(bookingData)
+            .update({ ...bookingData, booking_id })
             .eq("id", id)
             .select()
             .single()
-        : await supabase.from("Bookings").insert(bookingData).select().single();
+        : await supabase
+            .from("Bookings")
+            .insert({ ...bookingData, booking_id })
+            .select()
+            .single();
 
       if (error) throw error;
       return data;

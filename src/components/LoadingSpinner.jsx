@@ -7,12 +7,12 @@ const Spinner = () => (
       <div className={styles.loader}>
         <p>Loading</p>
         <div className={styles.words}>
+          <span className={styles.word}>Documents</span>
           <span className={styles.word}>Bookings</span>
           <span className={styles.word}>Properties</span>
           <span className={styles.word}>Owners</span>
           <span className={styles.word}>Dashboard</span>
-          <span className={styles.word}>Documents</span>
-          <span className={styles.word}>Documents</span>
+          <span className={styles.word}>Calendar</span>
         </div>
       </div>
     </div>

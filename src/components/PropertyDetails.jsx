@@ -37,7 +37,7 @@ const PropertyDetails = ({ property, selectedProperty }) => {
               icon={BsPencil}
               text="Edit Property Details"
               callbackFn={() =>
-                navigate(`/Client-Management/Properties/${property?.id}`)
+                navigate(`/Client-Management/Properties/${property?.name}`)
               }
             />
           </div>
@@ -122,7 +122,9 @@ const PropertyDetails = ({ property, selectedProperty }) => {
                 Property Owners
               </p>
               {owners?.map((owner) => (
-                <div className="mt-3 flex rounded-2xl border border-brand-primary/30 bg-brand-primary/20 p-2 flex-row gap-2">
+                <div
+                  key={owner.id}
+                  className="mt-3 flex rounded-2xl border border-brand-primary/30 bg-brand-primary/20 p-2 flex-row gap-2">
                   {owner.avatar ? (
                     <img
                       className="rounded-xl w-24 h-24 object-cover"

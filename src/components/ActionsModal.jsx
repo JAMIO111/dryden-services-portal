@@ -47,8 +47,8 @@ const ActionsModal = ({ item, position }) => {
   const navigate = useNavigate();
 
   const handleEditBooking = () => {
-    console.log(`Editing ${item.id}`);
-    navigate(`/Bookings/${item.id}`);
+    console.log(`Editing ${item.booking_id}`);
+    navigate(`/Bookings/${item.booking_id}`);
   };
 
   return createPortal(
@@ -74,7 +74,7 @@ const ActionsModal = ({ item, position }) => {
           color="blue"
           item={item}
           callback={() => {
-            console.log(`Scheduling recurring bookings ${item.id}`);
+            console.log(`Scheduling recurring bookings ${item.booking_id}`);
           }}
         />
         <ActionsModalItem
@@ -83,7 +83,7 @@ const ActionsModal = ({ item, position }) => {
           color="blue"
           item={item}
           callback={() => {
-            console.log(`Opened 8D for ${item.id}`);
+            console.log(`Opened 8D for ${item.booking_id}`);
           }}
         />
       </div>

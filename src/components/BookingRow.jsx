@@ -51,7 +51,7 @@ const BookingRow = ({
   return (
     <tr
       onClick={handleRowClick}
-      onDoubleClick={() => navigate(`/Bookings/${item.id}`)}
+      onDoubleClick={() => navigate(`/Bookings/${item.booking_id}`)}
       className={`text-primary-text hover:bg-hover-menu-color ${
         selected ? "bg-active-menu-color" : ""
       }`}>

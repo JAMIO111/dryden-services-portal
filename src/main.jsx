@@ -95,7 +95,7 @@ const router = createBrowserRouter([
             element: <BookingForm />,
           },
           {
-            path: "Bookings/:id",
+            path: "Bookings/:bookingId",
             element: <BookingForm />,
           },
           {
@@ -107,16 +107,12 @@ const router = createBrowserRouter([
             element: <Properties />,
           },
           {
-            path: "Client-Management/Properties/:id",
+            path: "Client-Management/Properties/:name",
             element: <PropertyForm />,
           },
           {
             path: "Client-Management/Properties/New-Property",
             element: <PropertyForm />,
-          },
-          {
-            path: "Client-Management/Owners/:id",
-            element: <OwnerForm />,
           },
           {
             path: "Client-Management/Owners/New-Owner",

@@ -2,7 +2,6 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { PiFilePlus } from "react-icons/pi";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useUser } from "@/contexts/UserProvider";
-import { useNCDateTrend } from "@/hooks/useNCDateTrend";
 import CTAButton from "../CTAButton";
 import { useNavigate } from "react-router-dom";
 import { getGreeting } from "@/lib/HelperFunctions";
@@ -46,16 +45,6 @@ const BookingsDashboard = () => {
   const memoisedRange = useMemo(
     () => selectedRange,
     [selectedRange.startDate, selectedRange.endDate]
-  );
-
-  const {
-    data: dateTrendData,
-    error: dateTrendError,
-    isLoading: isDateTrendLoading,
-  } = useNCDateTrend(
-    memoisedRange.startDate,
-    memoisedRange.endDate,
-    aggregation
   );
 
   const setPage = (newPage) => {
@@ -186,7 +175,6 @@ const BookingsDashboard = () => {
   const filterCount = activeFilters.length;
 
   console.log("Bookings Dashboard Data:", bookingsData);
-  console.log("Date Trend Data:", dateTrendData);
 
   return (
     <div className="flex bg-primary-bg flex-col flex-grow overflow-hidden">

@@ -13,7 +13,7 @@ import { CgClose } from "react-icons/cg";
 import JobSheetPrintModal from "../JobSheetPrintModal";
 
 const Dashboard = () => {
-  const { profile } = useUser();
+  const { profile, orgUsers } = useUser();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const today = useMemo(() => new Date(), []);
   const end = useMemo(() => {
@@ -21,6 +21,9 @@ const Dashboard = () => {
     s.setDate(today.getDate() + 14);
     return s;
   }, [today]);
+
+  console.log("Org Users in Dashboard:", orgUsers);
+  console.log("Profile in Dashboard:", profile);
 
   const [selectedRange, setSelectedRange] = useState({
     startDate: today,

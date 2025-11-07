@@ -6,7 +6,15 @@ export const PropertyFormSchema = z.object({
     .min(1, { message: "Property name must be at least 1 character long" })
     .max(40, {
       message: "Property name must not be more than 40 characters long",
-    }),
+    })
+    .transform((val) =>
+      val
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ")
+    ),
   bedrooms: z
     .number({ required_error: "Number of bedrooms is required" })
     .min(1),

@@ -3,14 +3,13 @@ import supabase from "../supabase-client";
 import { useUser } from "../contexts/UserProvider";
 
 export function useCreateNotification() {
-  const { profile } = useUser();
+  const { profile, orgUsers } = useUser();
   const createNotification = useCallback(
     async ({ title, body, metaData = {}, docRef }) => {
       // Step 1: Create the notification
       if (!profile) {
         throw new Error("User profile is not available");
       }
-      const orgId = profile.organisation_id;
       const authId = profile.auth_id;
       const { data: notif, error: notifError } = await supabase
         .from("Notifications")
@@ -29,17 +28,10 @@ export function useCreateNotification() {
       if (notifError)
         throw new Error(`Failed to create notification: ${notifError.message}`);
 
-      // Step 2: Get all users in the org
-      const { data: users, error: userError } = await supabase
-        .from("Employees")
-        .select("auth_id")
-        .eq("notifications", true);
-
-      if (userError)
-        throw new Error(`Failed to get users: ${userError.message}`);
+      const recipientUsers = orgUsers.filter((u) => u.auth_id === authId);
 
       // Step 3: Insert recipients
-      const recipientInserts = users.map((u) => ({
+      const recipientInserts = recipientUsers.map((u) => ({
         notification_id: notif.id,
         recipient_id: u.auth_id,
         read: false,

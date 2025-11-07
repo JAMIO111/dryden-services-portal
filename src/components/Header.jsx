@@ -5,6 +5,7 @@ import SearchBar from "./ui/SearchBar";
 import { useUser } from "../contexts/UserProvider";
 import { useNotification } from "../contexts/NotificationProvider";
 import { useNotifications } from "../hooks/useNotifications";
+import Breadcrumb from "./Breadcrumb";
 
 const Header = () => {
   const { profile } = useUser();
@@ -22,6 +23,10 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center border-b-1 border-border-color bg-secondary-bg px-4">
       <SearchBar />
+      <div className="flex-1 mx-3">
+        <Breadcrumb />
+      </div>
+
       <div className="flex justify-between items-center py-2 gap-3">
         <HeaderIcon icon={GoMail} top={7} right={3} />
         <button onClick={() => openPane()}>

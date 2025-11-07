@@ -35,24 +35,31 @@ const NotificationPane = () => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.3 }}
-            className="w-120 max-w-full h-full bg-primary-bg p-4 shadow-s border border-border-color/50 rounded-2xl"
-            onClick={(e) => e.stopPropagation()} // Prevent backdrop close when clicking inside
+            className="w-120 overflow-hidden max-w-full h-full bg-primary-bg p-0 shadow-s border border-border-color/50 rounded-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()} // Prevent backdrop close
           >
-            <div className="flex justify-between items-center mb-3 text-primary-text">
-              <h2 className="text-lg font-semibold">Notifications</h2>
-              <button
-                className="hover:bg-border-color transition-colors duration-300 rounded-md cursor-pointer p-1.5"
-                onClick={closePane}>
-                <CgClose />
-              </button>
+            {/* Sticky Blur Header */}
+            <div className="sticky top-0 z-20 backdrop-blur-md bg-transparent p-4 flex flex-col gap-2 border-b border-border-color/30">
+              <div className="flex justify-between items-center text-primary-text">
+                <h2 className="text-lg font-semibold">Notifications</h2>
+                <button
+                  className="hover:bg-border-color transition-colors duration-300 rounded-md cursor-pointer p-1.5"
+                  onClick={closePane}>
+                  <CgClose />
+                </button>
+              </div>
+
+              {/* Sliding Selector */}
+              <SlidingSelectorGeneric
+                options={["All", "New", "Read"]}
+                value={typeFilter}
+                onChange={setTypeFilter}
+                notifications={notifications}
+              />
             </div>
-            <SlidingSelectorGeneric
-              options={["All", "New", "Read"]}
-              value={typeFilter}
-              onChange={setTypeFilter}
-              notifications={notifications}
-            />
-            <div className="mt-4 flex flex-col gap-2">
+
+            {/* Notifications List */}
+            <div className="flex-1 overflow-y-auto flex flex-col gap-2 p-4">
               {isLoading ? (
                 <div className="flex-col text-center items-center justify-center text-secondary-text border border-dashed border-border-color/50 p-6 rounded-xl">
                   Loading Notifications...

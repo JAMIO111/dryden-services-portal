@@ -11,7 +11,7 @@ import { PiNumberThreeFill } from "react-icons/pi";
 import { GiMagicBroom } from "react-icons/gi";
 import NumericInputGroup from "../NumericInputGroup";
 import TextInput from "../ui/TextInput";
-import { usePropertyById } from "@/hooks/usePropertyById";
+import { usePropertyByName } from "@/hooks/usePropertyByName";
 import CTAButton from "../CTAButton";
 import { useModal } from "@/contexts/ModalContext";
 import KeyCodeForm from "./KeyCodeForm";
@@ -31,8 +31,10 @@ import { useToast } from "../../contexts/ToastProvider";
 import ToggleButton from "../ui/ToggleButton";
 import ProfileImageSection from "../ProfileImageSection";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 
 const defaultFormData = {
+  id: undefined,
   name: undefined,
   bedrooms: 0,
   sleeps: 0,
@@ -53,32 +55,28 @@ const PropertyForm = () => {
   const queryClient = useQueryClient();
   const { openModal, closeModal } = useModal();
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { name } = useParams();
   const { showToast } = useToast();
-  const { data: property, isLoading } = usePropertyById(
-    id !== "New-Property" ? id : null
+  const { createNotification } = useCreateNotification();
+  const { data: property, isLoading } = usePropertyByName(
+    name !== "New-Property" ? name : null
   );
   const { data: packages } = usePackages();
-  console.log("Property Data:", property);
-  console.log("Packages Data:", packages);
-  const upsertProperty = useUpsertProperty();
 
-  const normalizedProperty = {
-    ...property,
-    line_1: property?.line_1 || undefined,
-    line_2: property?.line_2 || undefined,
-  };
+  const upsertProperty = useUpsertProperty();
 
   const {
     control,
     handleSubmit,
     reset,
     trigger,
+    register,
+    watch,
     formState: { errors, isSubmitting, isValid, isDirty },
   } = useForm({
     resolver: zodResolver(PropertyFormSchema),
     mode: "all",
-    defaultValues: defaultFormData,
+    defaultValues: { ...defaultFormData, ...(property || {}) },
     delayError: 250,
   });
 
@@ -105,26 +103,21 @@ const PropertyForm = () => {
   });
 
   useEffect(() => {
-    if (id === "New-Property") {
+    if (name === "New-Property") {
       reset(defaultFormData);
     } else if (property) {
-      reset(normalizedProperty);
+      reset({ ...defaultFormData, ...property });
     }
-  }, [id, property, reset]);
+  }, [name, property, reset]);
 
-  console.log("Form Errors:", errors);
-  console.log("Is Form Valid:", isValid);
-  console.log("Is Form Dirty:", isDirty);
-
-  console.log("KeyCode Fields:", keyCodeFields);
-  console.log("Owner Fields:", ownerFields);
+  console.log("Form Values:", watch());
 
   const openManageOwnersModal = () => {
     openModal({
       title: "Manage Property Owners",
       content: (
         <PropertyOwnerForm
-          propertyId={id}
+          propertyId={property.id}
           defaultOwners={ownerFields.map((field) => field)}
           onSave={(updatedOwners) => {
             replaceOwners(updatedOwners); // replaces entire array in form state
@@ -192,7 +185,7 @@ const PropertyForm = () => {
             width="w-full"
             onImageChange={(url) => {
               // Optional: update your parent state, e.g. via TanStack Query invalidate
-              queryClient.invalidateQueries(["Property", property.id]);
+              queryClient.invalidateQueries(["Property", property.name]);
               console.log("New avatar URL:", url);
             }}
           />
@@ -202,6 +195,7 @@ const PropertyForm = () => {
               control={control}
               render={({ field, fieldState }) => (
                 <TextInput
+                  required
                   label="Property Name"
                   placeholder="Enter property name..."
                   {...field}
@@ -260,36 +254,42 @@ const PropertyForm = () => {
               label: "Line 1",
               icon: IoLocation,
               textTransform: "capitalize",
+              required: true,
             },
             {
               name: "line_2",
               label: "Line 2",
               icon: IoLocation,
               textTransform: "capitalize",
+              required: false,
             },
             {
               name: "town",
               label: "Town",
               icon: BsFillBuildingsFill,
               textTransform: "capitalize",
+              required: true,
             },
             {
               name: "county",
               label: "County",
               icon: FaTreeCity,
               textTransform: "capitalize",
+              required: true,
             },
             {
               name: "postcode",
               label: "Postcode",
               icon: BsMailbox2Flag,
               textTransform: "uppercase",
+              required: true,
             },
             {
               name: "what_3_words",
               label: "What 3 Words",
               icon: PiNumberThreeFill,
               textTransform: "lowercase",
+              required: true,
             },
           ].map((input) => (
             <Controller
@@ -298,6 +298,7 @@ const PropertyForm = () => {
               control={control}
               render={({ field, fieldState }) => (
                 <TextInput
+                  required={input.required}
                   label={input.label}
                   placeholder={`Enter ${input.label.toLowerCase()}...`}
                   {...field}
@@ -500,8 +501,10 @@ const PropertyForm = () => {
             icon={FaCheck}
             callbackFn={handleSubmit(async (data) => {
               try {
-                const payload =
-                  id && id !== "New-Property" ? { ...data, id } : { ...data };
+                // For new properties, id will be undefined
+                const payload = { ...data, id: watch("id") };
+
+                console.log("Payload Data:", payload);
 
                 await upsertProperty.mutateAsync({
                   propertyData: payload,
@@ -511,22 +514,25 @@ const PropertyForm = () => {
 
                 showToast({
                   type: "success",
-                  title: id ? "Property Updated" : "Property Created",
-                  message: id
+                  title: payload.id ? "Property Updated" : "Property Created",
+                  message: payload.id
                     ? "The property has been successfully updated."
                     : "New property successfully entered.",
                 });
 
                 navigate("/Client-Management/Properties");
               } catch (error) {
-                console.error("Save failed:", error.message);
+                console.error("Save Failed:", error);
 
                 showToast({
                   type: "error",
                   title: "Save Failed",
-                  message:
-                    error?.message ||
-                    "An unexpected error occurred while saving.",
+                  message: error?.message?.includes(
+                    'duplicate key value violates unique constraint "Properties_name_key"'
+                  )
+                    ? "A property with this name already exists. Please choose a different name."
+                    : error?.message ||
+                      "An unexpected error occurred while saving the property. Please try again.",
                 });
               }
             })}
