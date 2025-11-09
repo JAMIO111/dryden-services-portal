@@ -99,7 +99,6 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
     setCurrentMonth(today);
     setCurrentYear(today);
     onChange(today);
-    setOpen(false);
   };
 
   const calendarDays = getCalendarDays(currentMonth);
@@ -161,12 +160,12 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
                   <div className="flex gap-1">
                     <button
                       onClick={() => handleMonthChange(-1)}
-                      className="hover:bg-secondary-color text-primary-text px-2 py-1 rounded">
+                      className="hover:bg-border-color/50 cursor-pointer text-primary-text px-2 py-1 rounded">
                       <IoChevronDown className="w-5 h-5 rotate-180" />
                     </button>
                     <button
                       onClick={() => handleMonthChange(1)}
-                      className="hover:bg-tertiary-color text-primary-text px-2 py-1 rounded">
+                      className="hover:bg-border-color/50 cursor-pointer text-primary-text px-2 py-1 rounded">
                       <IoChevronDown className="w-5 h-5" />
                     </button>
                   </div>
@@ -187,9 +186,7 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
                     const classes = [
                       "h-7 w-7 rounded-lg cursor-pointer text-primary-text hover:bg-brand-primary/30 flex items-center justify-center",
                       isSelected ? "bg-brand-primary text-white" : "",
-                      isCurrentDay && !isSelected
-                        ? "border border-brand-primary"
-                        : "",
+                      isCurrentDay && !isSelected ? "shadow-s" : "",
                     ].join(" ");
 
                     return (
@@ -214,12 +211,12 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
                     <div className="flex gap-1">
                       <button
                         onClick={() => handleYearChange(-1)}
-                        className="hover:bg-border-color text-primary-text px-2 py-1 rounded">
+                        className="hover:bg-border-color/50 text-primary-text px-2 py-1 rounded">
                         <IoChevronDown className="w-5 h-5 rotate-180" />
                       </button>
                       <button
                         onClick={() => handleYearChange(1)}
-                        className="hover:bg-border-color text-primary-text px-2 py-1 rounded">
+                        className="hover:bg-border-color/50 text-primary-text px-2 py-1 rounded">
                         <IoChevronDown className="w-5 h-5" />
                       </button>
                     </div>
@@ -241,9 +238,7 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
                       const classes = [
                         "h-8 flex-1 rounded-lg cursor-pointer flex text-primary-text items-center justify-center hover:bg-brand-primary/30",
                         isSelectedMonth ? "bg-brand-primary text-white" : "",
-                        isTodayMonth && !isSelectedMonth
-                          ? "border border-brand-primary"
-                          : "",
+                        isTodayMonth && !isSelectedMonth ? "shadow-s" : "",
                       ].join(" ");
 
                       return (
@@ -260,7 +255,7 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
 
                 <button
                   onClick={handleGoToToday}
-                  className="mt-4 text-brand-primary hover:underline text-sm self-center">
+                  className="mt-4 cursor-pointer text-brand-primary hover:underline text-sm self-center">
                   Go to today
                 </button>
               </div>

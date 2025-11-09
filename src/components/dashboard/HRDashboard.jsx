@@ -1,14 +1,16 @@
-import React from "react";
 import { useUser } from "@/contexts/UserProvider";
-import { PiFilePlus } from "react-icons/pi";
+import { PiUsersThree } from "react-icons/pi";
+import { FaUmbrellaBeach } from "react-icons/fa";
+import { MdOutlineSick } from "react-icons/md";
 import DateRangePicker from "../ui/DateRangePicker";
-import CTAButton from "../CTAButton";
 import { getGreeting } from "@/lib/HelperFunctions";
 import { useState, useMemo } from "react";
+import DashboardCard from "./DashboardCard";
+import { useEmployees } from "@/hooks/useEmployees";
 
 const HRDashboard = () => {
   const { profile } = useUser();
-  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const { data: employees } = useEmployees();
   const today = useMemo(() => new Date(), []);
   const end = useMemo(() => {
     const s = new Date(today);
@@ -28,7 +30,7 @@ const HRDashboard = () => {
   }, [selectedRange]);
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col bg-primary-bg h-full w-full">
       <div className="flex flex-col gap-2 xl:flex-row items-start xl:items-center justify-between px-6 py-1 shadow-sm border-b border-border-color shrink-0 bg-primary-bg">
         <div className="flex flex-col">
           <h1 className="text-xl whitespace-nowrap text-primary-text">
@@ -40,12 +42,6 @@ const HRDashboard = () => {
         </div>
         <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
           <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
-            <CTAButton
-              callbackFn={() => setPreviewModalOpen(true)}
-              type="main"
-              text="Preview Job Sheets"
-              icon={PiFilePlus}
-            />
             <DateRangePicker
               alignment="right"
               width="w-80"
@@ -66,8 +62,18 @@ const HRDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col flex-1 p-3 gap-3 bg-red-500">
-        <div className="flex flex-row h-35 bg-green-500"></div>
+      <div className="flex flex-col flex-1 p-3 gap-3 ">
+        <div className="flex flex-row h-35 gap-3">
+          <DashboardCard
+            title="Total Employees"
+            value={employees?.filter((emp) => emp.is_active).length}
+            icon={PiUsersThree}
+            link="/Human-Resources/Employees"
+          />
+          <DashboardCard title="Holidays" icon={FaUmbrellaBeach} />
+          <DashboardCard title="Sick Leave" icon={MdOutlineSick} />
+          <DashboardCard title="New Hires" icon={PiUsersThree} />
+        </div>
         <div className="flex flex-row flex-1 bg-green-500"></div>
       </div>
     </div>

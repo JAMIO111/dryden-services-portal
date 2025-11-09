@@ -1,16 +1,17 @@
-import React, { useState } from "react";
-import { fetchAll } from "../api/supabaseApi";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useGlobalSearch } from "../contexts/SearchProvider";
 import CTAButton from "./CTAButton";
 import { HiOutlinePencil } from "react-icons/hi2";
 import { IoPersonAdd } from "react-icons/io5";
+import { AiOutlineUserAdd } from "react-icons/ai";
 import { useModal } from "@/contexts/ModalContext";
 import EmployeeForm from "./forms/EmployeeForm.jsx";
+import { useEmployees } from "@/hooks/useEmployees";
 
 const Employees = () => {
   const { openModal } = useModal();
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const { data: employees, isLoading, error } = useEmployees();
 
   const getInitials = (firstName, lastName) => {
     const firstInitial = firstName?.charAt(0)?.toUpperCase();
@@ -18,16 +19,10 @@ const Employees = () => {
     return `${firstInitial}${lastInitial}`;
   };
 
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["Employees"],
-    queryFn: () => fetchAll("Employees"),
-    staleTime: 1000 * 60 * 60, // 1 hour
-  });
-
   const { debouncedSearchTerm } = useGlobalSearch();
 
   const filteredData = debouncedSearchTerm
-    ? data?.filter((employee) => {
+    ? employees?.filter((employee) => {
         const term = debouncedSearchTerm.toLowerCase();
         return (
           employee.first_name?.toLowerCase().includes(term) ||
@@ -38,7 +33,7 @@ const Employees = () => {
           term === (employee.is_active ? "active" : "inactive")
         );
       })
-    : data;
+    : employees;
 
   const handleAddEmployee = () => {
     openModal({
@@ -84,7 +79,7 @@ const Employees = () => {
           )}
           <CTAButton
             text={"Add Employee"}
-            icon={IoPersonAdd}
+            icon={AiOutlineUserAdd}
             type={"main"}
             callbackFn={handleAddEmployee}
           />

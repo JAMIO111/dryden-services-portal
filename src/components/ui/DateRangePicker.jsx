@@ -205,7 +205,7 @@ export default function DateRangePicker({
           <div className="flex flex-col flex-1 w-70 p-4">
             <div className="flex justify-between items-center mb-2">
               <button
-                className="hover:bg-border-color/20 rounded p-1 text-primary-text"
+                className="hover:shadow-s cursor-pointer active:scale-95 rounded p-1 text-primary-text"
                 onClick={goToPreviousMonth}>
                 <IoChevronDown className="rotate-90" />
               </button>
@@ -216,7 +216,7 @@ export default function DateRangePicker({
                 })}
               </span>
               <button
-                className="hover:bg-border-color/20 rounded p-1 text-primary-text"
+                className="hover:shadow-s cursor-pointer active:scale-95 rounded p-1 text-primary-text"
                 onClick={goToNextMonth}>
                 <IoChevronDown className="rotate-270" />
               </button>

@@ -1,10 +1,9 @@
 import { RxDashboard } from "react-icons/rx";
 import { BsPeople } from "react-icons/bs";
 import { IoReceiptOutline } from "react-icons/io5";
-import { BsHouseGear, BsBuildingGear } from "react-icons/bs";
+import { BsBuildingGear } from "react-icons/bs";
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { IoCalendarOutline } from "react-icons/io5";
-import { MdOutlineHolidayVillage } from "react-icons/md";
 
 export const menuStructure = [
   {

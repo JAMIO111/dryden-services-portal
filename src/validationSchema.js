@@ -258,13 +258,14 @@ export const MeetingFormSchema = z
 
 export const EmployeeFormSchema = z.object({
   first_name: z.string({ required_error: "First name is required" }),
+  middle_name: z.string().optional().nullable().or(z.literal("")),
   surname: z.string({ required_error: "Surname is required" }),
-  email: z
-    .string({ required_error: "Email is required" })
-    .email("Invalid email format"),
+  address: z.string({ required_error: "Address is required" }),
+  email: z.string().email("Invalid email format").optional(),
   phone: z
     .string()
-    .regex(/^[+()\-0-9\s]{6,20}$/, { message: "Invalid phone number format" }),
+    .regex(/^[+()\-0-9\s]{6,20}$/, { message: "Invalid phone number format" })
+    .optional(),
   dob: z.date({ required_error: "Date of birth is required" }),
   gender: z.string({ required_error: "Gender is required" }),
   job_title: z.string({ required_error: "Job title is required" }),
@@ -272,5 +273,7 @@ export const EmployeeFormSchema = z.object({
   ni_number: z
     .string()
     .max(15, { message: "NI Number must not exceed 15 characters" }),
-  is_active: z.boolean().default(true),
+  is_active: z.boolean(),
+  is_driver: z.boolean(),
+  is_cscs: z.boolean(),
 });

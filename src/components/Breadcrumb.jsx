@@ -1,7 +1,11 @@
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import { BiHome } from "react-icons/bi";
-import { IoFolderOpenOutline, IoReceiptOutline } from "react-icons/io5";
+import {
+  IoFolderOpenOutline,
+  IoReceiptOutline,
+  IoCalendarOutline,
+} from "react-icons/io5";
 import { BsBoxes, BsGear, BsPeople, BsBuildingGear } from "react-icons/bs";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { MdOutlineHolidayVillage } from "react-icons/md";
@@ -16,6 +20,7 @@ const iconMap = {
   Properties: <MdOutlineHolidayVillage />,
   Owners: <FiUsers />,
   "Client-Management": <BsBuildingGear />,
+  Calendar: <IoCalendarOutline />,
 };
 
 // Utility: format normal route segments only

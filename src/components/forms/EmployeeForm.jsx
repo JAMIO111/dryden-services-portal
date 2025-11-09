@@ -3,7 +3,6 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IoText } from "react-icons/io5";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEmployeeById } from "@/hooks/useEmployeeById";
 import { EmployeeFormSchema } from "../../validationSchema";
 import ProfileImageSection from "../ProfileImageSection";
 import TextInput from "../ui/TextInput";
@@ -37,6 +36,8 @@ const defaultFormData = {
   address: "",
   ni_number: "",
   is_driver: false,
+  is_cscs: false,
+  is_active: true,
 };
 
 const EmployeeForm = ({ employee }) => {
@@ -46,7 +47,7 @@ const EmployeeForm = ({ employee }) => {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty, isValid },
   } = useForm({
     resolver: zodResolver(EmployeeFormSchema),
     mode: "onChange",
@@ -241,6 +242,24 @@ const EmployeeForm = ({ employee }) => {
             )}
           />
         </div>
+        <div className="col-span-2">
+          <Controller
+            name="start_date"
+            control={control}
+            render={({ field, fieldState }) => (
+              <DatePicker
+                required
+                label="Start of Employment"
+                currentDate={field.value}
+                onDateChange={field.onChange}
+                placeholder="Select start date..."
+                {...field}
+                error={fieldState.error}
+              />
+            )}
+          />
+        </div>
+
         {/* NI Number */}
         <Controller
           name="ni_number"
@@ -316,6 +335,7 @@ const EmployeeForm = ({ employee }) => {
         <CTAButton
           type="success"
           text="Save"
+          disabled={!isDirty || !isValid || isSubmitting}
           icon={GiSaveArrow}
           callbackFn={() => console.log("CTA Button Clicked")}
         />

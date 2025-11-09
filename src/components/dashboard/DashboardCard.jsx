@@ -2,12 +2,14 @@ import { FiTrendingUp } from "react-icons/fi";
 import { LuTrendingDown } from "react-icons/lu";
 import currencyCodes from "@/currencyCodes";
 import { useOrganisation } from "@/contexts/OrganisationProvider";
+import { TbExternalLink } from "react-icons/tb";
+import { useNavigate } from "react-router-dom";
 
 const DashboardCard = ({
   title = "Title",
   icon: Icon,
   currencyItem = false,
-  value = "123,456.78",
+  value = "123",
   trend = 25,
   isSelected = false,
   onClick,
@@ -15,6 +17,7 @@ const DashboardCard = ({
   isLoading = false,
   isPositiveGood = true,
   previousPeriodLabel = "Previous Period",
+  link = null,
 }) => {
   const colorMap = {
     lime: {
@@ -47,7 +50,7 @@ const DashboardCard = ({
 
   if (isLoading) {
     return (
-      <div className="flex relative flex-row justify-start p-4 h-full w-full rounded-2xl bg-secondary-bg">
+      <div className="flex relative flex-row justify-start p-4 h-full w-full rounded-2xl shadow-s bg-secondary-bg">
         <div className="flex flex-col justify-center items-left gap-2 flex-grow">
           <div className="h-8 w-32 rounded shimmer" />
           <div className="h-4 w-24 rounded shimmer" />
@@ -62,6 +65,7 @@ const DashboardCard = ({
   }
 
   const { organisation } = useOrganisation();
+  const navigate = useNavigate();
   const base_currency = organisation?.base_currency || "GBP";
 
   function getCurrencyFormatter(currencyCode) {
@@ -110,8 +114,8 @@ const DashboardCard = ({
         isSelected
           ? "bg-gradient-to-b from-cta-color/40 to-cta-color/70 "
           : "bg-secondary-bg"
-      } flex relative flex-row justify-start p-4 h-full w-full rounded-2xl`}>
-      <div className="flex flex-col justify-center items-left">
+      } flex relative flex-row justify-start p-4 h-full w-full rounded-2xl shadow-s`}>
+      <div className="flex flex-col justify-center gap-1 items-left">
         <p
           className={`${
             isSelected ? "text-white" : "text-primary-text"
@@ -149,18 +153,25 @@ const DashboardCard = ({
               </span>
             </>
           ) : (
-            <span
+            <label
               className={`text-sm ${isSelected ? "text-white" : "text-muted"}`}>
               No trend data
-            </span>
+            </label>
           )}
         </div>
       </div>
+      {link && (
+        <div
+          onClick={() => navigate(link)}
+          className="absolute bottom-3 text-icon-color right-3 hover:shadow-s p-1 rounded-lg active:scale-95">
+          <TbExternalLink className="w-6 h-6" />
+        </div>
+      )}
 
       <div
         className={`${
           isSelected ? "bg-white/10" : ""
-        } flex absolute top-2 right-2 justify-center items-center h-12 w-12 rounded-full ${
+        } flex shadow-m absolute top-3 right-3 justify-center items-center h-12 w-12 rounded-full ${
           currentColor.bg
         }`}>
         <Icon
