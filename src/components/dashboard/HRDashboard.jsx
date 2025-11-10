@@ -10,7 +10,7 @@ import { useEmployees } from "@/hooks/useEmployees";
 
 const HRDashboard = () => {
   const { profile } = useUser();
-  const { data: employees } = useEmployees();
+  const { data: employees, isLoading } = useEmployees();
   const today = useMemo(() => new Date(), []);
   const end = useMemo(() => {
     const s = new Date(today);
@@ -62,19 +62,27 @@ const HRDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col flex-1 p-3 gap-3 ">
-        <div className="flex flex-row h-35 gap-3">
+      <div className="flex flex-col flex-1 ">
+        <div className="flex flex-row p-3 gap-3">
           <DashboardCard
             title="Total Employees"
             value={employees?.filter((emp) => emp.is_active).length}
             icon={PiUsersThree}
             link="/Human-Resources/Employees"
+            isLoading={isLoading}
           />
           <DashboardCard title="Holidays" icon={FaUmbrellaBeach} />
           <DashboardCard title="Sick Leave" icon={MdOutlineSick} />
           <DashboardCard title="New Hires" icon={PiUsersThree} />
         </div>
-        <div className="flex flex-row flex-1 bg-green-500"></div>
+        <div className="flex flex-row flex-1 p-3 pt-0 gap-3">
+          <div className="flex-3 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
+            More to come soon!
+          </div>
+          <div className="flex-2 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
+            More to come soon!
+          </div>
+        </div>
       </div>
     </div>
   );

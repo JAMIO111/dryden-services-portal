@@ -96,12 +96,6 @@ const Dashboard = () => {
           </div>
           <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
             <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
-              <CTAButton
-                callbackFn={() => setPreviewModalOpen(true)}
-                type="main"
-                text="Preview Job Sheets"
-                icon={PiFilePlus}
-              />
               <DateRangePicker
                 alignment="right"
                 width="w-80"

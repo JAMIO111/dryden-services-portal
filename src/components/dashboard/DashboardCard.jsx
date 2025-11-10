@@ -10,7 +10,7 @@ const DashboardCard = ({
   icon: Icon,
   currencyItem = false,
   value = "123",
-  trend = 25,
+  trend,
   isSelected = false,
   onClick,
   color = "cta-color",
@@ -120,13 +120,16 @@ const DashboardCard = ({
           className={`${
             isSelected ? "text-white" : "text-primary-text"
           } text-3xl font-semibold`}>
-          {currencyItem ? currencyFormatter(value) : value}
+          {isLoading ? "-" : currencyItem ? currencyFormatter(value) : value}
         </p>
-        <p className={`${isSelected ? "text-white" : "text-primary-text/80"}`}>
+        <p
+          className={`${
+            isSelected ? "text-white" : "text-primary-text/80 text-lg"
+          }`}>
           {title}
         </p>
         <div className="flex flex-row items-center gap-2">
-          {trend !== undefined && trend !== null ? (
+          {trend ? (
             <>
               <span
                 className={`text-md flex items-center gap-1 ${
@@ -154,7 +157,9 @@ const DashboardCard = ({
             </>
           ) : (
             <label
-              className={`text-sm ${isSelected ? "text-white" : "text-muted"}`}>
+              className={`text-sm mt-3 ${
+                isSelected ? "text-white" : "text-muted"
+              }`}>
               No trend data
             </label>
           )}

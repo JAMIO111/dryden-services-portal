@@ -127,7 +127,7 @@ const router = createBrowserRouter([
             element: <OwnerForm />,
           },
           {
-            path: "Client-Management/Leads/:id",
+            path: "Client-Management/Leads/:title",
             element: <LeadDetails />,
           },
           {

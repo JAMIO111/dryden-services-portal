@@ -3,7 +3,7 @@ import LeadCorrespondence from "./LeadCorrespondence.jsx";
 import LeadMeeting from "./LeadMeeting.jsx";
 import { HiOutlinePhone } from "react-icons/hi2";
 import { TfiEmail } from "react-icons/tfi";
-import { useLeadById } from "@/hooks/useLeadById.jsx";
+import { useLeadByTitle } from "@/hooks/useLeadByTitle.jsx";
 import { useNavigate, useParams } from "react-router-dom";
 import CorrespondenceForm from "./forms/CorrespondenceForm.jsx";
 import MeetingForm from "./forms/MeetingForm.jsx";
@@ -11,9 +11,9 @@ import SlidingSelector from "./ui/SlidingSelectorGeneric.jsx";
 
 const LeadDetails = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { title } = useParams();
   const [selectedTab, setSelectedTab] = useState("Lead Details");
-  const { data: lead, isLoading } = useLeadById(id);
+  const { data: lead, isLoading } = useLeadByTitle(title);
 
   const statusColor = {
     "Hot Lead": "bg-red-400/20 text-red-500",
@@ -135,9 +135,9 @@ const LeadDetails = () => {
         {/* Scrollable Form Section */}
         <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:hidden">
           {selectedTab === "Correspondence" && (
-            <CorrespondenceForm leadId={id} />
+            <CorrespondenceForm leadId={lead.id} />
           )}
-          {selectedTab === "Meeting" && <MeetingForm leadId={id} />}
+          {selectedTab === "Meeting" && <MeetingForm leadId={lead.id} />}
         </div>
       </div>
     </div>

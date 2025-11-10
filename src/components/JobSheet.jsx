@@ -101,21 +101,21 @@ const JobSheet = forwardRef(({ job }, ref) => {
             <div className="flex gap-3 flex-row mb-1.5">
               <div className="flex-2 font-semibold">Job Date</div>
               <div className="flex-3 ">
-                {new Date(job?.jobDate).toLocaleDateString("en-GB", {
+                {`${new Date(job?.jobDate).toLocaleDateString("en-GB", {
                   weekday: "short",
                   day: "numeric",
                   month: "short",
-                })}
+                })} - ${job?.bookingId}`}
               </div>
             </div>
             <div className="flex gap-3 flex-row">
               <div className="flex-2 font-semibold">Next Arrival</div>
               <div className="flex-3 ">
-                {new Date(job?.nextArrival).toLocaleDateString("en-GB", {
+                {`${new Date(job?.nextArrival).toLocaleDateString("en-GB", {
                   weekday: "short",
                   day: "numeric",
                   month: "short",
-                })}
+                })} - ${job?.bookingDetails?.booking_id}`}
               </div>
             </div>
             <div className="flex gap-3 flex-row mt-1.5">
@@ -270,14 +270,18 @@ const JobSheet = forwardRef(({ job }, ref) => {
           </p>
           <div className="flex h-12 gap-6 items-end">
             <div className="mb-7">Team Leader:</div>
-            <div className="flex-1 items-stretch flex flex-col gap-1">
+            <div className="flex-3 items-stretch flex flex-col gap-1">
               <div className="border-b"></div>
               <p className="text-center text-sm">PRINT NAME</p>
             </div>
 
-            <div className="flex-1 items-stretch flex flex-col gap-1">
+            <div className="flex-3 items-stretch flex flex-col gap-1">
               <div className="border-b"></div>
               <p className="text-center text-sm">SIGNATURE</p>
+            </div>
+            <div className="flex-2 items-stretch flex flex-col gap-1">
+              <div className="border-b"></div>
+              <p className="text-center text-sm">DATE:</p>
             </div>
           </div>
         </div>

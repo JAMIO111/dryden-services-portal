@@ -4,30 +4,9 @@ import { useModal } from "@/contexts/ModalContext";
 import DailyCalendarItems from "@components/DailyCalendarItems";
 import SlidingSelectorGeneric from "./ui/SlidingSelectorGeneric";
 import { useCalendarItems } from "@/hooks/useCalendarItems";
-import { useJobs } from "@/hooks/useJobs";
-import { useMeetings } from "@/hooks/useMeetings";
 
 export default function FullScreenCalendar() {
   const [view, setView] = useState("Weekly");
-  const { data: calendarItems, isLoading } = useCalendarItems(
-    new Date("2025-08-01"),
-    new Date("2025-12-30")
-  );
-
-  const { jobs, isLoading: jobsLoading } = useJobs(
-    new Date("2025-08-01"),
-    new Date("2025-12-30")
-  );
-
-  const { data: meetings, isLoading: meetingsLoading } = useMeetings(
-    new Date("2025-08-01"),
-    new Date("2025-12-30")
-  );
-
-  console.log("Calendar Items:", calendarItems);
-  console.log("Jobs for Calendar:", jobs);
-  console.log("Meetings for Calendar:", meetings);
-
   const { openModal } = useModal();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -51,20 +30,47 @@ export default function FullScreenCalendar() {
   // --- WEEKLY DAYS ---
   const startOfWeek = useMemo(() => {
     const d = new Date(currentDate);
-    const day = d.getDay();
-    d.setDate(d.getDate() - day); // Sunday-start week
-    return d;
+    const day = d.getDay(); // 0 = Sunday
+    const localStart = new Date(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate() - day
+    );
+    localStart.setHours(0, 0, 0, 0);
+    return localStart;
   }, [currentDate]);
 
   const weeklyDays = useMemo(() => {
     const days = [];
     for (let i = 0; i < 7; i++) {
-      const newDate = new Date(startOfWeek);
-      newDate.setDate(startOfWeek.getDate() + i);
+      const newDate = new Date(
+        startOfWeek.getFullYear(),
+        startOfWeek.getMonth(),
+        startOfWeek.getDate() + i
+      );
       days.push(newDate);
     }
     return days;
   }, [startOfWeek]);
+
+  const calendarStartDate = useMemo(() => {
+    if (view === "Monthly")
+      return calendarDays.find((d) => d !== null) || new Date();
+    return weeklyDays[0];
+  }, [view, calendarDays, weeklyDays]);
+
+  const calendarEndDate = useMemo(() => {
+    if (view === "Monthly")
+      return [...calendarDays].reverse().find((d) => d !== null) || new Date();
+    return weeklyDays[6];
+  }, [view, calendarDays, weeklyDays]);
+
+  const { data: calendarItems, isLoading } = useCalendarItems(
+    calendarStartDate,
+    calendarEndDate
+  );
+
+  console.log("Calendar Items:", calendarItems);
 
   // --- NAVIGATION ---
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
@@ -76,20 +82,14 @@ export default function FullScreenCalendar() {
 
   // --- DAILY MODAL ---
   const formattedDate = selectedDate
-    ? selectedDate.toISOString().split("T")[0]
+    ? `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${selectedDate
+        .getDate()
+        .toString()
+        .padStart(2, "0")}`
     : null;
-  const tasks = formattedDate ? tasksData[formattedDate] || [] : [];
-
-  const openDailyItemsModal = (date) => {
-    openModal({
-      title: `Calendar Items for ${date.toLocaleDateString("en-GB", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })}`,
-      content: <DailyCalendarItems date={date} tasks={tasks} />,
-    });
-  };
+  const tasks = formattedDate ? calendarItems[formattedDate] || [] : [];
 
   // --- SHARED DAY CELL RENDERER ---
   const renderDayCell = (date, idx) => {
@@ -108,6 +108,20 @@ export default function FullScreenCalendar() {
     const meetingsForDay = itemsForDay.filter(
       (item) => item.type === "meeting"
     );
+    const absencesForDay = itemsForDay.filter(
+      (item) => item.type === "absence"
+    );
+
+    const openDailyItemsModal = (date) => {
+      openModal({
+        title: `Calendar Items for ${date.toLocaleDateString("en-GB", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })}`,
+        content: <DailyCalendarItems date={date} items={itemsForDay} />,
+      });
+    };
 
     return (
       <div
@@ -134,8 +148,14 @@ export default function FullScreenCalendar() {
         </span>
         {jobsForDay.length + meetingsForDay.length > 0 && (
           <span className="absolute top-2 right-2 text-xs text-error-color">
-            {jobsForDay.length + meetingsForDay.length} item
-            {jobsForDay.length + meetingsForDay.length !== 1 ? "s" : ""}
+            {jobsForDay.length + meetingsForDay.length + absencesForDay.length}{" "}
+            item
+            {jobsForDay.length +
+              meetingsForDay.length +
+              absencesForDay.length !==
+            1
+              ? "s"
+              : ""}
           </span>
         )}
 
@@ -147,7 +167,7 @@ export default function FullScreenCalendar() {
                   key={job.id}
                   className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                   <div className="bg-blue-500 rounded-full w-0.75 h-full"></div>
-                  <div className="flex flex-col py-2 gap-1">
+                  <div className="flex flex-col py-1 gap-1">
                     <p className="font-semibold text-sm">Changeover</p>
                     <p className="text-xs">{job.propertyDetails.name}</p>
                     <p className="text-xs text-secondary-text">
@@ -174,6 +194,7 @@ export default function FullScreenCalendar() {
                   {jobsForDay.length > 1 ? "s" : ""}
                 </span>
               )}
+
           {meetingsForDay.length > 0 && view === "Monthly" ? (
             <span className="bg-green-400/30 text-primary-text text-xs px-1 rounded">
               {meetingsForDay.length} Meeting
@@ -187,7 +208,7 @@ export default function FullScreenCalendar() {
                 key={meeting.id}
                 className="bg-green-400/30 p-1 rounded flex flex-row gap-2">
                 <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
-                <div className="flex flex-col py-2 gap-1">
+                <div className="flex flex-col py-1 gap-1">
                   <p className="text-sm font-semibold text-primary-text">
                     Meeting
                   </p>
@@ -208,6 +229,34 @@ export default function FullScreenCalendar() {
               </span>
             ))
           )}
+          {absencesForDay.length > 0 && view === "Weekly"
+            ? absencesForDay.map((absence) => (
+                <span
+                  key={absence.id}
+                  className="bg-red-400/30 p-1 rounded flex flex-row gap-2">
+                  <div className="bg-red-500 rounded-full w-0.75 h-full"></div>
+                  <div className="flex flex-col py-1 gap-1">
+                    <p className="text-sm font-semibold text-primary-text">
+                      Absence
+                    </p>
+                    <p className="text-xs text-primary-text">
+                      {absence.category
+                        ?.toLowerCase()
+                        .replace(/\b\w/g, (char) => char.toUpperCase())}
+                    </p>
+                    <p className="text-xs text-secondary-text">
+                      {absence.reason}
+                    </p>
+                  </div>
+                </span>
+              ))
+            : absencesForDay.length > 0 &&
+              view === "Monthly" && (
+                <span className="bg-red-400/30 text-primary-text text-xs px-1 rounded">
+                  {absencesForDay.length} Absence
+                  {absencesForDay.length > 1 ? "s" : ""}
+                </span>
+              )}
         </div>
       </div>
     );

@@ -6,10 +6,10 @@ const LeadMeeting = ({ meeting }) => {
     <div className="flex items-stretch flex-col mr-5">
       <div className="flex p-3 flex-col">
         <div className="flex flex-row gap-3 justify-start items-center">
-          <div className="flex rounded-full justify-center items-center w-9 h-9 bg-cta-color">
+          <div className="flex rounded-full justify-center items-center shadow-m w-9 h-9 bg-cta-color">
             <IoCalendarOutline className="w-5 h-5 text-white" />
           </div>
-          <div className="flex justify-center items-center rounded-full p-0.5 bg-primary-text">
+          <div className="flex justify-center items-center rounded-full p-0.5 bg-primary-bg shadow-m">
             {meeting.created_by?.avatar ? (
               <img
                 src={meeting.created_by.avatar || ""}
@@ -46,7 +46,7 @@ const LeadMeeting = ({ meeting }) => {
         </div>
       </div>
       <div className="flex flex-row justify-start items-stretch">
-        <div className="w-[2px] rounded-full bg-border-color ml-6.5"></div>
+        <div className="w-[2px] rounded-full bg-border-color ml-6.5 mr-10"></div>
         <MeetingCard meeting={meeting} />
       </div>
     </div>

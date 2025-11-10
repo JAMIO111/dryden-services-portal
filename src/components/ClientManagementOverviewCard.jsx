@@ -248,11 +248,8 @@ export default function ClientManagementOverviewCard({
                       key={i}
                       className="flex flex-col items-center flex-shrink-0">
                       <img
-                        src={
-                          property.image ||
-                          `https://i.pravatar.cc/100?u=${property.id || i}`
-                        }
-                        alt={property.name}
+                        src={property.image || `No Image`}
+                        alt={"No Image"}
                         className="w-20 h-14 object-cover rounded-xl border border-border-color"
                       />
                       <span className="text-sm text-secondary-text mt-2 truncate max-w-[4rem]">

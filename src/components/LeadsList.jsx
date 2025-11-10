@@ -117,7 +117,7 @@ export default function LeadList() {
                       type="main"
                       text="View Details"
                       callbackFn={() =>
-                        navigate(`/Client-Management/Leads/${lead.id}`)
+                        navigate(`/Client-Management/Leads/${lead.title}`)
                       }
                     />
                     <CTAButton

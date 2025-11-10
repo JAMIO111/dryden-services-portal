@@ -51,14 +51,16 @@ const Employees = () => {
 
   const getStatusPill = (status) => {
     return (
-      <span
-        className={`px-3 py-1 rounded-full text-sm font-medium ${
-          status
-            ? "bg-green-500/20 text-green-600 border border-green-500/40"
-            : "bg-red-500/20 text-red-600 border border-red-500/40"
-        }`}>
-        {status ? "Active" : "Inactive"}
-      </span>
+      <div className="rounded-full flex w-fit bg-tertiary-bg">
+        <span
+          className={`px-3 py-1 shadow-s rounded-full text-sm font-medium ${
+            status
+              ? "bg-green-500/20 text-green-600 border border-green-500/40"
+              : "bg-red-500/20 text-red-600 border border-red-500/40"
+          }`}>
+          {status ? "Active" : "Inactive"}
+        </span>
+      </div>
     );
   };
 
@@ -68,7 +70,7 @@ const Employees = () => {
         <p className="text-primary-text text-xl font-semibold pl-1">
           Employee Directory
         </p>
-        <div className="flex flex-row gap-2 pr-6">
+        <div className="flex flex-row gap-2">
           {selectedEmployee && (
             <CTAButton
               text={"Edit Details"}
@@ -110,6 +112,13 @@ const Employees = () => {
           ) : (
             filteredData.map((employee, index) => (
               <div
+                onDoubleClick={() => {
+                  setSelectedEmployee(employee); // optional if you want to highlight
+                  openModal({
+                    title: "Edit Employee Details",
+                    content: <EmployeeForm employee={employee} />, // use the clicked employee directly
+                  });
+                }}
                 onClick={
                   selectedEmployee?.id === employee.id
                     ? () => setSelectedEmployee(null)

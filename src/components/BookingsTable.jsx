@@ -115,6 +115,11 @@ const BookingsTable = ({
               </th>
               <th>
                 <div className="table-header">
+                  <span className="font-normal">#</span> Booking ID
+                </div>
+              </th>
+              <th>
+                <div className="table-header">
                   <CiTextAlignCenter /> Booking Ref
                 </div>
               </th>

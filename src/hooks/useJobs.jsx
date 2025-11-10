@@ -15,6 +15,7 @@ export function useJobs(startDate, endDate) {
         .select(
           `
           id,
+          booking_id,
           property_id,
           arrival_date,
           departure_date,
@@ -44,7 +45,7 @@ export function useJobs(startDate, endDate) {
       const { data: allBookings, error: allErr } = await supabase
         .from("Bookings")
         .select(
-          "id, property_id, arrival_date, departure_date, is_return_guest, is_owner_booking, adults, children, infants, pets, cots, highchairs, stairgates"
+          "id, property_id, booking_id, arrival_date, departure_date, is_return_guest, is_owner_booking, adults, children, infants, pets, cots, highchairs, stairgates"
         )
         .order("arrival_date", { ascending: true });
 
@@ -79,6 +80,7 @@ export function useJobs(startDate, endDate) {
 
         return {
           jobId: booking.id,
+          bookingId: booking.booking_id,
           propertyId: booking.property_id,
           propertyDetails: booking.Properties ?? null,
           jobDate: booking.departure_date,

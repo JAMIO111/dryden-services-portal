@@ -25,7 +25,7 @@ const NavItem = ({
           `flex gap-3 w-full rounded-lg ml-2 p-2 h-9 items-center border border-transparent
   ${
     isActive
-      ? "text-white border-cta-color hover:bg-cta-color/80 bg-cta-color/50"
+      ? "text-white border-cta-color bg-cta-color/80 hover:bg-cta-color/50 shadow-s"
       : "text-primary-text hover:border-cta-color/20 hover:bg-cta-color/10"
   }`
         }

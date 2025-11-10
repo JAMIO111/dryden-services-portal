@@ -85,7 +85,7 @@ export default function SlidingSelector({
             )}>
             <p
               className={clsx({
-                "group-hover:text-cta-color group-hover:scale-110": !isActive,
+                "group-hover:text-cta-color group-hover:scale-105": !isActive,
               })}>
               {label}
             </p>

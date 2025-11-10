@@ -29,7 +29,7 @@ const CTAButton = ({
     success:
       "border border-success-btn-border bg-success-btn-bg text-primary-text hover:bg-success-btn-bg-hover hover:border-success-btn-border-hover",
     neutral:
-      "border border-neutral-btn-border bg-neutral-btn-bg text-primary-text hover:bg-neutral-btn-bg-hover hover:border-neutral-btn-border-hover",
+      "border border-neutral-btn-border bg-tertiary-bg text-primary-text hover:bg-secondary-bg/50 hover:border-neutral-btn-border-hover",
   };
 
   return (

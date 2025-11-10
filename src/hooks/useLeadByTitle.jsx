@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
 
-const fetchLeadsById = async (leadId) => {
+const fetchLeadsByTitle = async (leadTitle) => {
   const { data, error } = await supabase
     .from("Leads")
     .select(
@@ -27,7 +27,7 @@ const fetchLeadsById = async (leadId) => {
     )
   `
     )
-    .eq("id", leadId)
+    .eq("title", leadTitle)
     .single();
 
   if (error) throw new Error(error.message);
@@ -35,11 +35,11 @@ const fetchLeadsById = async (leadId) => {
   return data;
 };
 
-export const useLeadById = (leadId) => {
+export const useLeadByTitle = (leadTitle) => {
   return useQuery({
-    queryKey: ["Lead", leadId],
-    queryFn: () => fetchLeadsById(leadId),
+    queryKey: ["Lead", leadTitle],
+    queryFn: () => fetchLeadsByTitle(leadTitle),
     staleTime: 1000 * 60 * 5, // optional: 5 min cache
-    enabled: !!leadId,
+    enabled: !!leadTitle,
   });
 };

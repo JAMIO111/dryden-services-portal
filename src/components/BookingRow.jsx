@@ -65,8 +65,9 @@ const BookingRow = ({
           onDoubleClick={(e) => e.stopPropagation()}
         />
       </td>
+      <td className="p-2">{item.booking_id}</td>
       <td className="p-2">{item.booking_ref}</td>
-      <td className="p-2">{item.property_name}</td>
+      <td className="p-2 font-semibold">{item.property_name}</td>
       <td className="p-2">{formattedArrivalDate}</td>
       <td className="p-2">{formattedDepartureDate}</td>
       <td className="p-2">
