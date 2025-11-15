@@ -1,86 +1,82 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import CTAButton from "./CTAButton";
 import { useModal } from "@/contexts/ModalContext";
 import DailyCalendarItems from "@components/DailyCalendarItems";
 import SlidingSelectorGeneric from "./ui/SlidingSelectorGeneric";
 import { useCalendarItems } from "@/hooks/useCalendarItems";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+// --- UTC helpers to avoid DST issues ---
+function getSundayUTC(date) {
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+  const day = d.getUTCDay();
+  d.setUTCDate(d.getUTCDate() - day);
+  return d;
+}
+
+function getFirstOfMonthUTC(date) {
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
+}
+
+function formatDateKey(date) {
+  return `${date.getUTCFullYear()}-${(date.getUTCMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${date.getUTCDate().toString().padStart(2, "0")}`;
+}
 
 export default function FullScreenCalendar() {
-  const [view, setView] = useState("Weekly");
-  const { openModal } = useModal();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const navigate = useNavigate();
+  const { openModal, closeModal } = useModal();
+  const [params, setParams] = useSearchParams();
+
+  // --- Initial view & date from URL
+  const initialView = params.get("view") || "Weekly";
+  const initialDate = params.get("date")
+    ? new Date(params.get("date"))
+    : new Date();
+
+  const [view, setView] = useState(initialView);
+  const [focusedDate, setFocusedDate] = useState(initialDate);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+  // --- Normalize date based on view
+  const normalizedDate = useMemo(() => {
+    if (view === "Monthly") return getFirstOfMonthUTC(focusedDate);
+    return getSundayUTC(focusedDate);
+  }, [view, focusedDate]);
 
-  // --- MONTHLY DAYS ---
-  const firstDayOfMonth = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  // --- Sync URL
+  useEffect(() => {
+    setParams({
+      view,
+      date: normalizedDate.toISOString().slice(0, 10),
+    });
+  }, [view, normalizedDate]);
 
-  const calendarDays = useMemo(() => {
-    const days = [];
-    for (let i = 0; i < firstDayOfMonth; i++) days.push(null);
-    for (let d = 1; d <= daysInMonth; d++) days.push(new Date(year, month, d));
-    const totalCells = Math.ceil(days.length / 7) * 7;
-    while (days.length < totalCells) days.push(null);
-    return days;
-  }, [year, month, firstDayOfMonth, daysInMonth]);
-
-  // --- WEEKLY DAYS ---
-  const startOfWeek = useMemo(() => {
-    const d = new Date(currentDate);
-    const day = d.getDay(); // 0 = Sunday
-    const localStart = new Date(
-      d.getFullYear(),
-      d.getMonth(),
-      d.getDate() - day
-    );
-    localStart.setHours(0, 0, 0, 0);
-    return localStart;
-  }, [currentDate]);
-
-  const weeklyDays = useMemo(() => {
-    const days = [];
-    for (let i = 0; i < 7; i++) {
-      const newDate = new Date(
-        startOfWeek.getFullYear(),
-        startOfWeek.getMonth(),
-        startOfWeek.getDate() + i
-      );
-      days.push(newDate);
-    }
-    return days;
-  }, [startOfWeek]);
-
-  const calendarStartDate = useMemo(() => {
-    if (view === "Monthly")
-      return calendarDays.find((d) => d !== null) || new Date();
-    return weeklyDays[0];
-  }, [view, calendarDays, weeklyDays]);
-
+  // --- Calendar items
+  const calendarStartDate = normalizedDate;
   const calendarEndDate = useMemo(() => {
-    if (view === "Monthly")
-      return [...calendarDays].reverse().find((d) => d !== null) || new Date();
-    return weeklyDays[6];
-  }, [view, calendarDays, weeklyDays]);
+    if (view === "Monthly") {
+      const year = normalizedDate.getUTCFullYear();
+      const month = normalizedDate.getUTCMonth();
+      const firstDayOfMonth = new Date(Date.UTC(year, month, 1)).getUTCDay();
+      const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+      const totalCells = Math.ceil((firstDayOfMonth + daysInMonth) / 7) * 7;
+      return new Date(Date.UTC(year, month, totalCells - firstDayOfMonth));
+    } else {
+      const d = new Date(normalizedDate);
+      d.setUTCDate(d.getUTCDate() + 6);
+      return d;
+    }
+  }, [normalizedDate, view]);
 
-  const { data: calendarItems, isLoading } = useCalendarItems(
+  const { data: calendarItems } = useCalendarItems(
     calendarStartDate,
     calendarEndDate
   );
 
-  console.log("Calendar Items:", calendarItems);
-
-  // --- NAVIGATION ---
-  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-  const prevWeek = () =>
-    setCurrentDate((d) => new Date(d.setDate(d.getDate() - 7)));
-  const nextWeek = () =>
-    setCurrentDate((d) => new Date(d.setDate(d.getDate() + 7)));
-
-  // --- DAILY MODAL ---
   const formattedDate = selectedDate
     ? `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
         .toString()
@@ -89,16 +85,85 @@ export default function FullScreenCalendar() {
         .toString()
         .padStart(2, "0")}`
     : null;
-  const tasks = formattedDate ? calendarItems[formattedDate] || [] : [];
 
-  // --- SHARED DAY CELL RENDERER ---
+  function getWeekNumber(date) {
+    const d = new Date(
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    );
+    const dayNum = d.getUTCDay() || 7; // Make Sunday = 7
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum); // Thursday in current week
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    return weekNo;
+  }
+
+  // --- Navigation
+  const goNext = () => {
+    const d = new Date(normalizedDate);
+    if (view === "Monthly") {
+      d.setUTCMonth(d.getUTCMonth() + 1);
+      d.setUTCDate(1);
+    } else {
+      d.setUTCDate(d.getUTCDate() + 7);
+    }
+    setFocusedDate(d);
+  };
+
+  const goPrev = () => {
+    const d = new Date(normalizedDate);
+    if (view === "Monthly") {
+      d.setUTCMonth(d.getUTCMonth() - 1);
+      d.setUTCDate(1);
+    } else {
+      d.setUTCDate(d.getUTCDate() - 7);
+    }
+    setFocusedDate(d);
+  };
+
+  const switchView = (newView) => {
+    let d = new Date(focusedDate);
+    if (newView === "Monthly") d = getFirstOfMonthUTC(d);
+    else d = getSundayUTC(d);
+    setView(newView);
+    setFocusedDate(d);
+  };
+
+  // --- Build calendar grids ---
+  const calendarDays = useMemo(() => {
+    if (view !== "Monthly") return [];
+    const year = normalizedDate.getUTCFullYear();
+    const month = normalizedDate.getUTCMonth();
+    const firstDay = new Date(Date.UTC(year, month, 1)).getUTCDay();
+    const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    const days = [];
+    for (let i = 0; i < firstDay; i++) days.push(null);
+    for (let d = 1; d <= daysInMonth; d++)
+      days.push(new Date(Date.UTC(year, month, d)));
+    const totalCells = Math.ceil(days.length / 7) * 7;
+    while (days.length < totalCells) days.push(null);
+    return days;
+  }, [normalizedDate, view]);
+
+  const weeklyDays = useMemo(() => {
+    if (view !== "Weekly") return [];
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(normalizedDate);
+      d.setUTCDate(d.getUTCDate() + i);
+      days.push(d);
+    }
+    return days;
+  }, [normalizedDate, view]);
+
+  // --- Render day cell with indicators ---
   const renderDayCell = (date, idx) => {
-    if (!date)
+    if (!date) {
       return (
         <div
           key={idx}
           className="border border-border-color bg-secondary-bg cursor-default"></div>
       );
+    }
 
     const dateKey = `${date.getFullYear()}-${(date.getMonth() + 1)
       .toString()
@@ -119,14 +184,24 @@ export default function FullScreenCalendar() {
           day: "numeric",
           year: "numeric",
         })}`,
-        content: <DailyCalendarItems date={date} items={itemsForDay} />,
+        content: (
+          <DailyCalendarItems
+            date={date}
+            items={itemsForDay}
+            navigate={navigate}
+            closeModal={closeModal}
+          />
+        ),
       });
     };
 
     return (
       <div
         key={idx}
-        onClick={() => openDailyItemsModal(date)}
+        onClick={() => {
+          setSelectedDate(date);
+          openDailyItemsModal(date);
+        }}
         className={`relative border border-border-color flex flex-col cursor-pointer
         hover:bg-cta-color/5 
         ${
@@ -140,129 +215,117 @@ export default function FullScreenCalendar() {
             : "bg-tertiary-bg"
         }`}>
         {/* Date Label */}
-        <span className="font-semibold text-secondary-text absolute top-1 left-2 z-10">
+        <span className="font-semibold text-secondary-text absolute top-1 left-2 z-10 text-right">
           {date.getDate()}
           {view === "Weekly"
             ? ` ${date.toLocaleString("default", { month: "short" })}`
             : ""}
         </span>
-        {jobsForDay.length + meetingsForDay.length > 0 && (
+
+        {/* Item counter */}
+        {itemsForDay.length > 0 && (
           <span className="absolute top-2 right-2 text-xs text-error-color">
-            {jobsForDay.length + meetingsForDay.length + absencesForDay.length}{" "}
-            item
-            {jobsForDay.length +
-              meetingsForDay.length +
-              absencesForDay.length !==
-            1
-              ? "s"
-              : ""}
+            {itemsForDay.length} item{itemsForDay.length !== 1 ? "s" : ""}
           </span>
         )}
 
         {/* Indicators */}
-        <div className="absolute top-8 bottom-1 left-1 right-1 overflow-y-auto flex flex-col justify-start gap-1">
-          {jobsForDay.length > 0 && view === "Weekly"
-            ? jobsForDay.map((job) => (
-                <span
-                  key={job.id}
-                  className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
-                  <div className="bg-blue-500 rounded-full w-0.75 h-full"></div>
-                  <div className="flex flex-col py-1 gap-1">
-                    <p className="font-semibold text-sm">Changeover</p>
-                    <p className="text-xs">{job.propertyDetails.name}</p>
-                    <p className="text-xs text-secondary-text">
-                      {`Next Arrival: ${
-                        job.nextArrival
-                          ? new Date(job.nextArrival).toLocaleString(
-                              "default",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "2-digit",
-                              }
-                            )
-                          : "N/A"
-                      }`}
-                    </p>
-                  </div>
-                </span>
-              ))
-            : jobsForDay.length > 0 &&
-              view === "Monthly" && (
-                <span className="bg-blue-400/30 text-primary-text text-xs px-1 rounded">
-                  {jobsForDay.length} Changeover
-                  {jobsForDay.length > 1 ? "s" : ""}
-                </span>
-              )}
+        <div className="absolute top-7 bottom-1 left-1 right-1 overflow-y-auto flex flex-col justify-start gap-1">
+          {jobsForDay.length > 0 &&
+            (view === "Weekly"
+              ? jobsForDay.map((job) => (
+                  <span
+                    key={job.id}
+                    className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                    <div className="bg-blue-500 rounded-full w-0.75 h-full"></div>
+                    <div className="flex flex-col py-1 gap-1">
+                      <p className="font-semibold text-sm">Changeover</p>
+                      <p className="text-xs">{job.propertyDetails.name}</p>
+                      <p className="text-xs text-secondary-text">
+                        {`Next Arrival: ${
+                          job.nextArrival
+                            ? new Date(job.nextArrival).toLocaleDateString(
+                                "en-GB"
+                              )
+                            : "N/A"
+                        }`}
+                      </p>
+                    </div>
+                  </span>
+                ))
+              : view === "Monthly" && (
+                  <span className="bg-blue-400/30 text-primary-text text-xs px-1 rounded">
+                    {jobsForDay.length} Changeover
+                    {jobsForDay.length > 1 ? "s" : ""}
+                  </span>
+                ))}
 
-          {meetingsForDay.length > 0 && view === "Monthly" ? (
-            <span className="bg-green-400/30 text-primary-text text-xs px-1 rounded">
-              {meetingsForDay.length} Meeting
-              {meetingsForDay.length > 1 ? "s" : ""}
-            </span>
-          ) : (
-            meetingsForDay.length > 0 &&
-            view === "Weekly" &&
-            meetingsForDay.map((meeting) => (
-              <span
-                key={meeting.id}
-                className="bg-green-400/30 p-1 rounded flex flex-row gap-2">
-                <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
-                <div className="flex flex-col py-1 gap-1">
-                  <p className="text-sm font-semibold text-primary-text">
-                    Meeting
-                  </p>
-                  <p className="text-xs text-primary-text">{meeting.title}</p>
-                  <p className="text-xs text-secondary-text">
-                    {`${new Date(meeting.start_date).toLocaleString("default", {
-                      hour: "numeric",
-                      minute: "numeric",
-                    })} - ${new Date(meeting.end_date).toLocaleString(
-                      "default",
-                      {
-                        hour: "numeric",
-                        minute: "numeric",
-                      }
-                    )}`}
-                  </p>
-                </div>
-              </span>
-            ))
-          )}
-          {absencesForDay.length > 0 && view === "Weekly"
-            ? absencesForDay.map((absence) => (
-                <span
-                  key={absence.id}
-                  className="bg-red-400/30 p-1 rounded flex flex-row gap-2">
-                  <div className="bg-red-500 rounded-full w-0.75 h-full"></div>
-                  <div className="flex flex-col py-1 gap-1">
-                    <p className="text-sm font-semibold text-primary-text">
-                      Absence
-                    </p>
-                    <p className="text-xs text-primary-text">
-                      {absence.category
-                        ?.toLowerCase()
-                        .replace(/\b\w/g, (char) => char.toUpperCase())}
-                    </p>
-                    <p className="text-xs text-secondary-text">
-                      {absence.reason}
-                    </p>
-                  </div>
-                </span>
-              ))
-            : absencesForDay.length > 0 &&
-              view === "Monthly" && (
-                <span className="bg-red-400/30 text-primary-text text-xs px-1 rounded">
-                  {absencesForDay.length} Absence
-                  {absencesForDay.length > 1 ? "s" : ""}
-                </span>
-              )}
+          {meetingsForDay.length > 0 &&
+            (view === "Weekly"
+              ? meetingsForDay.map((meeting) => (
+                  <span
+                    key={meeting.id}
+                    className="bg-green-400/30 p-1 rounded flex flex-row gap-2">
+                    <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
+                    <div className="flex flex-col py-1 gap-1">
+                      <p className="text-sm font-semibold text-primary-text">
+                        Meeting
+                      </p>
+                      <p className="text-xs text-primary-text">
+                        {meeting.title}
+                      </p>
+                      <p className="text-xs text-secondary-text">
+                        {`${new Date(meeting.start_date).toLocaleTimeString(
+                          "en-GB",
+                          { hour: "2-digit", minute: "2-digit" }
+                        )} - ${new Date(meeting.end_date).toLocaleTimeString(
+                          "en-GB",
+                          { hour: "2-digit", minute: "2-digit" }
+                        )}`}
+                      </p>
+                    </div>
+                  </span>
+                ))
+              : view === "Monthly" && (
+                  <span className="bg-green-400/30 text-primary-text text-xs px-1 rounded">
+                    {meetingsForDay.length} Meeting
+                    {meetingsForDay.length > 1 ? "s" : ""}
+                  </span>
+                ))}
+
+          {absencesForDay.length > 0 &&
+            (view === "Weekly"
+              ? absencesForDay.map((absence) => (
+                  <span
+                    key={absence.id}
+                    className="bg-red-400/30 p-1 rounded flex flex-row gap-2">
+                    <div className="bg-red-500 rounded-full w-0.75 h-full"></div>
+                    <div className="flex flex-col py-1 gap-1">
+                      <p className="text-sm font-semibold text-primary-text">
+                        Absence
+                      </p>
+                      <p className="text-xs text-primary-text">
+                        {absence.category
+                          ?.toLowerCase()
+                          .replace(/\b\w/g, (c) => c.toUpperCase())}
+                      </p>
+                      <p className="text-xs text-secondary-text">
+                        {absence.reason}
+                      </p>
+                    </div>
+                  </span>
+                ))
+              : view === "Monthly" && (
+                  <span className="bg-red-400/30 text-primary-text text-xs px-1 rounded">
+                    {absencesForDay.length} Absence
+                    {absencesForDay.length > 1 ? "s" : ""}
+                  </span>
+                ))}
         </div>
       </div>
     );
   };
 
-  // --- WEEKDAY TITLES ---
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
@@ -272,27 +335,19 @@ export default function FullScreenCalendar() {
         <header className="p-3 gap-3 border-border-color flex justify-between items-center bg-tertiary-bg text-primary-text">
           <h1 className="text-2xl flex-1 font-bold">
             {view === "Monthly"
-              ? currentDate.toLocaleString("default", {
+              ? normalizedDate.toLocaleString("default", {
                   month: "long",
                   year: "numeric",
                 })
-              : (() => {
-                  const tempDate = new Date(currentDate);
-                  tempDate.setHours(0, 0, 0, 0);
-                  const dayNum = (tempDate.getDay() + 6) % 7;
-                  tempDate.setDate(tempDate.getDate() - dayNum + 3);
-                  const firstThursday = new Date(tempDate.getFullYear(), 0, 4);
-                  const weekNumber = Math.floor(
-                    1 + (tempDate - firstThursday) / (7 * 24 * 60 * 60 * 1000)
-                  );
-                  return `Week ${weekNumber}, ${tempDate.getFullYear()}`;
-                })()}
+              : `Week ${getWeekNumber(
+                  normalizedDate
+                )}, ${normalizedDate.getUTCFullYear()}`}
           </h1>
           <div className="flex w-60 items-center gap-4">
             <SlidingSelectorGeneric
               options={["Weekly", "Monthly"]}
               value={view}
-              onChange={setView}
+              onChange={switchView}
             />
           </div>
           <div className="flex gap-2 items-center shadow-s bg-secondary-bg p-1 rounded-xl">
@@ -300,13 +355,13 @@ export default function FullScreenCalendar() {
               width="w-28"
               type="main"
               text="Previous"
-              callbackFn={view === "Monthly" ? prevMonth : prevWeek}
+              callbackFn={goPrev}
             />
             <CTAButton
               width="w-28"
               type="main"
               text="Next"
-              callbackFn={view === "Monthly" ? nextMonth : nextWeek}
+              callbackFn={goNext}
             />
           </div>
         </header>

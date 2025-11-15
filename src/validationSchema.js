@@ -15,13 +15,10 @@ export const PropertyFormSchema = z.object({
         )
         .join(" ")
     ),
-  bedrooms: z
-    .number({ required_error: "Number of bedrooms is required" })
-    .min(1),
-  sleeps: z.number({ required_error: "Number of sleeps is required" }).min(1),
-  bathrooms: z
-    .number({ required_error: "Number of bathrooms is required" })
-    .min(1),
+  bedrooms: z.number(),
+  sleeps: z.number(),
+  bathrooms: z.number(),
+
   line_1: z
     .string({ required_error: "Address line 1 is required" })
     .min(2, { message: "Address line 1 must be at least 2 characters long" })
@@ -30,14 +27,18 @@ export const PropertyFormSchema = z.object({
     })
     .optional(),
   line_2: z
-    .string({ required_error: "Address line 2 is required" })
-    .min(2, { message: "Address line 2 must be at least 2 characters long" })
+    .string()
     .max(100, {
       message: "Address line 2 must not be more than 100 characters long",
     })
+    .nullable()
     .optional(),
   town: z.string({ required_error: "Town is required" }).min(2).max(100),
-  county: z.string({ required_error: "County is required" }).min(2).max(100),
+  county: z
+    .string({ required_error: "County is required" })
+    .min(2)
+    .max(100)
+    .or(z.literal("")),
   postcode: z
     .string()
     .regex(
@@ -51,11 +52,14 @@ export const PropertyFormSchema = z.object({
         .toUpperCase()
     ),
   what_3_words: z
-    .string({ required_error: "What3Words address is required" })
+    .string()
     .regex(
       /^(?:\/\/\/)?[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?$/,
       "Enter a valid What3Words address"
-    ),
+    )
+    .or(z.literal("")) // allow blank input
+    .optional()
+    .nullable(),
   KeyCodes: z
     .array(
       z.object({
@@ -261,11 +265,18 @@ export const EmployeeFormSchema = z.object({
   middle_name: z.string().optional().nullable().or(z.literal("")),
   surname: z.string({ required_error: "Surname is required" }),
   address: z.string({ required_error: "Address is required" }),
-  email: z.string().email("Invalid email format").optional(),
+  email: z
+    .string()
+    .email("Invalid email format")
+    .optional()
+    .nullable()
+    .or(z.literal("")),
   phone: z
     .string()
     .regex(/^[+()\-0-9\s]{6,20}$/, { message: "Invalid phone number format" })
-    .optional(),
+    .optional()
+    .nullable()
+    .or(z.literal("")),
   dob: z.date({ required_error: "Date of birth is required" }),
   gender: z.string({ required_error: "Gender is required" }),
   job_title: z.string({ required_error: "Job title is required" }),

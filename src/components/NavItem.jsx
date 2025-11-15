@@ -1,4 +1,4 @@
-import { NavLink, useMatch } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { HiOutlineChevronDown } from "react-icons/hi";
 
 const NavItem = ({
@@ -11,28 +11,33 @@ const NavItem = ({
   isSubMenuOpen,
   closeMenu,
 }) => {
-  const match = useMatch(path);
+  const location = useLocation();
+
+  // Check if current path starts with this path (parent + any child)
+  const match = location.pathname.startsWith(path);
 
   return (
-    <div className="nav-item flex pr-3 items-center ">
+    <div className="nav-item flex pr-3 items-center">
+      {/* Left indicator */}
       <div
-        className={`${
+        className={`w-1 h-9 rounded-r-md ${
           match ? "bg-cta-color" : "bg-transparent"
-        } w-1 h-9 rounded-r-md`}></div>
+        }`}></div>
+
       <NavLink
         title={label}
-        className={({ isActive }) =>
-          `flex gap-3 w-full rounded-lg ml-2 p-2 h-9 items-center border border-transparent
-  ${
-    isActive
-      ? "text-white border-cta-color bg-cta-color/80 hover:bg-cta-color/50 shadow-s"
-      : "text-primary-text hover:border-cta-color/20 hover:bg-cta-color/10"
-  }`
-        }
+        to={path}
         onClick={closeMenu}
-        to={path}>
+        className={`flex gap-3 w-full rounded-lg ml-2 p-2 h-9 items-center border border-transparent
+          ${
+            match
+              ? "text-white border-cta-color bg-cta-color/80 hover:bg-cta-color/50 shadow-s"
+              : "text-primary-text hover:border-cta-color/20 hover:bg-cta-color/10"
+          }
+        `}>
         {Icon && <Icon className="h-6 w-6" />}
         {isExpanded && <span className="text-sm flex-1">{label}</span>}
+
         {isExpanded && hasSubMenu && (
           <HiOutlineChevronDown
             onClick={(e) => {

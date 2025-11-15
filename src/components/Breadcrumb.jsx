@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { BiHome } from "react-icons/bi";
 import {
@@ -23,11 +23,9 @@ const iconMap = {
   Calendar: <IoCalendarOutline />,
 };
 
-// Utility: format normal route segments only
 function formatSegment(segment) {
-  // If it contains digits or looks like a booking ID, skip formatting
   if (/\d/.test(segment) || /^BKG-\d{2}-\d+$/i.test(segment)) {
-    return segment; // leave as is
+    return segment;
   }
 
   return segment
@@ -44,17 +42,30 @@ function splitPath(pathname) {
 const Breadcrumb = () => {
   const location = useLocation();
   const segments = splitPath(location.pathname);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        left: scrollRef.current.scrollWidth,
+        behavior: "smooth",
+      });
+    }
+  }, [location.pathname]);
 
   return (
-    <nav className="flex items-center gap-1 text-sm text-secondary-text font-semibold">
+    <nav
+      ref={scrollRef}
+      className="flex items-center gap-1 text-sm text-secondary-text font-semibold overflow-x-auto whitespace-nowrap [&::-webkit-scrollbar]:hidden">
       <BiHome />
       <Link to="/Dashboard" className="hover:underline">
         Home
       </Link>
+
       {segments.map((segment, index) => {
         const path = "/" + segments.slice(0, index + 1).join("/");
         return (
-          <React.Fragment key={segment}>
+          <React.Fragment key={path}>
             <span className="mx-1">/</span>
             {iconMap[segment] || <IoFolderOpenOutline />}
             <Link to={path} className="hover:underline capitalize">

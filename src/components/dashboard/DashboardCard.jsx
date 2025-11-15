@@ -166,11 +166,11 @@ const DashboardCard = ({
         </div>
       </div>
       {link && (
-        <div
+        <button
           onClick={() => navigate(link)}
           className="absolute bottom-3 text-icon-color right-3 hover:shadow-s p-1 rounded-lg active:scale-95">
           <TbExternalLink className="w-6 h-6" />
-        </div>
+        </button>
       )}
 
       <div

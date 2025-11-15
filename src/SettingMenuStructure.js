@@ -4,6 +4,7 @@ import { BsBell } from "react-icons/bs";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { TbDeviceDesktopCog } from "react-icons/tb";
 import { BsGear } from "react-icons/bs";
+import { LuUserCog } from "react-icons/lu";
 
 const SettingMenuStructure = [
   {
@@ -15,7 +16,7 @@ const SettingMenuStructure = [
   {
     name: "Account",
     path: "Account",
-    icon: MdOutlineManageAccounts,
+    icon: LuUserCog,
     subMenu: [],
   },
   {

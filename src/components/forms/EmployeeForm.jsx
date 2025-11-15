@@ -28,13 +28,15 @@ const defaultFormData = {
   id: null,
   first_name: "",
   surname: "",
+  middle_name: "",
   gender: "",
   job_title: "",
-  dob: new Date("1990-01-01"),
+  dob: null,
   email: "",
   phone: "",
   address: "",
   ni_number: "",
+  start_date: null,
   is_driver: false,
   is_cscs: false,
   is_active: true,
@@ -47,6 +49,7 @@ const EmployeeForm = ({ employee }) => {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting, isDirty, isValid },
   } = useForm({
     resolver: zodResolver(EmployeeFormSchema),
@@ -73,6 +76,10 @@ const EmployeeForm = ({ employee }) => {
   }, [employee, reset]);
 
   console.log("Rendering EmployeeForm with employee:", employee);
+  console.log("Form errors:", errors);
+  console.log("Form is dirty:", isDirty);
+  console.log("Form is valid:", isValid);
+  console.log("Form Values Employee", watch());
 
   return (
     <form
@@ -155,6 +162,7 @@ const EmployeeForm = ({ employee }) => {
                 label="Date of Birth"
                 currentDate={field.value}
                 onDateChange={field.onChange}
+                defaultPageDate={new Date("1990-01-01")}
                 placeholder="Select date of birth..."
                 {...field}
                 error={fieldState.error}
@@ -266,7 +274,6 @@ const EmployeeForm = ({ employee }) => {
           control={control}
           render={({ field, fieldState }) => (
             <TextInput
-              required
               icon={PiPassword}
               label="NI Number"
               placeholder="Enter NI number..."

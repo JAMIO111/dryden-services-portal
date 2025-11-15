@@ -39,7 +39,7 @@ const NotificationPane = () => {
             onClick={(e) => e.stopPropagation()} // Prevent backdrop close
           >
             {/* Sticky Blur Header */}
-            <div className="sticky top-0 z-20 backdrop-blur-md bg-transparent p-4 flex flex-col gap-2 border-b border-border-color/30">
+            <div className="sticky top-0 z-20 p-4 flex flex-col gap-2 border-b border-border-color/70">
               <div className="flex justify-between items-center text-primary-text">
                 <h2 className="text-lg font-semibold">Notifications</h2>
                 <button

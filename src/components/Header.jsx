@@ -23,7 +23,7 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center border-b-1 border-border-color bg-secondary-bg px-4">
       <SearchBar />
-      <div className="flex-1 mx-3">
+      <div className="flex-1 min-w-0 mx-3">
         <Breadcrumb />
       </div>
 
@@ -38,7 +38,7 @@ const Header = () => {
           />
         </button>
         <div className="flex flex-col ml-3">
-          <span className="text-primary-text text-right font-semibold">
+          <span className="text-primary-text text-right font-semibold whitespace-nowrap">
             {userName}
           </span>
           <span className="text-right text-secondary-text">{jobTitle}</span>

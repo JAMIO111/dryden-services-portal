@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { IoChevronDown } from "react-icons/io5";
 import { TbCalendarTime, TbCalendar, TbClock } from "react-icons/tb";
+import { motion } from "framer-motion";
 import {
   startOfMonth,
   endOfMonth,
@@ -33,7 +34,14 @@ const monthsOfYear = [
   "Dec",
 ];
 
-const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
+const DatePicker = ({
+  label,
+  currentDate,
+  onChange,
+  displayMode = "date",
+  placeholder,
+  defaultPageDate,
+}) => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date());
@@ -87,8 +95,12 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
     setCurrentYear(updated);
   };
 
-  const handleYearChange = (amount) =>
-    setCurrentYear(addYears(currentYear, amount));
+  const handleYearChange = (amount) => {
+    const updated = addYears(currentYear, amount);
+    setCurrentYear(updated);
+    setCurrentMonth((prev) => setYear(prev, updated.getFullYear()));
+  };
+
   const handleMonthChange = (amount) => {
     const updated = addMonths(currentMonth, amount);
     setCurrentMonth(updated);
@@ -105,6 +117,16 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = Array.from({ length: 12 }, (_, i) => i * 5);
 
+  useEffect(() => {
+    if (open && currentDate) {
+      setCurrentMonth(currentDate);
+      setCurrentYear(currentDate);
+    } else if (open && defaultPageDate) {
+      setCurrentMonth(defaultPageDate);
+      setCurrentYear(defaultPageDate);
+    }
+  }, [open, currentDate]);
+
   return (
     <div
       className="flex flex-col w-full gap-1 h-fit min-w-0 relative"
@@ -115,7 +137,7 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
 
       {/* Input Box */}
       <div
-        className="flex items-center justify-between transition-all duration-300 bg-text-input-color rounded-lg shadow-s hover:shadow-m p-2.5 text-sm text-primary-text cursor-pointer"
+        className="flex items-center select-none justify-between transition-all duration-300 bg-text-input-color rounded-lg shadow-s hover:shadow-m p-2.5 text-sm text-primary-text cursor-pointer"
         onClick={() => {
           setOpen(!open);
           setMode(displayMode === "datetime" ? "date" : displayMode);
@@ -128,15 +150,17 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
           ) : (
             <TbClock className="w-5 h-5 text-primary-text" />
           )}
-          <span>
-            {format(
-              currentDate || today,
-              displayMode === "date"
-                ? "PPP"
-                : displayMode === "time"
-                ? "p"
-                : "PPP p"
-            )}
+          <span className={!currentDate ? "text-primary-text/50" : ""}>
+            {currentDate
+              ? format(
+                  currentDate,
+                  displayMode === "date"
+                    ? "PPP"
+                    : displayMode === "time"
+                    ? "p"
+                    : "PPP p"
+                )
+              : placeholder || "Select a date"}
           </span>
         </div>
         <IoChevronDown
@@ -154,19 +178,24 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
               {/* Left: Calendar */}
               <div className="w-1/2">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold text-primary-text">
-                    {format(currentMonth, "MMM yyyy")}
-                  </span>
-                  <div className="flex gap-1">
+                  <motion.span
+                    key={currentYear} // crucial: triggers animation on change
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-primary-text font-semibold">
+                    {format(currentYear, "MMM yyy")}
+                  </motion.span>
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleMonthChange(-1)}
-                      className="hover:bg-border-color/50 cursor-pointer text-primary-text px-2 py-1 rounded">
-                      <IoChevronDown className="w-5 h-5 rotate-180" />
+                      className="active:scale-95 hover:bg-border-color/50 shadow-s cursor-pointer flex justify-center items-center text-primary-text p-0.75 rounded">
+                      <IoChevronDown className="w-4.5 h-4.5 rotate-90" />
                     </button>
                     <button
                       onClick={() => handleMonthChange(1)}
-                      className="hover:bg-border-color/50 cursor-pointer text-primary-text px-2 py-1 rounded">
-                      <IoChevronDown className="w-5 h-5" />
+                      className="active:scale-95 hover:bg-border-color/50 shadow-s flex justify-center items-center cursor-pointer text-primary-text p-0.75 rounded">
+                      <IoChevronDown className="w-4.5 h-4.5 -rotate-90" />
                     </button>
                   </div>
                 </div>
@@ -205,19 +234,24 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
               <div className="w-1/2 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-primary-text font-semibold">
+                    <motion.span
+                      key={currentYear} // crucial: triggers animation on change
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-primary-text font-semibold">
                       {format(currentYear, "yyyy")}
-                    </span>
-                    <div className="flex gap-1">
+                    </motion.span>
+                    <div className="flex gap-2">
                       <button
                         onClick={() => handleYearChange(-1)}
-                        className="hover:bg-border-color/50 text-primary-text px-2 py-1 rounded">
-                        <IoChevronDown className="w-5 h-5 rotate-180" />
+                        className="active:scale-95 hover:bg-border-color/50 shadow-s cursor-pointer flex justify-center items-center text-primary-text p-0.75 rounded">
+                        <IoChevronDown className="w-4.5 h-4.5 rotate-90" />
                       </button>
                       <button
                         onClick={() => handleYearChange(1)}
-                        className="hover:bg-border-color/50 text-primary-text px-2 py-1 rounded">
-                        <IoChevronDown className="w-5 h-5" />
+                        className="active:scale-95 hover:bg-border-color/50 shadow-s cursor-pointer flex justify-center items-center text-primary-text p-0.75 rounded">
+                        <IoChevronDown className="w-4.5 h-4.5 -rotate-90" />
                       </button>
                     </div>
                   </div>
@@ -229,9 +263,7 @@ const DatePicker = ({ label, currentDate, onChange, displayMode = "date" }) => {
                         i
                       );
                       const isSelectedMonth =
-                        currentDate &&
-                        isSameMonth(monthDate, currentDate) &&
-                        isSameYear(monthDate, currentDate);
+                        currentDate && isSameMonth(monthDate, currentDate);
                       const isTodayMonth =
                         isSameMonth(monthDate, today) &&
                         isSameYear(monthDate, today);

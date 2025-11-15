@@ -181,7 +181,7 @@ const BookingsTable = ({
           <tbody className="text-sm">
             {totalCount === 0 ? (
               <tr>
-                <td colSpan="11" className="text-center py-6 text-muted">
+                <td colSpan="14" className="text-center py-6 text-muted">
                   No Bookings found.
                 </td>
               </tr>

@@ -1,7 +1,7 @@
-import React from "react";
 import MeetingCard from "./MeetingCard";
+import { TbExternalLink } from "react-icons/tb";
 
-const DailyCalendarItems = ({ date, items }) => {
+const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
   // Group items by type
   const groupedItems = items.reduce(
     (acc, item) => {
@@ -55,7 +55,7 @@ const DailyCalendarItems = ({ date, items }) => {
                 key={absence.id}
                 className="bg-tertiary-bg shadow-s max-w-[250px] w-full p-3 rounded-lg flex flex-col items-start gap-2">
                 {/* Category */}
-                <p className="font-semibold text-sm text-center">
+                <p className="font-semibold text-sm text-primary-text text-center">
                   {absence.category
                     ?.toLowerCase()
                     .replace(/\b\w/g, (char) => char.toUpperCase()) ||
@@ -105,7 +105,7 @@ const DailyCalendarItems = ({ date, items }) => {
                       </div>
                     )}
                     <div className="flex flex-col ml-2 items-start">
-                      <p className="text-sm font-semibold text-secondary-text text-center">
+                      <p className="text-sm font-semibold text-primary-text/80 text-center">
                         {absence.employee.first_name} {absence.employee.surname}
                       </p>
                       <p className="text-xs text-secondary-text text-center">
@@ -128,28 +128,62 @@ const DailyCalendarItems = ({ date, items }) => {
             {groupedItems.job.map((job) => (
               <div
                 key={job.jobId}
-                className="bg-blue-400/30 p-3 rounded shadow flex flex-col gap-1">
-                <p className="font-semibold text-sm">
+                className="bg-tertiary-bg p-3 rounded-lg shadow-s flex flex-col gap-1">
+                <p className="font-semibold text-sm text-primary-text">
                   {job.propertyDetails?.name || "Unnamed Property"}
                 </p>
-                <p className="text-xs text-secondary-text">
-                  Departure:{" "}
-                  {new Date(job.jobDate).toLocaleString("en-GB", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </p>
-                {job.nextArrival && (
+                <div className="flex flex-row items-center gap-2">
                   <p className="text-xs text-secondary-text">
-                    Next Arrival:{" "}
-                    {new Date(job.nextArrival).toLocaleString("en-GB", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {`Departure: ${new Date(job.jobDate).toLocaleString(
+                      "en-GB",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )} ${job.propertyDetails.check_out || ""} - ${
+                      job?.bookingId || ""
+                    }`}
                   </p>
-                )}
+                  {job.bookingId && (
+                    <button
+                      onClick={() => {
+                        navigate(`/Bookings/${job.bookingId}`);
+                        closeModal();
+                      }}
+                      className="text-icon-color hover:shadow-s p-1 rounded active:scale-95">
+                      <TbExternalLink className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-row items-center gap-2">
+                  <p className="text-xs text-secondary-text">
+                    {job.nextArrival
+                      ? `Next Arrival: ${new Date(
+                          job.nextArrival
+                        ).toLocaleString("en-GB", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })} ${job.propertyDetails.check_in || ""} ${
+                          job?.bookingDetails?.booking_id
+                            ? `- ${job.bookingDetails.booking_id}`
+                            : ""
+                        }
+                      `
+                      : "Next Arrival: No future booking"}
+                  </p>
+                  {job.bookingDetails?.booking_id && (
+                    <button
+                      onClick={() => {
+                        navigate(`/Bookings/${job.bookingDetails.booking_id}`);
+                        closeModal();
+                      }}
+                      className="text-icon-color hover:shadow-s p-1 rounded active:scale-95">
+                      <TbExternalLink className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

@@ -106,8 +106,8 @@ const Navbar = () => {
               label="Settings"
               icon={BsGear}
               isExpanded={isMenuExpanded}
-              path="/Settings"
               onClick={() => {}}
+              path="/Settings"
             />
             <NavItem
               label="Help Centre"
