@@ -46,7 +46,7 @@ const ToastNotification = ({ type, title, message, onClose, index }) => {
 
   const currentOption = options[type] || options.info;
   const baseClass =
-    "flex flex-row items-center bg-secondary-bg justify-between border-border-color border-1 rounded-xl px-4 py-2 w-120";
+    "flex flex-row items-center bg-tertiary-bg shadow-s justify-between border-border-color border-1 rounded-xl px-4 py-2 w-120";
   const baseButtonClass =
     "cursor-pointer border text-secondary-text hover:text-primary-text border-transparent rounded-lg p-1";
 
@@ -79,7 +79,7 @@ const ToastNotification = ({ type, title, message, onClose, index }) => {
       className={clsx(baseClass, currentOption.color)}>
       <div className="flex flex-row items-center justify-between gap-4 w-full">
         {/* Icon */}
-        <div className="relative bg-secondary-bg">
+        <div className="relative bg-tertiary-bg">
           <div
             className={clsx(
               "flex-shrink-0 p-0.25 rounded-full",

@@ -5,9 +5,9 @@ const CardSelect = ({
   label = "Select an option",
   value,
   onChange,
-  titleKey,
-  descriptionKey,
-  valueKey,
+  titleKey = "title",
+  descriptionKey = "description",
+  valueKey = "value",
   package: isPackage = false,
 }) => {
   const getPackageColor = (title) => {
@@ -15,12 +15,13 @@ const CardSelect = ({
     if (lower.includes("gold")) return "bg-yellow-400";
     if (lower.includes("silver")) return "bg-gray-300";
     if (lower.includes("bronze")) return "bg-amber-600";
+    if (lower.includes("new")) return "bg-blue-400/30";
     return "border border-primary-text bg-transparent"; // fallback
   };
 
   return (
     <div className="flex flex-col">
-      <p className="text-primary-text mb-2">{label}</p>
+      <p className="text-primary-text mb-1">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => {
           const selected = value === option[valueKey];
@@ -53,14 +54,14 @@ const CardSelect = ({
               )}
 
               <h3
-                className={`font-medium truncate ${
+                className={`font-medium pl-1 truncate ${
                   selected ? "text-cta-color" : "text-primary-text"
                 }`}>
                 {title}
               </h3>
 
               {!isPackage && option[descriptionKey] && (
-                <p className="text-sm text-secondary-text mt-1">
+                <p className="text-sm pl-1 text-secondary-text mt-1">
                   {option[descriptionKey]}
                 </p>
               )}

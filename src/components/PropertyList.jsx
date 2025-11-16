@@ -70,8 +70,8 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
                 key={property.id}
                 className={`flex border-b pr-5 border-border-color items-center cursor-pointer ${
                   selectedProperty?.id === property.id
-                    ? "bg-brand-primary/20"
-                    : ""
+                    ? "bg-brand-primary/10"
+                    : "hover:bg-brand-primary/5"
                 }`}
                 onClick={() => onSelectProperty(property)}>
                 {/* Property Image */}

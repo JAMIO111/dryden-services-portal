@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CgClose } from "react-icons/cg";
 import { useBookingsFilters } from "../hooks/useBookingsFilters";
 import { useSearchParams } from "react-router-dom";
@@ -9,6 +9,7 @@ import {
 } from "@/hooks/useCategoryOptions";
 
 const FilterPane = ({ onClose }) => {
+  const paneRef = useRef(null);
   const [searchParams] = useSearchParams();
   const propertyUrl = searchParams.get("property") || "";
   const managementPackageUrl = searchParams.get("managementPackage") || "";
@@ -16,6 +17,17 @@ const FilterPane = ({ onClose }) => {
     useBookingsFilters();
   const [localProperty, setLocalProperty] = useState(propertyUrl);
   const [localPackage, setLocalPackage] = useState(managementPackageUrl);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (paneRef.current && !paneRef.current.contains(e.target)) {
+        onClose?.();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
 
   useEffect(() => {
     setLocalProperty(property);
@@ -64,7 +76,9 @@ const FilterPane = ({ onClose }) => {
   } = usePropertyOptions();
 
   return (
-    <div className="border absolute bg-primary-bg text-primary-text z-1000 top-32 rounded-2xl border-border-color shadow-lg shadow-shadow-color w-80 h-fit">
+    <div
+      ref={paneRef}
+      className="border absolute bg-primary-bg text-primary-text z-1000 top-32 rounded-2xl border-border-color shadow-lg shadow-shadow-color w-80 h-fit">
       <div className="flex px-4 py-1 bg-secondary-bg border-b border-border-color flex-row justify-between items-center rounded-t-2xl ">
         <h3 className="text-xl">Filter</h3>
         <button

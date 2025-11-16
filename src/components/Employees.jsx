@@ -51,12 +51,12 @@ const Employees = () => {
 
   const getStatusPill = (status) => {
     return (
-      <div className="rounded-full flex w-fit bg-tertiary-bg">
+      <div className="rounded-lg flex w-20 bg-tertiary-bg">
         <span
-          className={`px-3 py-1 shadow-s rounded-full text-sm font-medium ${
+          className={`py-1 w-20 text-center shadow-s rounded-lg text-sm font-medium ${
             status
-              ? "bg-green-500/20 text-green-600 border border-green-500/40"
-              : "bg-red-500/20 text-red-600 border border-red-500/40"
+              ? "bg-green-500/20 text-green-600"
+              : "bg-red-500/20 text-red-600"
           }`}>
           {status ? "Active" : "Inactive"}
         </span>

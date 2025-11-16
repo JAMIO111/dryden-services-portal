@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const fetchLeadsByTitle = async (leadTitle) => {
   const { data, error } = await supabase
@@ -36,9 +37,13 @@ const fetchLeadsByTitle = async (leadTitle) => {
 };
 
 export const useLeadByTitle = (leadTitle) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["Lead", leadTitle],
     queryFn: () => fetchLeadsByTitle(leadTitle),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["Lead", data.id], data);
+    },
     staleTime: 1000 * 60 * 5, // optional: 5 min cache
     enabled: !!leadTitle,
   });

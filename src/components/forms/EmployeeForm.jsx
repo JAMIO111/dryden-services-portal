@@ -161,7 +161,7 @@ const EmployeeForm = ({ employee }) => {
                 required
                 label="Date of Birth"
                 currentDate={field.value}
-                onDateChange={field.onChange}
+                onChange={field.onChange}
                 defaultPageDate={new Date("1990-01-01")}
                 placeholder="Select date of birth..."
                 {...field}
@@ -259,7 +259,7 @@ const EmployeeForm = ({ employee }) => {
                 required
                 label="Start of Employment"
                 currentDate={field.value}
-                onDateChange={field.onChange}
+                onChange={field.onChange}
                 placeholder="Select start date..."
                 {...field}
                 error={fieldState.error}

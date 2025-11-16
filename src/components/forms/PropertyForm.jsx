@@ -488,9 +488,9 @@ const PropertyForm = () => {
             text="Revert Changes"
             icon={IoIosUndo}
             callbackFn={() =>
-              id === "New-Property"
+              !property || watch("id") === undefined
                 ? reset(defaultFormData)
-                : reset(normalizedProperty)
+                : reset({ ...defaultFormData, ...property })
             }
           />
           <CTAButton

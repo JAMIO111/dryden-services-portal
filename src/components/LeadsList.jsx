@@ -6,11 +6,15 @@ import { IoAddOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useLeads } from "@/hooks/useLeads";
+import { useModal } from "@/contexts/ModalContext";
+import LeadForm from "./forms/LeadForm.jsx";
 
 export default function LeadList() {
+  const { openModal } = useModal();
   const navigate = useNavigate();
   const { data: leads, isLoading } = useLeads();
   const statusColor = {
+    New: "bg-pink-400/20 text-pink-500",
     "Hot Lead": "bg-red-400/20 text-red-500",
     "Follow-up": "bg-yellow-400/20 text-yellow-500",
     "Cold Lead": "bg-blue-400/20 text-blue-500",
@@ -31,6 +35,21 @@ export default function LeadList() {
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleAddLead = () => {
+    openModal({
+      title: "Create New Lead",
+      content: (
+        <div className="min-w-[300px] max-w-[600px] max-h-[80vh] min-h-0 overflow-y-auto px-3 pt-3">
+          <p className="text-sm text-secondary-text mb-4">
+            Fill out the form below to add a new lead to the system. This can be
+            used to track engagement and can be converted to a client later.
+          </p>
+          <LeadForm lead={null} navigate={navigate} />
+        </div>
+      ),
+    });
+  };
 
   return (
     <div className="bg-secondary-bg border border-border-color rounded-3xl h-full flex flex-col overflow-hidden">
@@ -59,7 +78,7 @@ export default function LeadList() {
             width="w-auto"
             type="main"
             text="Add New Lead"
-            onClick={() => alert("Add New Lead Clicked")}
+            callbackFn={handleAddLead}
           />
         </div>
 
@@ -90,7 +109,7 @@ export default function LeadList() {
                     {lead.title}
                   </h3>
                   <span
-                    className={`text-xs font-medium px-3 py-2 rounded-xl ${
+                    className={`text-sm font-medium px-3 py-1.5 rounded-lg ${
                       statusColor[lead.status]
                     }`}>
                     {lead.status}

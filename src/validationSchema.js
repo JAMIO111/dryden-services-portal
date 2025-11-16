@@ -1,11 +1,70 @@
 import { z } from "zod";
 
+const postcodeRegex =
+  /^([Gg][Ii][Rr]0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z]))))\s?[0-9][A-Za-z]{2})$/;
+const what3WordsRegex =
+  /^(?:\/\/\/)?[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?$/;
+const phoneRegex = /^[+()\-0-9\s]{6,20}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const emailMaxLength = 255;
+const nameMaxLength = 30;
+const phoneMaxLength = 20;
+
+const transformPhoneNumber = (val) => {
+  if (!val) return "";
+
+  // Strip all non-digits
+  let digits = val.replace(/\D/g, "");
+
+  // ---------------------------------------
+  // NORMALISE COUNTRY CODE
+  // ---------------------------------------
+  if (digits.startsWith("44")) {
+    digits = "0" + digits.slice(2);
+  }
+
+  // Mobile typed without the leading zero
+  if (/^7\d{9}$/.test(digits)) {
+    digits = "0" + digits;
+  }
+
+  // ---------------------------------------
+  // UK NUMBER DETECTION
+  // ---------------------------------------
+  // Mobile: 07xxxxxxxxx (11 digits)
+  const isUkMobile = /^07\d{9}$/.test(digits);
+
+  // Landline (01 / 02) — realistically 10 or 11 digits
+  const isUkLandline = /^0[12]\d{8,9}$/.test(digits);
+
+  // Non-geo: 03, 05, 08, 09 — also normally 10 or 11 digits
+  const isUkNonGeo = /^0[3589]\d{8,9}$/.test(digits);
+
+  const looksUk = isUkMobile || isUkLandline || isUkNonGeo;
+
+  if (!looksUk) {
+    // return original digits cleaned, without forcing UK structure
+    return digits;
+  }
+
+  // ---------------------------------------
+  // SIMPLE UK FORMATTING
+  // "xxxxx xxxxxx" for anything UK-like
+  // (Not perfect for every STD code, but consistent)
+  // ---------------------------------------
+  if (digits.length > 5) {
+    return digits.slice(0, 5) + " " + digits.slice(5);
+  }
+
+  return digits;
+};
+
 export const PropertyFormSchema = z.object({
   name: z
     .string({ required_error: "Property name is required" })
     .min(1, { message: "Property name must be at least 1 character long" })
-    .max(40, {
-      message: "Property name must not be more than 40 characters long",
+    .max(nameMaxLength, {
+      message: `Property name must not be more than ${nameMaxLength} characters long`,
     })
     .transform((val) =>
       val
@@ -41,10 +100,7 @@ export const PropertyFormSchema = z.object({
     .or(z.literal("")),
   postcode: z
     .string()
-    .regex(
-      /^([Gg][Ii][Rr]0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z]))))\s?[0-9][A-Za-z]{2})$/,
-      "Invalid UK postcode"
-    )
+    .regex(postcodeRegex, "Invalid UK postcode")
     .transform((val) =>
       val
         .replace(/\s+/g, "")
@@ -53,18 +109,20 @@ export const PropertyFormSchema = z.object({
     ),
   what_3_words: z
     .string()
-    .regex(
-      /^(?:\/\/\/)?[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?$/,
-      "Enter a valid What3Words address"
-    )
+    .regex(what3WordsRegex, "Enter a valid What3Words address")
     .or(z.literal("")) // allow blank input
     .optional()
     .nullable(),
   KeyCodes: z
     .array(
       z.object({
-        code: z.string().min(1),
-        name: z.string().min(2).max(30),
+        code: z.string().min(1).max(10),
+        name: z
+          .string()
+          .min(2, { message: "Location must be at least 2 characters long" })
+          .max(20, {
+            message: "Location must not be more than 20 characters long",
+          }),
         is_private: z.boolean(),
       })
     )
@@ -73,9 +131,6 @@ export const PropertyFormSchema = z.object({
   service_type: z.string(),
   hired_laundry: z.boolean(),
 });
-
-const phoneRegex = /^[+()\-0-9\s]{6,20}$/;
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const OwnerFormSchema = z.object({
   first_name: z
@@ -100,13 +155,17 @@ export const OwnerFormSchema = z.object({
     .or(z.literal("")), // ✅ allow blank strings
   primary_email: z
     .string({ required_error: "Email is required" })
-    .email({ message: "Invalid email address" }),
+    .email({ message: "Invalid email address" })
+    .max(255, { message: "Email must not be more than 255 characters long" }),
   primary_phone: z
     .string()
-    .regex(phoneRegex, { message: "Invalid phone number format" })
     .min(6, { message: "Phone number must be at least 6 characters long" })
     .max(20, {
       message: "Phone number must not be more than 20 characters long",
+    })
+    .regex(phoneRegex, { message: "Invalid phone number format" })
+    .transform((val) => {
+      return transformPhoneNumber(val);
     })
     .optional()
     .nullable()
@@ -114,16 +173,19 @@ export const OwnerFormSchema = z.object({
   secondary_email: z
     .string()
     .email({ message: "Invalid email address" })
-    .max(100, { message: "Email must not be more than 100 characters long" })
+    .max(255, { message: "Email must not be more than 255 characters long" })
     .optional()
     .nullable()
     .or(z.literal("")), // ✅ allow blank strings
   secondary_phone: z
     .string()
-    .regex(phoneRegex, { message: "Invalid phone number format" })
     .min(6, { message: "Phone number must be at least 6 characters long" })
     .max(20, {
       message: "Phone number must not be more than 20 characters long",
+    })
+    .regex(phoneRegex, { message: "Invalid phone number format" })
+    .transform((val) => {
+      return transformPhoneNumber(val);
     })
     .optional()
     .nullable()
@@ -219,6 +281,45 @@ export const BookingFormSchema = z.object({
   is_owner_booking: z.boolean(),
 });
 
+export const LeadFormSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, { message: "Title is required" })
+    .max(50, { message: "Title must not exceed 50 characters" }),
+  first_name: z
+    .string()
+    .trim()
+    .min(1, { message: "First name is required" })
+    .max(50, { message: "First name must not exceed 50 characters" }),
+  surname: z
+    .string()
+    .trim()
+    .min(1, { message: "Surname is required" })
+    .max(50, { message: "Surname must not exceed 50 characters" }),
+  phone: z
+    .string()
+    .min(6, { message: "Phone number must be at least 6 characters long" })
+    .max(20, {
+      message: "Phone number must not be more than 20 characters long",
+    })
+    .regex(phoneRegex, { message: "Invalid phone number format" })
+    .transform((val) => {
+      return transformPhoneNumber(val);
+    })
+    .optional()
+    .nullable()
+    .or(z.literal("")), // ✅ allow blank strings
+  email: z
+    .string()
+    .email({ message: "Invalid email address" })
+    .max(255, { message: "Email must not be more than 255 characters long" })
+    .optional()
+    .nullable()
+    .or(z.literal("")), // ✅ allow blank strings
+  status: z.string({ required_error: "Status is required" }),
+});
+
 export const CorrespondenceFormSchema = z.object({
   title: z
     .string()
@@ -273,7 +374,14 @@ export const EmployeeFormSchema = z.object({
     .or(z.literal("")),
   phone: z
     .string()
+    .min(6, { message: "Phone number must be at least 6 characters long" })
+    .max(20, {
+      message: "Phone number must not be more than 20 characters long",
+    })
     .regex(/^[+()\-0-9\s]{6,20}$/, { message: "Invalid phone number format" })
+    .transform((val) => {
+      return transformPhoneNumber(val);
+    })
     .optional()
     .nullable()
     .or(z.literal("")),
@@ -281,6 +389,7 @@ export const EmployeeFormSchema = z.object({
   gender: z.string({ required_error: "Gender is required" }),
   job_title: z.string({ required_error: "Job title is required" }),
   start_date: z.date({ required_error: "Start date is required" }),
+  address: z.string({ required_error: "Address is required" }),
   ni_number: z
     .string()
     .max(15, { message: "NI Number must not exceed 15 characters" }),

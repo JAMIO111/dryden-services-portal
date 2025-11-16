@@ -46,11 +46,22 @@ const KeyCodeForm = ({ defaultValues, onSave, onCancel }) => {
         icon={PiPassword}
         value={form.code}
         onChange={(e) => setForm({ ...form, code: e.target.value })}
-        error={
-          submitted && !form.code?.trim()
-            ? { message: "Key Code is required" }
-            : null
-        }
+        error={(() => {
+          if (!submitted) return null;
+          const code = form.code?.trim() || "";
+          if (!code) {
+            return { message: "Key Code is required" };
+          }
+          if (code.length < 1) {
+            return { message: "Key Code must be at least 1 characters long" };
+          }
+          if (code.length > 10) {
+            return {
+              message: "Key Code must be no more than 10 characters long",
+            };
+          }
+          return null;
+        })()}
       />
 
       <TextInput
@@ -59,11 +70,22 @@ const KeyCodeForm = ({ defaultValues, onSave, onCancel }) => {
         icon={GrLocationPin}
         value={form.name}
         onChange={(e) => setForm({ ...form, name: e.target.value })}
-        error={
-          submitted && !form.name?.trim()
-            ? { message: "Description is required" }
-            : null
-        }
+        error={(() => {
+          if (!submitted) return null;
+          const value = form.name?.trim() || "";
+          if (!value) {
+            return { message: "Location is required" };
+          }
+          if (value.length < 2) {
+            return { message: "Location must be at least 2 characters long" };
+          }
+          if (value.length > 20) {
+            return {
+              message: "Location must be no more than 20 characters long",
+            };
+          }
+          return null;
+        })()}
       />
 
       <ToggleButton

@@ -5,10 +5,10 @@ const LeadCorrespondence = ({ correspondence }) => {
     <div className="flex items-stretch flex-col mr-5">
       <div className="flex p-3 flex-col">
         <div className="flex flex-row gap-3 justify-start items-center">
-          <div className="rounded-full flex justify-center items-center shadow-m w-9 h-9 bg-cta-color">
+          <div className="rounded-full flex shrink-0 justify-center items-center shadow-m w-9 h-9 bg-cta-color">
             <BsChatRightText className="w-4.5 h-4.5 text-white" />
           </div>
-          <div className="rounded-full flex justify-center items-center p-0.5 bg-primary-bg shadow-m">
+          <div className="rounded-full flex justify-center items-center shrink-0 p-0.5 bg-primary-bg shadow-m">
             {correspondence.created_by?.avatar ? (
               <img
                 src={correspondence.created_by.avatar || ""}
@@ -33,12 +33,12 @@ const LeadCorrespondence = ({ correspondence }) => {
           </p>
           <div className="rounded-full w-1 h-1 bg-muted/50"></div>
           <div className="rounded-md shadow-s flex flex-row items-center justify-between py-1 px-2 bg-tertiary-bg">
-            <p className="text-xs text-secondary-text">
+            <p className="text-xs whitespace-nowrap text-secondary-text">
               # {correspondence.tag || "General"}
             </p>
           </div>
           <div className="rounded-full w-1 h-1 bg-muted/50"></div>
-          <p className="text-sm text-muted/50">
+          <p className="text-sm whitespace-nowrap text-muted/50">
             {new Date(correspondence.created_at).toLocaleTimeString([], {
               day: "2-digit",
               month: "short",

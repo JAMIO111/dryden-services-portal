@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import CorrespondenceForm from "./forms/CorrespondenceForm.jsx";
 import MeetingForm from "./forms/MeetingForm.jsx";
 import SlidingSelector from "./ui/SlidingSelectorGeneric.jsx";
+import LeadForm from "./forms/LeadForm.jsx";
 
 const LeadDetails = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const LeadDetails = () => {
   const { data: lead, isLoading } = useLeadByTitle(title);
 
   const statusColor = {
+    New: "bg-pink-400/20 text-pink-500",
     "Hot Lead": "bg-red-400/20 text-red-500",
     "Follow-up": "bg-yellow-400/20 text-yellow-500",
     "Cold Lead": "bg-blue-400/20 text-blue-500",
@@ -58,7 +60,7 @@ const LeadDetails = () => {
                 {lead?.title || "Unknown Company"} - Lead Activity
               </h2>
               <span
-                className={`text-sm font-medium px-3 py-2 rounded-xl ${
+                className={`font-medium px-3 py-2 rounded-xl ${
                   statusColor[lead?.status] || "bg-gray-200 text-gray-600"
                 }`}>
                 {lead?.status || "No Status"}
@@ -133,12 +135,21 @@ const LeadDetails = () => {
         </div>
 
         {/* Scrollable Form Section */}
-        <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:hidden">
-          {selectedTab === "Correspondence" && (
-            <CorrespondenceForm leadId={lead.id} />
-          )}
-          {selectedTab === "Meeting" && <MeetingForm leadId={lead.id} />}
-        </div>
+        {lead?.id ? (
+          <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:hidden">
+            {selectedTab === "Correspondence" && (
+              <CorrespondenceForm leadId={lead?.id} />
+            )}
+            {selectedTab === "Meeting" && <MeetingForm leadId={lead?.id} />}
+            {selectedTab === "Lead Details" && (
+              <LeadForm lead={lead} navigate={navigate} />
+            )}
+          </div>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-secondary-text">
+            Loading details...
+          </div>
+        )}
       </div>
     </div>
   );

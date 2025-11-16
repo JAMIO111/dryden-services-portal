@@ -35,7 +35,7 @@ const NotificationPane = () => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.3 }}
-            className="w-120 overflow-hidden max-w-full h-full bg-primary-bg p-0 shadow-s border border-border-color/50 rounded-2xl flex flex-col"
+            className="w-120 overflow-hidden max-w-full h-full bg-primary-bg p-0 shadow-s rounded-2xl flex flex-col"
             onClick={(e) => e.stopPropagation()} // Prevent backdrop close
           >
             {/* Sticky Blur Header */}

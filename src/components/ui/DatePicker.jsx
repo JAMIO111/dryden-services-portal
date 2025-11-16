@@ -62,8 +62,8 @@ const DatePicker = ({
   const handleSelectDate = (date) => {
     const updated = new Date(date);
     if (currentDate) {
-      updated.setHours(currentDate.getHours());
-      updated.setMinutes(currentDate.getMinutes());
+      updated.setHours(new Date(currentDate).getHours());
+      updated.setMinutes(new Date(currentDate).getMinutes());
     }
     onChange(updated);
     setCurrentMonth(date);
@@ -119,13 +119,15 @@ const DatePicker = ({
 
   useEffect(() => {
     if (open && currentDate) {
-      setCurrentMonth(currentDate);
-      setCurrentYear(currentDate);
+      const d = new Date(currentDate);
+      setCurrentMonth(d);
+      setCurrentYear(d);
     } else if (open && defaultPageDate) {
-      setCurrentMonth(defaultPageDate);
-      setCurrentYear(defaultPageDate);
+      const d = new Date(defaultPageDate);
+      setCurrentMonth(d);
+      setCurrentYear(d);
     }
-  }, [open, currentDate]);
+  }, [open, currentDate, defaultPageDate]);
 
   return (
     <div
@@ -297,7 +299,7 @@ const DatePicker = ({
               <label className="text-primary-text">Select Time</label>
               <div className="flex gap-3">
                 <select
-                  value={(currentDate || today).getHours()}
+                  value={(new Date(currentDate) || today).getHours()}
                   onChange={(e) =>
                     handleTimeChange("hours", parseInt(e.target.value))
                   }
@@ -310,7 +312,7 @@ const DatePicker = ({
                 </select>
                 <p className="text-lg text-primary-text font-semibold">:</p>
                 <select
-                  value={(currentDate || today).getMinutes()}
+                  value={(new Date(currentDate) || today).getMinutes()}
                   onChange={(e) =>
                     handleTimeChange("minutes", parseInt(e.target.value))
                   }
