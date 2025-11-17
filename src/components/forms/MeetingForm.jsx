@@ -7,7 +7,6 @@ import { useToast } from "../../contexts/ToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import CTAButton from "../CTAButton";
 import { useInsertMeeting } from "@/hooks/useInsertMeeting";
-import { useUser } from "@/contexts/UserProvider";
 import DatePicker from "../ui/DatePicker";
 import { IoLocationOutline } from "react-icons/io5";
 
@@ -34,7 +33,6 @@ const MeetingForm = ({ leadId }) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const insertMeeting = useInsertMeeting();
-  const { profile } = useUser();
 
   const {
     register,
@@ -161,7 +159,6 @@ const MeetingForm = ({ leadId }) => {
             try {
               await insertMeeting.mutateAsync({
                 lead_id: leadId,
-                created_by: profile.id,
                 start_date: calculatedStart,
                 end_date: calculatedEnd,
                 ...meetingData,

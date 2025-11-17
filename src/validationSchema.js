@@ -83,15 +83,15 @@ export const PropertyFormSchema = z.object({
     .min(2, { message: "Address line 1 must be at least 2 characters long" })
     .max(100, {
       message: "Address line 1 must not be more than 100 characters long",
-    })
-    .optional(),
+    }),
   line_2: z
     .string()
     .max(100, {
       message: "Address line 2 must not be more than 100 characters long",
     })
     .nullable()
-    .optional(),
+    .optional()
+    .or(z.literal("")),
   town: z.string({ required_error: "Town is required" }).min(2).max(100),
   county: z
     .string({ required_error: "County is required" })
@@ -110,9 +110,9 @@ export const PropertyFormSchema = z.object({
   what_3_words: z
     .string()
     .regex(what3WordsRegex, "Enter a valid What3Words address")
-    .or(z.literal("")) // allow blank input
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal("")), // allow blank input
   KeyCodes: z
     .array(
       z.object({
@@ -128,8 +128,10 @@ export const PropertyFormSchema = z.object({
     )
     .optional(),
   package: z.number(),
-  service_type: z.string(),
+  service_type: z.array(z.string()),
   hired_laundry: z.boolean(),
+  owner_ref: z.string().optional().nullable().or(z.literal("")),
+  property_ref: z.string().optional().nullable().or(z.literal("")),
 });
 
 export const OwnerFormSchema = z.object({

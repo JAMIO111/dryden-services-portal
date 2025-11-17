@@ -47,7 +47,7 @@ const NumericInput = forwardRef(
           disabled={value !== "" && value <= min}
           className="shadow-s group hover:bg-brand-primary/70 p-2 bg-text-input-color cursor-pointer rounded-full disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 active:transition-transform active:duration-100"
           onClick={decrement}>
-          <FaMinus className="group-hover:text-primary-bg w-6 h-6 text-secondary-text" />
+          <FaMinus className="group-hover:text-primary-bg w-5 h-5 text-secondary-text" />
         </button>
 
         <input
@@ -66,7 +66,7 @@ const NumericInput = forwardRef(
           disabled={value !== "" && value >= max}
           className="shadow-s group hover:bg-brand-primary/70 p-2 bg-text-input-color cursor-pointer rounded-full disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 active:transition-transform active:duration-100"
           onClick={increment}>
-          <FaPlus className="group-hover:text-primary-bg w-6 h-6 text-secondary-text" />
+          <FaPlus className="group-hover:text-primary-bg w-5 h-5 text-secondary-text" />
         </button>
       </div>
     );

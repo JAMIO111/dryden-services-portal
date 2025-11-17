@@ -7,6 +7,7 @@ import { FaUser } from "react-icons/fa6";
 
 const PropertyOwnerForm = ({ defaultOwners = [], onSave, onCancel }) => {
   const { data: owners, isLoading: ownersLoading } = useOwners();
+  console.log("Owners data:", owners);
 
   const [currentOwners, setCurrentOwners] = useState(() => [
     ...(defaultOwners || []),
@@ -64,7 +65,7 @@ const PropertyOwnerForm = ({ defaultOwners = [], onSave, onCancel }) => {
         }
       />
 
-      <ul className="flex flex-1 flex-col p-1 gap-2  max-h-60 overflow-y-auto">
+      <ul className="flex flex-1 flex-col p-1 gap-2 max-h-60 overflow-y-auto">
         {currentOwners.length === 0 && (
           <li className="text-sm text-primary-text">No owners added yet.</li>
         )}
@@ -72,14 +73,14 @@ const PropertyOwnerForm = ({ defaultOwners = [], onSave, onCancel }) => {
           <li
             key={owner.id}
             className="flex justify-between items-center p-2 bg-tertiary-bg rounded-lg gap-3 shadow-s">
-            {owner.avatar ? (
+            {owner?.avatar ? (
               <img
                 src={owner.avatar}
                 alt={`${owner.first_name} ${owner.surname}`}
-                className="w-12 h-12 rounded-lg object-cover"
+                className="w-10 h-10 rounded-lg object-cover"
               />
             ) : (
-              <div className="flex items-center justify-center shadow-s w-12 h-12 rounded-lg bg-primary-bg">
+              <div className="flex items-center justify-center shadow-s w-10 h-10 rounded-lg bg-primary-bg">
                 <p className="text-lg font-semibold text-primary-text">
                   {(owner.first_name?.[0] || "").toUpperCase()}
                   {(owner.surname?.[0] || "").toUpperCase()}

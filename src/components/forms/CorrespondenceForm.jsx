@@ -10,7 +10,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import TextAreaInput from "../ui/RHFTextArea";
 import CTAButton from "../CTAButton";
 import { useInsertCorrespondence } from "@/hooks/useInsertCorrespondence";
-import { useUser } from "@/contexts/UserProvider";
 
 const defaultFormData = {
   title: "",
@@ -22,7 +21,6 @@ const CorrespondenceForm = ({ leadId }) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const insertCorrespondence = useInsertCorrespondence();
-  const { profile } = useUser();
 
   const {
     register,
@@ -98,7 +96,6 @@ const CorrespondenceForm = ({ leadId }) => {
             try {
               await insertCorrespondence.mutateAsync({
                 lead_id: leadId,
-                created_by: profile.id,
                 ...data,
               });
 

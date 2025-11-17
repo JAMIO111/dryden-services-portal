@@ -9,7 +9,16 @@ export const useUpsertProperty = () => {
       console.log("Upserting property with data:", {
         propertyData,
       });
-      const { KeyCodes = [], Owners = [], ...property } = propertyData;
+      const {
+        KeyCodes = [],
+        Owners = [],
+        service_type = [],
+        ...rest
+      } = propertyData;
+      const property = {
+        ...rest,
+        service_type, // ensure it's always an array
+      };
       let propertyId = property.id;
       let result;
 

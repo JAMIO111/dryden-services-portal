@@ -35,7 +35,7 @@ const ToggleButton = forwardRef(
               <Icon className="w-5 h-5 text-primary-text mr-2 flex-shrink-0 pointer-events-none" />
             )
           )}
-          <span className="text-primary-text ml-2 min-w-[60px]">
+          <span className="text-primary-text mx-3 ml-1 min-w-[60px]">
             {checked ? trueLabel : falseLabel}
           </span>
           <div className="flex flex-1 items-center justify-end">

@@ -24,13 +24,13 @@ const NumericInputGroup = forwardRef(
             rest.error ? "border border-error-color" : null
           }`}>
           {rest.error ? (
-            <MdErrorOutline className="text-error-color text-xl" />
+            <MdErrorOutline className="text-error-color w-5 h-5 text-xl" />
           ) : (
-            <Icon className="text-primary-text text-xl" />
+            <Icon className="text-primary-text w-5 h-5 text-xl" />
           )}
         </div>
-        <div className="flex items-center gap-1 px-3 flex-1 ml-4">
-          <label className="text-primary-text text-xl text-left font-medium">
+        <div className="flex items-center gap-1 px-3 flex-1">
+          <label className="text-primary-text text-lg text-left font-medium">
             {label}
           </label>
           {required && (

@@ -1,14 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import supabase from "../supabase-client";
+import { useUser } from "@/contexts/UserProvider";
 
 export const useInsertMeeting = () => {
   const queryClient = useQueryClient();
+  const { profile } = useUser();
 
   return useMutation({
     mutationFn: async (meetingData) => {
       const { data, error } = await supabase
         .from("Meetings")
-        .insert(meetingData)
+        .insert({ ...meetingData, created_by: profile.id })
         .select()
         .single();
 

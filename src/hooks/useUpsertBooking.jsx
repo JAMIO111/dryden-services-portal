@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import supabase from "../supabase-client";
+import { useUser } from "@/contexts/UserProvider";
 
 export const useUpsertBooking = () => {
   const queryClient = useQueryClient();
+  const { profile } = useUser();
 
   return useMutation({
     mutationFn: async (bookingData) => {
@@ -89,7 +91,7 @@ export const useUpsertBooking = () => {
             .single()
         : await supabase
             .from("Bookings")
-            .insert({ ...bookingData, booking_id })
+            .insert({ ...bookingData, booking_id, created_by: profile.id })
             .select()
             .single();
 

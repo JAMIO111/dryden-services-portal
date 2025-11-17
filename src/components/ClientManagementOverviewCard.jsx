@@ -1,5 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowUpRight, ArrowDownRight, Users, Wallet } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  Users,
+  Wallet,
+  Building2,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function ClientManagementOverviewCard({
@@ -222,14 +228,23 @@ export default function ClientManagementOverviewCard({
                       }
                       key={i}
                       className="flex flex-col cursor-pointer items-center flex-shrink-0">
-                      <img
-                        src={
-                          owner.avatar ||
-                          `https://i.pravatar.cc/100?u=${owner.id || i}`
-                        }
-                        alt={owner.first_name || owner.surname}
-                        className="w-14 h-14 object-cover rounded-xl border border-border-color"
-                      />
+                      {owner.avatar ? (
+                        <img
+                          src={
+                            owner.avatar ||
+                            `https://i.pravatar.cc/100?u=${owner.id || i}`
+                          }
+                          alt={owner.first_name || owner.surname}
+                          className="w-14 h-14 object-cover rounded-xl border border-border-color"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 flex items-center justify-center rounded-xl border border-border-color bg-primary-bg">
+                          <p className="text-lg font-semibold text-primary-text">
+                            {(owner.first_name?.[0] || "").toUpperCase()}
+                            {(owner.surname?.[0] || "").toUpperCase()}
+                          </p>
+                        </div>
+                      )}
                       <span className="text-sm text-secondary-text mt-2 truncate max-w-[4rem]">
                         {owner.first_name || owner.surname}
                       </span>
@@ -247,11 +262,17 @@ export default function ClientManagementOverviewCard({
                       }
                       key={i}
                       className="flex flex-col items-center flex-shrink-0">
-                      <img
-                        src={property.image || `No Image`}
-                        alt={"No Image"}
-                        className="w-20 h-14 object-cover rounded-xl border border-border-color"
-                      />
+                      {property.image ? (
+                        <img
+                          src={property.image || `No Image`}
+                          alt={"No Image"}
+                          className="w-20 h-14 object-cover rounded-xl border border-border-color"
+                        />
+                      ) : (
+                        <div className="w-20 h-14 flex items-center justify-center rounded-xl border border-border-color bg-primary-bg">
+                          <Building2 className="w-6 h-6 text-secondary-text" />
+                        </div>
+                      )}
                       <span className="text-sm text-secondary-text mt-2 truncate max-w-[4rem]">
                         {property.name}
                       </span>

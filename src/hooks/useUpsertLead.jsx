@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import supabase from "../supabase-client";
+import { useUser } from "@/contexts/UserProvider";
 
 export const useUpsertLead = () => {
   const queryClient = useQueryClient();
+  const { profile } = useUser();
 
   return useMutation({
     mutationFn: async (leadData) => {
@@ -24,7 +26,7 @@ export const useUpsertLead = () => {
       // Insert
       const { data, error } = await supabase
         .from("Leads")
-        .insert(payload)
+        .insert({ ...payload, created_by: profile.id })
         .select()
         .single();
 

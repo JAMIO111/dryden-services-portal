@@ -3,11 +3,12 @@ import React from "react";
 const CardSelect = ({
   options,
   label = "Select an option",
-  value,
+  value = [],
   onChange,
   titleKey = "title",
   descriptionKey = "description",
   valueKey = "value",
+  multiSelect = false,
   package: isPackage = false,
 }) => {
   const getPackageColor = (title) => {
@@ -16,7 +17,35 @@ const CardSelect = ({
     if (lower.includes("silver")) return "bg-gray-300";
     if (lower.includes("bronze")) return "bg-amber-600";
     if (lower.includes("new")) return "bg-blue-400/30";
-    return "border border-primary-text bg-transparent"; // fallback
+    return "border border-primary-text bg-transparent";
+  };
+
+  const handleSelect = (val) => {
+    if (!multiSelect) {
+      onChange(val);
+      return;
+    }
+
+    const current = Array.isArray(value) ? [...value] : [];
+
+    if (current.includes(val)) {
+      onChange(current.filter((v) => v !== val));
+      return;
+    }
+
+    if (val === "hot_tub") {
+      onChange([...current, val]);
+      return;
+    }
+
+    const others = ["changeover", "clean", "laundry"];
+    if (others.includes(val)) {
+      const filtered = current.filter((v) => v === "hot_tub");
+      onChange([...filtered, val]);
+      return;
+    }
+
+    onChange([...current, val]);
   };
 
   return (
@@ -24,22 +53,24 @@ const CardSelect = ({
       <p className="text-primary-text mb-1">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => {
-          const selected = value === option[valueKey];
+          const selected = multiSelect
+            ? (value || []).includes(option[valueKey])
+            : value === option[valueKey];
+
           const title = option[titleKey];
           const circleColor = getPackageColor(title);
 
           return (
             <button
-              title={option[titleKey]}
               key={option[valueKey]}
               type="button"
-              onClick={() => onChange(option[valueKey])}
+              onClick={() => handleSelect(option[valueKey])}
               className={`cursor-pointer flex-1 shadow-s min-w-[calc(50%-0.5rem)] p-2 rounded-2xl text-left
-              ${
-                selected
-                  ? "border-cta-color border bg-cta-color/10 shadow-md"
-                  : "border border-transparent hover:border-cta-color/50 bg-tertiary-bg hover:bg-cta-color/5"
-              }`}>
+                ${
+                  selected
+                    ? "border-cta-color border bg-cta-color/10 shadow-md"
+                    : "border border-transparent hover:border-cta-color/50 bg-tertiary-bg hover:bg-cta-color/5"
+                }`}>
               {isPackage ? (
                 <div
                   className={`h-6 w-6 mb-2 border border-border-color/50 shadow-s rounded-full ${circleColor}`}></div>

@@ -8,9 +8,7 @@ import { useToast } from "../../contexts/ToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import CTAButton from "../CTAButton";
 import { useUpsertLead } from "@/hooks/useUpsertLead";
-import { useUser } from "@/contexts/UserProvider";
 import CardSelect from "../CardSelect";
-import { Card } from "../ui/card";
 
 const defaultFormData = {
   title: "",
@@ -25,7 +23,6 @@ const LeadForm = ({ lead, navigate }) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const upsertLead = useUpsertLead();
-  const { profile } = useUser();
 
   const {
     register,
@@ -61,7 +58,6 @@ const LeadForm = ({ lead, navigate }) => {
     try {
       const payload = {
         ...data,
-        created_by: profile.id,
       };
 
       // include ID if editing
@@ -85,8 +81,8 @@ const LeadForm = ({ lead, navigate }) => {
         type: "success",
         title: "Lead Saved",
         message: lead
-          ? "The lead has been updated."
-          : "The lead has been successfully created.",
+          ? "The lead has been successfully updated."
+          : "A new lead has been successfully created.",
       });
     } catch (error) {
       showToast({

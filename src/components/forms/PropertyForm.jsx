@@ -350,6 +350,7 @@ const PropertyForm = () => {
                   },
                   { id: "clean", name: "Clean", icon: GiMagicBroom },
                 ]}
+                multiSelect={true}
                 label="Service Type"
                 titleKey="name"
                 descriptionKey="tier"

@@ -14,8 +14,11 @@ import ActionsModal from "@components/ActionsModal";
 import IconButton from "@components/IconButton";
 import { BsSliders } from "react-icons/bs";
 import FilterPane from "@components/FilterPane";
+import { useModal } from "@/contexts/ModalContext";
+import SingleJobForm from "../forms/SingleJobForm";
 
 const BookingsDashboard = () => {
+  const { openModal } = useModal();
   const navigate = useNavigate();
   const { profile } = useUser();
   const [aggregation, setAggregation] = useState("month");
@@ -176,6 +179,19 @@ const BookingsDashboard = () => {
 
   console.log("Bookings Dashboard Data:", bookingsData);
 
+  const handleSingleJob = () => {
+    openModal({
+      title: "Single Job Booking",
+      content: (
+        <div
+          className="min-w-[600px] max-h-[80vh] overflow-y-auto p-4"
+          ref={modalRef}>
+          <SingleJobForm />
+        </div>
+      ),
+    });
+  };
+
   return (
     <div className="flex bg-primary-bg flex-col flex-grow overflow-hidden">
       <div className="flex flex-col gap-2 xl:flex-row items-start  xl:items-center justify-between px-6 py-1 shadow-sm border-b border-border-color shrink-0 bg-primary-bg">
@@ -189,6 +205,12 @@ const BookingsDashboard = () => {
         </div>
         <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
           <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
+            <CTAButton
+              callbackFn={handleSingleJob}
+              type="secondary"
+              text="Single Job"
+              icon={PiFilePlus}
+            />
             <CTAButton
               callbackFn={() => {
                 navigate("/Bookings/New-Booking");
