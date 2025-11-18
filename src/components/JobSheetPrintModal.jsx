@@ -16,7 +16,7 @@ export default function JobSheetPrintModal({ jobs, startDate, endDate }) {
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="flex flex-col h-full max-h-[90vh] p-3">
+      className="flex flex-col h-full max-h-[90vh] p-3 pt-0">
       {/* Fixed Button */}
       <div className="flex justify-between items-center flex-shrink-0 pb-2 border-b border-border-color mb-3">
         <div className="flex flex-col gap-1">

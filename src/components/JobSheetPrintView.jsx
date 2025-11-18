@@ -4,8 +4,8 @@ import JobSheet from "./JobSheet";
 
 const JobSheetPrintView = forwardRef(({ jobs }, ref) => (
   <div className="overflow-y-auto" ref={ref}>
-    {jobs.map((job) => (
-      <JobSheet key={job.id} job={job} />
+    {jobs.map((job, index) => (
+      <JobSheet key={index} job={job} />
     ))}
   </div>
 ));

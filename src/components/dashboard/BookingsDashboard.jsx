@@ -184,7 +184,7 @@ const BookingsDashboard = () => {
       title: "Single Job Booking",
       content: (
         <div
-          className="min-w-[600px] max-h-[80vh] overflow-y-auto p-4"
+          className="min-w-[600px] overflow-hidden min-h-0 h-[80vh] p-4"
           ref={modalRef}>
           <SingleJobForm />
         </div>

@@ -9,6 +9,7 @@ import { IoTrashOutline, IoLocation, IoHome } from "react-icons/io5";
 import { BsMailbox2Flag, BsFillBuildingsFill, BsPencil } from "react-icons/bs";
 import { PiNumberThreeFill } from "react-icons/pi";
 import { GiMagicBroom } from "react-icons/gi";
+import { SlLock } from "react-icons/sl";
 import NumericInputGroup from "../NumericInputGroup";
 import TextInput from "../ui/TextInput";
 import { usePropertyByName } from "@/hooks/usePropertyByName";
@@ -403,8 +404,8 @@ const PropertyForm = () => {
                     {field.name}
                   </span>
                   {field.is_private && (
-                    <span className="rounded-lg p-1 text-primary-text shadow-s px-2 bg-pink-500/30 font-medium">
-                      Private
+                    <span className="rounded-lg text-primary-text shadow-s p-2 bg-pink-500/30 font-medium">
+                      <SlLock className="h-5 w-5" />
                     </span>
                   )}
 

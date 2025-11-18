@@ -43,13 +43,13 @@ export const useUpsertSingleJob = () => {
       // === Upsert ===
       const { data, error } = id
         ? await supabase
-            .from("singleJobs")
+            .from("SingleJobs")
             .update({ ...singleJobData, single_job_id })
             .eq("id", id)
             .select()
             .single()
         : await supabase
-            .from("singleJobs")
+            .from("SingleJobs")
             .insert({ ...singleJobData, single_job_id, created_by: profile.id })
             .select()
             .single();

@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LeadFormSchema } from "../../validationSchema";
-import TextInput from "../ui/TextInput";
+import { SingleJobFormSchema } from "../../validationSchema";
 import { IoText } from "react-icons/io5";
 import { useToast } from "../../contexts/ToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,8 +12,9 @@ import RHFComboBox from "../ui/RHFComboBox";
 import { useProperties } from "@/hooks/useProperties";
 import SlidingSelector from "../ui/SlidingSelectorGeneric";
 import DatePicker from "../ui/DatePicker";
-import TextAreaInput from "../ui/TextArea";
+import RHFTextAreaInput from "../ui/RHFTextArea";
 import ToggleButton from "../ui/ToggleButton";
+import RecurrenceForm from "./RecurrenceForm";
 
 const defaultFormData = {
   type: "Clean",
@@ -22,7 +22,7 @@ const defaultFormData = {
   single_date: null,
   start_date: null,
   end_date: null,
-  transport: "",
+  transport: null,
   notes: "",
 };
 
@@ -31,6 +31,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
   const { showToast } = useToast();
   const upsertSingleJob = useUpsertSingleJob();
   const { data: properties } = useProperties();
+  const [jobType, setJobType] = useState("Clean");
   const [isRecurring, setIsRecurring] = useState(false);
 
   const {
@@ -41,9 +42,10 @@ const SingleJobForm = ({ singleJob, navigate }) => {
     setValue,
     trigger,
     watch,
+    setError,
     formState: { errors, isSubmitting, isValid, isDirty },
   } = useForm({
-    resolver: zodResolver(LeadFormSchema),
+    resolver: zodResolver(SingleJobFormSchema),
     mode: "all",
     defaultValues: defaultFormData,
     delayError: 250,
@@ -59,16 +61,28 @@ const SingleJobForm = ({ singleJob, navigate }) => {
     }
   }, [singleJob, reset]);
 
+  useEffect(() => {
+    setValue("type", jobType, { shouldValidate: true });
+  }, [jobType, setValue]);
+
+  const watchType = watch("type");
+
+  useEffect(() => {
+    if (watchType === "Laundry") {
+      setValue("single_date", null, { shouldValidate: true });
+    } else {
+      setValue("transport", null, { shouldValidate: true });
+      setValue("start_date", null, { shouldValidate: true });
+      setValue("end_date", null, { shouldValidate: true });
+    }
+  }, [watchType, setValue]);
+
   const onSubmit = async (data) => {
     try {
-      const payload = {
-        ...data,
-      };
-
-      // include ID if editing
+      const payload = { ...data };
       if (singleJob?.id) payload.id = singleJob.id;
 
-      const saved = await upsertSingleJob.mutateAsync(payload);
+      await upsertSingleJob.mutateAsync(payload);
 
       reset(defaultFormData);
 
@@ -76,163 +90,187 @@ const SingleJobForm = ({ singleJob, navigate }) => {
         type: "success",
         title: "Job Saved",
         message: singleJob
-          ? `The ${type === "clean" ? "cleaning" : type} job has been updated.`
+          ? `The ${
+              data.type === "Clean" ? "cleaning" : data.type
+            } job has been updated.`
           : `A ${
-              type === "clean" ? "cleaning" : type
+              data.type === "Clean" ? "cleaning" : data.type
             } job has been successfully created.`,
       });
     } catch (error) {
       showToast({
         type: "error",
         title: "Submission Failed",
-        message: error?.message || "An error occurred while saving the lead.",
+        message: error?.message || "An error occurred while saving the job.",
       });
     }
   };
 
-  const selectedType = watch("type");
-
   return (
-    <div className="flex flex-1 h-full flex-col">
-      <div className="mb-4">
-        <Controller
-          name="type"
-          control={control}
-          render={({ field, fieldState }) => (
-            <SlidingSelector
-              label="Job Type"
-              options={["Clean", "Hot Tub", "Laundry"]}
-              value={field.value}
-              onChange={(value) => field.onChange(value)}
-            />
-          )}
-        />
-      </div>
-      <div className="mb-3">
-        <Controller
-          name="property_id"
-          control={control}
-          render={({ field, fieldState }) => (
-            <RHFComboBox
-              error={fieldState.error}
-              {...field}
-              name="property_id"
-              control={control}
-              label="Property"
-              options={properties || []}
-              placeholder="Select a property..."
-              required={true}
-              icon={BsHouse}
-            />
-          )}
-        />
-      </div>
-      {selectedType === "Laundry" && (
-        <div className="mb-3">
-          <Controller
-            name="transport"
-            control={control}
-            render={({ field, fieldState }) => (
-              <RHFComboBox
-                error={fieldState.error}
-                {...field}
-                name="transport"
-                control={control}
-                label="Transport"
-                options={[
-                  { value: "Dryden Services", name: "Dryden Services" },
-                  { value: "Client Provided", name: "Client Provided" },
-                ]}
-                placeholder="Select a transport type..."
-                required={true}
-                icon={BsTruck}
-              />
-            )}
+    <div className="flex h-full">
+      {/* LEFT FORM */}
+      <div className="flex flex-col flex-1">
+        <div className="mb-4">
+          <SlidingSelector
+            label="Job Type"
+            options={["Clean", "Hot Tub", "Laundry"]}
+            value={jobType}
+            onChange={(value) => setJobType(value)}
           />
         </div>
-      )}
-      <div className="mb-3">
-        {selectedType !== "Laundry" ? (
-          <Controller
-            name="single_date"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <DatePicker
-                label="Job Date"
-                currentDate={value}
-                onChange={onChange}
-                displayMode="date"
+        <div className="flex-1 h-full overflow-y-auto flex pr-5 flex-col ">
+          <div className="flex-1 flex flex-col">
+            {/* Property */}
+            <div className="mb-3">
+              <Controller
+                name="property_id"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <RHFComboBox
+                    error={fieldState.error}
+                    {...field}
+                    name="property_id"
+                    control={control}
+                    label="Property"
+                    options={properties || []}
+                    placeholder="Select a property..."
+                    required
+                    icon={BsHouse}
+                  />
+                )}
               />
+            </div>
+
+            {/* Laundry / Dates */}
+            {jobType === "Laundry" ? (
+              <div className="flex flex-col gap-3 mb-3">
+                <Controller
+                  name="start_date"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <DatePicker
+                      label="Delivery Start"
+                      currentDate={value}
+                      onChange={onChange}
+                      displayMode="date"
+                    />
+                  )}
+                />
+                <Controller
+                  name="end_date"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <DatePicker
+                      label="Delivery End"
+                      currentDate={value}
+                      onChange={onChange}
+                      displayMode="date"
+                    />
+                  )}
+                />
+              </div>
+            ) : (
+              <div className="mb-3">
+                <Controller
+                  name="single_date"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <DatePicker
+                      label="Job Date"
+                      currentDate={value}
+                      onChange={onChange}
+                      displayMode="date"
+                    />
+                  )}
+                />
+              </div>
             )}
-          />
-        ) : (
-          <div className="flex flex-col gap-3">
-            <Controller
-              name="start_date"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <DatePicker
-                  label="Delivery Start"
-                  currentDate={value}
-                  onChange={onChange}
-                  displayMode="date"
+
+            {/* Transport */}
+            {jobType === "Laundry" && (
+              <div className="mb-3">
+                <Controller
+                  name="transport"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <RHFComboBox
+                      error={fieldState.error}
+                      {...field}
+                      name="transport"
+                      control={control}
+                      label="Transport"
+                      required
+                      options={[
+                        { id: "Dryden Services", name: "Dryden Services" },
+                        { id: "Client Provided", name: "Client Provided" },
+                      ]}
+                      placeholder="Select a transport type..."
+                      icon={BsTruck}
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              name="end_date"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <DatePicker
-                  label="Delivery End"
-                  currentDate={value}
-                  onChange={onChange}
-                  displayMode="date"
-                />
-              )}
+              </div>
+            )}
+
+            {/* Notes */}
+            <div className="mb-3">
+              <Controller
+                name="notes"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <RHFTextAreaInput
+                    label="Notes"
+                    placeholder="Enter any job details here..."
+                    maxLength={300}
+                    {...field}
+                    icon={IoText}
+                    error={fieldState.error}
+                  />
+                )}
+              />
+            </div>
+          </div>
+        </div>
+        {/* Buttons */}
+        <div className="flex items-end mt-3 gap-3 justify-end">
+          <div className="w-48 mr-auto">
+            <ToggleButton
+              label="Reccurring Job"
+              checked={isRecurring}
+              onChange={() => setIsRecurring(!isRecurring)}
+              falseLabel="Single Job"
+              trueLabel="Recurring Job"
             />
           </div>
-        )}
-      </div>
-      <Controller
-        name="notes"
-        control={control}
-        render={({ field, fieldState }) => (
-          <TextAreaInput
-            required={true}
-            label="Notes"
-            placeholder="Enter any job details here..."
-            {...field}
-            icon={IoText}
-            error={fieldState.error}
+          <CTAButton
+            type="cancel"
+            text="Revert Changes"
+            disabled={isSubmitting || !isDirty}
+            callbackFn={() => reset()}
           />
-        )}
-      />
-      <div className="flex items-end mt-5 gap-3 pb-5 justify-end">
-        <div className="w-48 mr-auto">
-          <ToggleButton
-            label="Reccurring Job"
-            checked={isRecurring}
-            onChange={() => setIsRecurring(!isRecurring)}
-            falseLabel="Single Job"
-            trueLabel="Recurring Job"
+          <CTAButton
+            type="success"
+            text={singleJob ? "Update Job" : "Save Job"}
+            disabled={!isValid || isSubmitting || !isDirty}
+            callbackFn={handleSubmit(onSubmit)}
           />
         </div>
+      </div>
 
-        <CTAButton
-          type="cancel"
-          text="Revert Changes"
-          disabled={isSubmitting || !isDirty}
-          callbackFn={() => {
-            reset();
-          }}
-        />
-        <CTAButton
-          type="success"
-          text={singleJob ? "Update Job" : "Save Job"}
-          disabled={!isValid || isSubmitting || !isDirty}
-          callbackFn={handleSubmit(onSubmit)}
-        />
+      {/* RIGHT SIDEBAR */}
+      <div
+        className="pl-6 transition-all duration-300"
+        style={{ width: isRecurring ? "400px" : "0px" }}>
+        {isRecurring && (
+          <div className="opacity-100 pl-2 transition-opacity duration-300">
+            <h2 className="text-primary-text whitespace-nowrap font-semibold mb-4">
+              Recurring Job Details
+            </h2>
+            <div className="flex flex-col gap-4 bg-secondary-bg p-4 rounded-md">
+              <RecurrenceForm />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

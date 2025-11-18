@@ -22,6 +22,9 @@ const BookingsDashboard = lazy(() =>
 const ClientManagementDashboard = lazy(() =>
   import("./components/dashboard/ClientManagementDashboard.jsx")
 );
+const MaintenanceDashboard = lazy(() =>
+  import("./components/dashboard/MaintenanceDashboard.jsx")
+);
 const Properties = lazy(() => import("./components/Properties.jsx"));
 const PropertyForm = lazy(() => import("./components/forms/PropertyForm.jsx"));
 const OwnerForm = lazy(() => import("./components/forms/OwnerForm.jsx"));
@@ -161,6 +164,10 @@ const router = createBrowserRouter([
               },
               { path: "Admin", element: <div>Admin Settings</div> },
             ],
+          },
+          {
+            path: "Maintenance",
+            element: <MaintenanceDashboard />,
           },
           {
             path: "Human-Resources",

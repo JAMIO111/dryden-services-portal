@@ -399,3 +399,55 @@ export const EmployeeFormSchema = z.object({
   is_driver: z.boolean(),
   is_cscs: z.boolean(),
 });
+
+export const SingleJobFormSchema = z
+  .object({
+    property_id: z
+      .string({ message: "You must select a property" })
+      .uuid("You must select a property"),
+    type: z.enum(["Clean", "Hot Tub", "Laundry"]),
+    single_date: z.date().nullable().optional(),
+    start_date: z.date().nullable().optional(),
+    end_date: z.date().nullable().optional(),
+    transport: z.string().nullable().optional(),
+    notes: z
+      .string()
+      .max(300, { message: "Notes must not exceed 300 characters" }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.type === "Laundry") {
+      if (!data.transport) {
+        ctx.addIssue({
+          path: ["transport"],
+          code: z.ZodIssueCode.custom,
+          message: "Transport must be selected.",
+        });
+      }
+
+      if (!data.start_date) {
+        ctx.addIssue({
+          path: ["start_date"],
+          code: z.ZodIssueCode.custom,
+          message: "Delivery start date is required.",
+        });
+      }
+
+      if (!data.end_date) {
+        ctx.addIssue({
+          path: ["end_date"],
+          code: z.ZodIssueCode.custom,
+          message: "Delivery end date is required.",
+        });
+      }
+    }
+
+    if (data.type !== "Laundry") {
+      if (!data.single_date) {
+        ctx.addIssue({
+          path: ["single_date"],
+          code: z.ZodIssueCode.custom,
+          message: "Job date must be selected.",
+        });
+      }
+    }
+  });
