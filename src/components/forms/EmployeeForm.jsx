@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IoText } from "react-icons/io5";
 import { useQueryClient } from "@tanstack/react-query";
 import { EmployeeFormSchema } from "../../validationSchema";
+import { useUpsertEmployee } from "@/hooks/useUpsertEmployee";
 import ProfileImageSection from "../ProfileImageSection";
 import TextInput from "../ui/TextInput";
 import RHFComboBox from "../ui/RHFComboBox";
@@ -23,6 +24,8 @@ import {
 import ToggleButton from "../ui/ToggleButton";
 import { HiOutlinePhone } from "react-icons/hi2";
 import { TfiEmail } from "react-icons/tfi";
+import { useToast } from "../../contexts/ToastProvider";
+import { useModal } from "@/contexts/ModalContext";
 
 const defaultFormData = {
   id: null,
@@ -40,10 +43,14 @@ const defaultFormData = {
   is_driver: false,
   is_cscs: false,
   is_active: true,
+  hourly_rate: "",
 };
 
 const EmployeeForm = ({ employee }) => {
   const queryClient = useQueryClient();
+  const upsertEmployee = useUpsertEmployee();
+  const { showToast } = useToast();
+  const { closeModal } = useModal();
 
   const {
     control,
@@ -61,8 +68,34 @@ const EmployeeForm = ({ employee }) => {
     employee?.surname?.[0] ?? ""
   }`.toUpperCase();
 
-  const onSubmit = (data) => {
-    console.log("Form submitted:", data);
+  const onSubmit = async (data) => {
+    try {
+      const payload = {
+        ...data,
+      };
+
+      // include ID if editing
+      if (employee?.id) payload.id = employee.id;
+
+      const saved = await upsertEmployee.mutateAsync(payload);
+
+      closeModal();
+
+      showToast({
+        type: "success",
+        title: "Employee Saved",
+        message: employee
+          ? "The employee has been successfully updated."
+          : "A new employee has been successfully created.",
+      });
+    } catch (error) {
+      showToast({
+        type: "error",
+        title: "Submission Failed",
+        message:
+          error?.message || "An error occurred while saving the employee.",
+      });
+    }
   };
 
   useEffect(() => {
@@ -70,7 +103,14 @@ const EmployeeForm = ({ employee }) => {
       reset({
         ...defaultFormData,
         ...employee,
+        hourly_rate:
+          employee.hourly_rate == null
+            ? ""
+            : Number(employee.hourly_rate).toFixed(2),
         dob: employee.dob ? new Date(employee.dob) : defaultFormData.dob,
+        start_date: employee.start_date
+          ? new Date(employee.start_date)
+          : defaultFormData.start_date,
       });
     }
   }, [employee, reset]);
@@ -250,7 +290,7 @@ const EmployeeForm = ({ employee }) => {
             )}
           />
         </div>
-        <div className="col-span-2">
+        <div className="col-span-1">
           <Controller
             name="start_date"
             control={control}
@@ -263,6 +303,26 @@ const EmployeeForm = ({ employee }) => {
                 placeholder="Select start date..."
                 {...field}
                 error={fieldState.error}
+              />
+            )}
+          />
+        </div>
+
+        <div className="col-span-1">
+          {/* Hourly Rate */}
+          <Controller
+            name="hourly_rate"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextInput
+                required
+                dataType="number"
+                prefix="£"
+                label="Hourly Rate"
+                placeholder="e.g. 15.00"
+                {...field}
+                error={fieldState.error}
+                icon={IoBriefcaseOutline}
               />
             )}
           />
@@ -336,7 +396,7 @@ const EmployeeForm = ({ employee }) => {
           type="cancel"
           text="Revert"
           icon={RxReset}
-          callbackFn={() => console.log("Revert Button Clicked")}
+          callbackFn={() => reset()}
         />
 
         <CTAButton
@@ -344,7 +404,7 @@ const EmployeeForm = ({ employee }) => {
           text="Save"
           disabled={!isDirty || !isValid || isSubmitting}
           icon={GiSaveArrow}
-          callbackFn={() => console.log("CTA Button Clicked")}
+          callbackFn={handleSubmit(onSubmit)}
         />
       </div>
     </form>

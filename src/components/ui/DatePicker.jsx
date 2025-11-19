@@ -41,6 +41,7 @@ const DatePicker = ({
   displayMode = "date",
   placeholder,
   defaultPageDate,
+  required = false,
 }) => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -134,7 +135,10 @@ const DatePicker = ({
       className="flex flex-col w-full gap-1 h-fit min-w-0 relative"
       ref={ref}>
       {label && (
-        <label className="font-medium text-primary-text">{label}</label>
+        <div className="flex items-center gap-1">
+          <label className="font-medium text-primary-text">{label}</label>
+          {required && <span className="text-error-color">*</span>}
+        </div>
       )}
 
       {/* Input Box */}

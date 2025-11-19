@@ -259,15 +259,17 @@ const SingleJobForm = ({ singleJob, navigate }) => {
 
       {/* RIGHT SIDEBAR */}
       <div
-        className="pl-6 transition-all duration-300"
-        style={{ width: isRecurring ? "400px" : "0px" }}>
+        className="transition-all duration-300"
+        style={{ width: isRecurring ? "550px" : "0px" }}>
         {isRecurring && (
-          <div className="opacity-100 pl-2 transition-opacity duration-300">
-            <h2 className="text-primary-text whitespace-nowrap font-semibold mb-4">
-              Recurring Job Details
-            </h2>
-            <div className="flex flex-col gap-4 bg-secondary-bg p-4 rounded-md">
-              <RecurrenceForm />
+          <div className="opacity-100 pl-8 h-full transition-opacity duration-300">
+            <div className="flex flex-col gap-3 bg-secondary-bg shadow-s p-4 rounded-xl h-full min-h-[400px]">
+              <h2 className="text-primary-text whitespace-nowrap font-semibold">
+                Recurring Job Details
+              </h2>
+              <div className="overflow-y-auto min-h-0">
+                <RecurrenceForm />
+              </div>
             </div>
           </div>
         )}

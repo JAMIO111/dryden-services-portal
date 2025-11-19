@@ -2,16 +2,17 @@ import { useState } from "react";
 import { useGlobalSearch } from "../contexts/SearchProvider";
 import CTAButton from "./CTAButton";
 import { HiOutlinePencil } from "react-icons/hi2";
-import { IoPersonAdd } from "react-icons/io5";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { useModal } from "@/contexts/ModalContext";
 import EmployeeForm from "./forms/EmployeeForm.jsx";
 import { useEmployees } from "@/hooks/useEmployees";
+import { BiSolidShow, BiSolidHide } from "react-icons/bi";
 
 const Employees = () => {
   const { openModal } = useModal();
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const { data: employees, isLoading, error } = useEmployees();
+  const [showHourlyRate, setShowHourlyRate] = useState(false);
 
   const getInitials = (firstName, lastName) => {
     const firstInitial = firstName?.charAt(0)?.toUpperCase();
@@ -98,7 +99,17 @@ const Employees = () => {
           <div className="flex-1">Job Title</div>
           <div className="flex-1">Email</div>
           <div className="flex-1">Phone</div>
-          <div className="w-30">Status</div>
+          <div className="flex gap-1 w-30">
+            <span>Hourly Rate</span>
+            <button
+              onMouseDown={() => setShowHourlyRate(true)}
+              onMouseUp={() => setShowHourlyRate(false)}
+              onMouseLeave={() => setShowHourlyRate(false)}
+              className="p-1 cursor-pointer hover:bg-tertiary-bg rounded-md">
+              {showHourlyRate ? <BiSolidShow /> : <BiSolidHide />}
+            </button>
+          </div>
+          <div className="w-25 text-center">Status</div>
         </div>
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden">
           {isLoading ? (
@@ -154,7 +165,18 @@ const Employees = () => {
                 <div className="flex-1">{employee.job_title || "-"}</div>
                 <div className="flex-1">{employee.email || "-"}</div>
                 <div className="flex-1">{employee.phone || "-"}</div>
-                <div className="w-30">{getStatusPill(employee.is_active)}</div>
+                <div className="w-30">
+                  {showHourlyRate
+                    ? employee.hourly_rate != null &&
+                      employee.hourly_rate !== ""
+                      ? `£${Number(employee.hourly_rate).toFixed(2)}`
+                      : "-"
+                    : "*****"}
+                </div>
+
+                <div className="flex justify-center w-25">
+                  {getStatusPill(employee.is_active)}
+                </div>
               </div>
             ))
           )}

@@ -364,10 +364,16 @@ export const MeetingFormSchema = z
   });
 
 export const EmployeeFormSchema = z.object({
-  first_name: z.string({ required_error: "First name is required" }),
+  first_name: z
+    .string({ required_error: "First name is required" })
+    .min(1, { message: "First name is required" }),
   middle_name: z.string().optional().nullable().or(z.literal("")),
-  surname: z.string({ required_error: "Surname is required" }),
-  address: z.string({ required_error: "Address is required" }),
+  surname: z
+    .string({ required_error: "Surname is required" })
+    .min(1, { message: "Surname is required" }),
+  address: z.string({ required_error: "Address is required" }).min(5, {
+    message: "Address must be at least 5 characters long",
+  }),
   email: z
     .string()
     .email("Invalid email format")
@@ -389,15 +395,22 @@ export const EmployeeFormSchema = z.object({
     .or(z.literal("")),
   dob: z.date({ required_error: "Date of birth is required" }),
   gender: z.string({ required_error: "Gender is required" }),
-  job_title: z.string({ required_error: "Job title is required" }),
+  job_title: z
+    .string({ required_error: "Job title is required" })
+    .min(1, { message: "Job title is required" }),
   start_date: z.date({ required_error: "Start date is required" }),
-  address: z.string({ required_error: "Address is required" }),
   ni_number: z
     .string()
     .max(15, { message: "NI Number must not exceed 15 characters" }),
   is_active: z.boolean(),
   is_driver: z.boolean(),
   is_cscs: z.boolean(),
+  hourly_rate: z
+    .union([z.string(), z.number()])
+    .transform((val) =>
+      typeof val === "string" && val.trim() !== "" ? parseFloat(val) : null
+    )
+    .nullable(),
 });
 
 export const SingleJobFormSchema = z

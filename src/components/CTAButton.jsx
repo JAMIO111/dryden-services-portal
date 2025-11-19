@@ -34,6 +34,7 @@ const CTAButton = ({
 
   return (
     <button
+      type="button"
       disabled={disabled}
       title={title}
       onClick={callbackFn}

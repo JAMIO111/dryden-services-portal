@@ -44,6 +44,29 @@ const TextInput = forwardRef(
     const remainingChars =
       typeof maxLength === "number" ? maxLength - (value?.length || 0) : null;
 
+    const handleNumericChange = (e) => {
+      let val = e.target.value;
+
+      // Allow empty
+      if (val === "") return onChange({ target: { value: "" } });
+
+      // Remove invalid characters
+      val = val.replace(/[^0-9.]/g, "");
+
+      // Only one decimal point
+      const parts = val.split(".");
+      if (parts.length > 2) {
+        val = parts[0] + "." + parts[1]; // chop extra dots
+      }
+
+      // Remove leading zeros (but keep "0." cases)
+      if (val.startsWith("0") && !val.startsWith("0.") && val.length > 1) {
+        val = String(parseFloat(val));
+      }
+
+      onChange({ target: { value: val } });
+    };
+
     return (
       <div className="flex flex-col gap-1 h-fit min-w-0 relative">
         {label && (
@@ -87,9 +110,9 @@ const TextInput = forwardRef(
           <input
             onKeyDown={dataType === "number" ? handleKeyDownNumeric : undefined}
             ref={ref}
-            type={dataType}
+            type={dataType === "number" ? "text" : dataType}
             value={value}
-            onChange={onChange}
+            onChange={dataType === "number" ? handleNumericChange : onChange}
             placeholder={placeholder}
             maxLength={maxLength}
             className={`placeholder:normal-case input-no-arrows flex-grow w-full min-w-0 bg-transparent outline-none text-primary-text placeholder:text-sm placeholder:text-muted
