@@ -5,8 +5,10 @@ import RHFComboBox from "../ui/RHFComboBox";
 import { BsCalendar2Week } from "react-icons/bs";
 import { FaHourglassEnd } from "react-icons/fa";
 import NumericInputGroup from "../NumericInputGroup";
-import { IoRepeat } from "react-icons/io5";
+import { IoRepeat, IoTodayOutline } from "react-icons/io5";
 import DatePicker from "../ui/DatePicker";
+import SlidingSelector from "../ui/SlidingSelectorGeneric";
+import { useGenerateRecurrences } from "../../hooks/useGenerateRecurrences";
 
 const weekdays = [
   "Sunday",
@@ -19,15 +21,19 @@ const weekdays = [
 ];
 const ordinals = ["First", "Second", "Third", "Fourth", "Last"];
 
-const RecurrenceForm = () => {
+const RecurrenceForm = ({ startDate }) => {
+  const [monthlyType, setMonthlyType] = useState("Day of Month");
+  const [recurrences, setRecurrences] = useState([]);
+  const { generateRecurrences } = useGenerateRecurrences();
   const { control, watch, handleSubmit } = useForm({
     defaultValues: {
       frequency: "weekly",
       interval: 1,
       daysOfWeek: [],
+      monthlyType: "DayofMonth",
       dayOfMonth: 1,
       monthlyOrdinal: { ordinal: "First", weekday: "Monday" },
-      endCondition: "after", // never | after | onDate
+      endCondition: null,
       occurrences: 1,
       endDate: "",
     },
@@ -133,64 +139,72 @@ const RecurrenceForm = () => {
 
       {frequency === "monthly" && (
         <div>
-          <label className="block font-semibold mb-1">Monthly Options</label>
-          <div className="mb-2">
-            <Controller
-              name="dayOfMonth"
-              control={control}
-              render={({ field }) => (
-                <input
-                  type="number"
-                  min={1}
-                  max={31}
-                  {...field}
-                  className="border p-1 rounded w-full"
-                  placeholder="Day of month"
-                />
-              )}
+          <label className="block text-primary-text mb-1 pl-1">
+            Monthly Options
+          </label>
+          <div className="mb-4">
+            <SlidingSelector
+              options={["Day of Month", "Ordinal Pattern"]}
+              value={monthlyType}
+              onChange={(value) => {
+                setMonthlyType(value);
+                setValue("monthlyType", value); // <-- important
+              }}
             />
           </div>
-          <div>
-            <span className="text-sm text-secondary-text">
-              Or use ordinal pattern:
-            </span>
-            <div className="flex gap-2 mt-1">
+          {monthlyType === "Day of Month" && (
+            <div className="my-5">
               <Controller
-                name="monthlyOrdinal.ordinal"
+                name="dayOfMonth"
                 control={control}
                 render={({ field }) => (
-                  <select {...field} className="border p-1 rounded flex-1">
-                    {ordinals.map((ord) => (
-                      <option key={ord} value={ord}>
-                        {ord}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              />
-              <Controller
-                name="monthlyOrdinal.weekday"
-                control={control}
-                render={({ field }) => (
-                  <select {...field} className="border p-1 rounded flex-1">
-                    {weekdays.map((day) => (
-                      <option
-                        className="capitalize text-primary-text"
-                        key={day}
-                        value={day}>
-                        {day}
-                      </option>
-                    ))}
-                  </select>
+                  <NumericInputGroup
+                    {...field}
+                    label="Day of Month"
+                    min={1}
+                    max={31}
+                    icon={IoTodayOutline}
+                  />
                 )}
               />
             </div>
-          </div>
+          )}
+          {monthlyType === "Ordinal Pattern" && (
+            <div>
+              <span className="text-sm text-secondary-text">
+                Ordinal pattern:
+              </span>
+              <div className="flex gap-2 mt-1">
+                <Controller
+                  name="monthlyOrdinal.ordinal"
+                  control={control}
+                  render={({ field }) => (
+                    <RHFComboBox
+                      options={ordinals.map((ord) => ({ id: ord, name: ord }))}
+                      placeholder="Select Ordinal"
+                      {...field}
+                    />
+                  )}
+                />
+                <Controller
+                  name="monthlyOrdinal.weekday"
+                  control={control}
+                  render={({ field }) => (
+                    <RHFComboBox
+                      options={weekdays.map((day) => ({ id: day, name: day }))}
+                      placeholder="Select Weekday"
+                      {...field}
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {/* Step 4: End Conditions */}
-      <div>
+      <div className="mt-6">
         <Controller
           name="endCondition"
           control={control}
@@ -249,7 +263,38 @@ const RecurrenceForm = () => {
         </div>
       )}
       <div className="pt-4">
-        <CTAButton type="main" text="Save Recurrence" />
+        <CTAButton
+          type="main"
+          text="Preview Recurrences"
+          callbackFn={() => {
+            const recurrences = generateRecurrences(startDate, watch());
+            setRecurrences(recurrences);
+          }}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2 mt-6">
+        {recurrences?.length > 0 ? (
+          recurrences.map((date, index) => (
+            <div
+              key={index}
+              className="flex items-center text-secondary-text gap-3">
+              {index + 1}.
+              <div className="text-sm text-primary-text">
+                {date.toLocaleDateString(undefined, {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-sm text-secondary-text">
+            No recurrences to display.
+          </div>
+        )}
       </div>
     </form>
   );

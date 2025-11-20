@@ -268,7 +268,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
                 Recurring Job Details
               </h2>
               <div className="overflow-y-auto min-h-0">
-                <RecurrenceForm />
+                <RecurrenceForm startDate={watch("single_date")} />
               </div>
             </div>
           </div>
