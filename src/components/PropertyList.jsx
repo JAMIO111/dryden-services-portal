@@ -37,7 +37,7 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
         <h2 className="text-xl flex-1 text-primary-text font-semibold">
           Property List
         </h2>
-        <div className="w-32">
+        <div className="w-36">
           <ToggleButton
             checked={activeStatus === "Active"}
             onChange={(isActive) =>

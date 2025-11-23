@@ -90,7 +90,7 @@ export default function SlidingSelector({
               {label}
             </p>
             {notifications && (
-              <div className="flex items-center justify-center bg-cta-color text-white hover:text-white rounded-full w-5 h-5">
+              <div className="flex text-xs items-center justify-center bg-cta-color text-white hover:text-white rounded-full w-6 h-6">
                 {count ?? 0}
               </div>
             )}

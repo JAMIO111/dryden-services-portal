@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { IoEllipsisVertical } from "react-icons/io5";
 import Pill from "@components/Pill";
+import { useModal } from "@/contexts/ModalContext";
+import AdHocJobForm from "@components/forms/AdHocJobForm";
 
-const BookingRow = ({
+const AdHocJobRow = ({
   item,
   selectedItem,
   setSelectedItem,
@@ -15,17 +17,18 @@ const BookingRow = ({
   onToggle,
 }) => {
   const navigate = useNavigate();
+  const { openModal } = useModal();
   const ellipsisRef = useRef(null);
   const selected = selectedItem?.id === item.id;
+  const modalRef = useRef(null);
 
-  const formattedArrivalDate = format(
-    new Date(item.arrival_date),
+  const formattedStartDate = format(
+    new Date(item.start_date || item.single_date),
     "EEE, d MMM yy"
   );
-  const formattedDepartureDate = format(
-    new Date(item.departure_date),
-    "EEE, d MMM yy"
-  );
+  const formattedEndDate = item.end_date
+    ? format(new Date(item.end_date), "EEE, d MMM yy")
+    : "-";
 
   const handleEllipsisClick = (e) => {
     e.stopPropagation();
@@ -48,10 +51,23 @@ const BookingRow = ({
     onOpenModal({ top, left });
   };
 
+  const handleEditJob = () => {
+    openModal({
+      title: `Edit ${item.ad_hoc_job_id} - ${item.type}`,
+      content: (
+        <div
+          className="min-w-[600px] overflow-hidden min-h-0 h-[80vh] p-4"
+          ref={modalRef}>
+          <AdHocJobForm adHocJob={item} />
+        </div>
+      ),
+    });
+  };
+
   return (
     <tr
       onClick={handleRowClick}
-      onDoubleClick={() => navigate(`/Jobs/Bookings/${item.booking_id}`)}
+      onDoubleClick={() => handleEditJob(item)}
       className={`text-primary-text hover:bg-hover-menu-color ${
         selected ? "bg-active-menu-color" : ""
       }`}>
@@ -65,37 +81,22 @@ const BookingRow = ({
           onDoubleClick={(e) => e.stopPropagation()}
         />
       </td>
-      <td className="p-2">{item.booking_id}</td>
-      <td className="p-2">{item.booking_ref}</td>
+      <td className="p-2">{item.ad_hoc_job_id}</td>
       <td className="p-2 font-semibold">{item.property_name}</td>
-      <td className="p-2">{formattedArrivalDate}</td>
-      <td className="p-2">{formattedDepartureDate}</td>
-      <td className="p-2">
-        <div className="text-center flex justify-center font-semibold items-center w-8 h-8 rounded-lg text-primary-text border bg-brand-primary/20 border-brand-primary">
-          {item.nights}
-        </div>
-      </td>
-      <td className="p-2 align-middle">
-        <div className="inline-flex items-center gap-2">
-          <span>{item.lead_guest || "N/A"}</span>
-          {item.is_return_guest && (
-            <div className="px-1 py-0.5 text-xs bg-brand-primary/20 text-brand-primary rounded flex-shrink-0">
-              RG
-            </div>
-          )}
-        </div>
-      </td>
-      <td className="p-2 text-center">{item.adults || "-"}</td>
-      <td className="p-2 text-center">{item.children || "-"}</td>
-      <td className="p-2 text-center">{item.infants || "-"}</td>
-      <td className="p-2 text-center">{item.pets || "-"}</td>
+      <td className="p-2">{formattedStartDate}</td>
+      <td className="p-2">{formattedEndDate}</td>
       <td className="p-2 text-center">
-        {item.is_owner_booking ? (
-          <Pill color="purple" text="Owner" />
-        ) : (
-          <Pill color="blue" text="Guest" />
-        )}
+        {item.type === "Laundry" ? (
+          <Pill color="purple" text="Laundry" />
+        ) : item.type === "Clean" ? (
+          <Pill color="green" text="Clean" />
+        ) : item.type === "Maintenance" ? (
+          <Pill color="orange" text="Maintenance" />
+        ) : item.type === "Hot Tub" ? (
+          <Pill color="blue" text={item.type} />
+        ) : null}
       </td>
+      <td className="p-2">{item.notes || "-"}</td>
 
       <td className="p-2 text-center">
         <button
@@ -110,4 +111,4 @@ const BookingRow = ({
   );
 };
 
-export default BookingRow;
+export default AdHocJobRow;

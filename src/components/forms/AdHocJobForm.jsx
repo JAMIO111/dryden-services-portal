@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SingleJobFormSchema } from "../../validationSchema";
-import { IoText } from "react-icons/io5";
+import { AdHocJobFormSchema } from "../../validationSchema";
 import { useToast } from "../../contexts/ToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import CTAButton from "../CTAButton";
-import { useUpsertSingleJob } from "@/hooks/useUpsertSingleJob";
+import { useUpsertAdHocJob } from "@/hooks/useUpsertAdHocJob";
 import { BsTruck, BsHouse } from "react-icons/bs";
 import RHFComboBox from "../ui/RHFComboBox";
 import { useProperties } from "@/hooks/useProperties";
@@ -15,6 +14,8 @@ import DatePicker from "../ui/DatePicker";
 import RHFTextAreaInput from "../ui/RHFTextArea";
 import ToggleButton from "../ui/ToggleButton";
 import RecurrenceForm from "./RecurrenceForm";
+import { useModal } from "@/contexts/ModalContext";
+import { FaRegNoteSticky } from "react-icons/fa6";
 
 const defaultFormData = {
   type: "Clean",
@@ -26,13 +27,15 @@ const defaultFormData = {
   notes: "",
 };
 
-const SingleJobForm = ({ singleJob, navigate }) => {
+const AdHocJobForm = ({ adHocJob, navigate }) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const upsertSingleJob = useUpsertSingleJob();
+  const upsertAdHocJob = useUpsertAdHocJob();
   const { data: properties } = useProperties();
-  const [jobType, setJobType] = useState("Clean");
   const [isRecurring, setIsRecurring] = useState(false);
+  const { closeModal } = useModal();
+
+  console.log("AdHocJobForm - adHocJob:", adHocJob);
 
   const {
     register,
@@ -45,7 +48,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
     setError,
     formState: { errors, isSubmitting, isValid, isDirty },
   } = useForm({
-    resolver: zodResolver(SingleJobFormSchema),
+    resolver: zodResolver(AdHocJobFormSchema),
     mode: "all",
     defaultValues: defaultFormData,
     delayError: 250,
@@ -53,21 +56,25 @@ const SingleJobForm = ({ singleJob, navigate }) => {
 
   // ---------- LOAD EXISTING LEAD INTO FORM ----------
   useEffect(() => {
-    if (singleJob) {
+    if (adHocJob) {
       reset({
         ...defaultFormData,
-        ...singleJob,
+        ...adHocJob,
+        single_date: adHocJob.single_date
+          ? new Date(adHocJob.single_date)
+          : null,
+        start_date: adHocJob.start_date ? new Date(adHocJob.start_date) : null,
+        end_date: adHocJob.end_date ? new Date(adHocJob.end_date) : null,
       });
     }
-  }, [singleJob, reset]);
-
-  useEffect(() => {
-    setValue("type", jobType, { shouldValidate: true });
-  }, [jobType, setValue]);
+  }, [adHocJob, reset]);
 
   const watchType = watch("type");
 
   useEffect(() => {
+    // Skip this effect on initial load when editing
+    if (adHocJob) return;
+
     if (watchType === "Laundry") {
       setValue("single_date", null, { shouldValidate: true });
     } else {
@@ -75,21 +82,21 @@ const SingleJobForm = ({ singleJob, navigate }) => {
       setValue("start_date", null, { shouldValidate: true });
       setValue("end_date", null, { shouldValidate: true });
     }
-  }, [watchType, setValue]);
+  }, [watchType, setValue, adHocJob]);
 
   const onSubmit = async (data) => {
     try {
       const payload = { ...data };
-      if (singleJob?.id) payload.id = singleJob.id;
+      if (adHocJob?.id) payload.id = adHocJob.id;
 
-      await upsertSingleJob.mutateAsync(payload);
+      await upsertAdHocJob.mutateAsync(payload);
 
       reset(defaultFormData);
 
       showToast({
         type: "success",
         title: "Job Saved",
-        message: singleJob
+        message: adHocJob
           ? `The ${
               data.type === "Clean" ? "cleaning" : data.type
             } job has been updated.`
@@ -97,6 +104,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
               data.type === "Clean" ? "cleaning" : data.type
             } job has been successfully created.`,
       });
+      closeModal();
     } catch (error) {
       showToast({
         type: "error",
@@ -106,22 +114,40 @@ const SingleJobForm = ({ singleJob, navigate }) => {
     }
   };
 
+  const filteredProperties = properties?.filter((prop) => {
+    return (
+      prop.is_active === true &&
+      Array.isArray(prop.service_type) &&
+      prop.service_type.includes(watchType.toLowerCase().replace(" ", "_"))
+    );
+  });
+
   return (
     <div className="flex h-full">
       {/* LEFT FORM */}
       <div className="flex flex-col flex-1">
-        <div className="mb-4">
-          <SlidingSelector
-            label="Job Type"
-            options={["Clean", "Hot Tub", "Laundry"]}
-            value={jobType}
-            onChange={(value) => setJobType(value)}
-          />
+        <div className="mb-4 pl-2 pr-6">
+          <div className={adHocJob ? "opacity-50 pointer-events-none" : ""}>
+            <SlidingSelector
+              label="Job Type"
+              options={["Clean", "Hot Tub", "Laundry"]}
+              value={watchType}
+              onChange={(value) => {
+                if (!adHocJob) {
+                  setValue("type", value, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }
+              }}
+            />
+          </div>
         </div>
-        <div className="flex-1 h-full overflow-y-auto flex pr-5 flex-col ">
+
+        <div className="flex-1 h-full overflow-y-auto flex flex-col ">
           <div className="flex-1 flex flex-col">
             {/* Property */}
-            <div className="mb-3">
+            <div className="mb-3 px-2">
               <Controller
                 name="property_id"
                 control={control}
@@ -132,7 +158,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
                     name="property_id"
                     control={control}
                     label="Property"
-                    options={properties || []}
+                    options={filteredProperties || []}
                     placeholder="Select a property..."
                     required
                     icon={BsHouse}
@@ -142,13 +168,14 @@ const SingleJobForm = ({ singleJob, navigate }) => {
             </div>
 
             {/* Laundry / Dates */}
-            {jobType === "Laundry" ? (
-              <div className="flex flex-col gap-3 mb-3">
+            {watchType === "Laundry" ? (
+              <div className="flex flex-col gap-3 px-2 mb-3">
                 <Controller
                   name="start_date"
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <DatePicker
+                      required={true}
                       label="Delivery Start"
                       currentDate={value}
                       onChange={onChange}
@@ -161,6 +188,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <DatePicker
+                      required={true}
                       label="Delivery End"
                       currentDate={value}
                       onChange={onChange}
@@ -170,12 +198,13 @@ const SingleJobForm = ({ singleJob, navigate }) => {
                 />
               </div>
             ) : (
-              <div className="mb-3">
+              <div className="mb-3 px-2">
                 <Controller
                   name="single_date"
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <DatePicker
+                      required={true}
                       label="Job Date"
                       currentDate={value}
                       onChange={onChange}
@@ -187,8 +216,8 @@ const SingleJobForm = ({ singleJob, navigate }) => {
             )}
 
             {/* Transport */}
-            {jobType === "Laundry" && (
-              <div className="mb-3">
+            {watchType === "Laundry" && (
+              <div className="mb-3 px-2">
                 <Controller
                   name="transport"
                   control={control}
@@ -213,7 +242,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
             )}
 
             {/* Notes */}
-            <div className="mb-3">
+            <div className="mb-3 px-2">
               <Controller
                 name="notes"
                 control={control}
@@ -223,7 +252,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
                     placeholder="Enter any job details here..."
                     maxLength={300}
                     {...field}
-                    icon={IoText}
+                    icon={FaRegNoteSticky}
                     error={fieldState.error}
                   />
                 )}
@@ -232,7 +261,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
           </div>
         </div>
         {/* Buttons */}
-        <div className="flex items-end mt-3 gap-3 justify-end">
+        <div className="flex flex-wrap items-end mt-3 gap-3 justify-end">
           <div className="w-48 mr-auto">
             <ToggleButton
               label="Reccurring Job"
@@ -250,7 +279,7 @@ const SingleJobForm = ({ singleJob, navigate }) => {
           />
           <CTAButton
             type="success"
-            text={singleJob ? "Update Job" : "Save Job"}
+            text={adHocJob ? "Update Job" : "Save Job"}
             disabled={!isValid || isSubmitting || !isDirty}
             callbackFn={handleSubmit(onSubmit)}
           />
@@ -278,4 +307,4 @@ const SingleJobForm = ({ singleJob, navigate }) => {
   );
 };
 
-export default SingleJobForm;
+export default AdHocJobForm;

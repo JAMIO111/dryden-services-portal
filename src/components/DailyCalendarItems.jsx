@@ -2,11 +2,12 @@ import MeetingCard from "./MeetingCard";
 import { TbExternalLink } from "react-icons/tb";
 
 const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
+  console.log("DailyCalendarItems items:", items);
   // Group items by type
   const groupedItems = items.reduce(
     (acc, item) => {
-      if (!acc[item.type]) acc[item.type] = [];
-      acc[item.type].push(item);
+      if (!acc[item.itemType]) acc[item.itemType] = [];
+      acc[item.itemType].push(item);
       return acc;
     },
     { job: [], meeting: [], absence: [] }

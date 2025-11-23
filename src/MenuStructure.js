@@ -13,17 +13,21 @@ export const menuStructure = [
     subMenu: [],
   },
   {
-    name: "Bookings",
+    name: "Jobs",
     icon: IoReceiptOutline,
-    path: "/Bookings",
+    path: "/Jobs",
     subMenu: [
       {
-        name: "New Booking",
-        path: "/Bookings/New-Booking",
+        name: "Bookings",
+        path: "/Jobs/Bookings",
       },
       {
-        name: "Existing Bookings",
-        path: "/Bookings/View-Existing",
+        name: "New Booking",
+        path: "/Jobs/Bookings/New-Booking",
+      },
+      {
+        name: "Ad-hoc Jobs",
+        path: "/Jobs/Ad-hoc-Jobs",
       },
     ],
   },

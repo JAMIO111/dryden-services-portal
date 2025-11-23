@@ -128,7 +128,10 @@ export const useGenerateRecurrences = () => {
           if (!pushIfValid(date)) break;
         }
 
-        current = addMonths(current, interval);
+        // IMPORTANT FIX
+        // Instead of "current = addMonths(current, interval)"
+        // use the *generated date* as the next anchor
+        current = addMonths(date, interval);
       }
     }
 

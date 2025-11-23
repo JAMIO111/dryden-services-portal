@@ -72,10 +72,12 @@ export default function FullScreenCalendar() {
     }
   }, [normalizedDate, view]);
 
-  const { data: calendarItems } = useCalendarItems(
+  const { data: calendarItems, isLoading } = useCalendarItems(
     calendarStartDate,
     calendarEndDate
   );
+
+  console.log("Calendar Items:", calendarItems);
 
   const formattedDate = selectedDate
     ? `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1)
@@ -169,12 +171,21 @@ export default function FullScreenCalendar() {
       .toString()
       .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
     const itemsForDay = calendarItems?.[dateKey] || [];
-    const jobsForDay = itemsForDay.filter((item) => item.type === "job");
+    const jobsForDay = itemsForDay.filter((item) => item.itemType === "job");
     const meetingsForDay = itemsForDay.filter(
-      (item) => item.type === "meeting"
+      (item) => item.itemType === "meeting"
     );
     const absencesForDay = itemsForDay.filter(
-      (item) => item.type === "absence"
+      (item) => item.itemType === "absence"
+    );
+    const laundryForDay = itemsForDay.filter(
+      (item) => item.itemType === "adHocJob" && item.type === "Laundry"
+    );
+    const hotTubForDay = itemsForDay.filter(
+      (item) => item.itemType === "adHocJob" && item.type === "Hot Tub"
+    );
+    const cleanForDay = itemsForDay.filter(
+      (item) => item.itemType === "adHocJob" && item.type === "Clean"
     );
 
     const openDailyItemsModal = (date) => {
@@ -223,21 +234,75 @@ export default function FullScreenCalendar() {
         </span>
 
         {/* Item counter */}
-        {itemsForDay.length > 0 && (
-          <span className="absolute top-2 right-2 text-xs text-error-color">
-            {itemsForDay.length} item{itemsForDay.length !== 1 ? "s" : ""}
-          </span>
-        )}
+
+        <span className="absolute top-2 right-2 text-xs text-error-color">
+          {isLoading ? (
+            <div className="h-3 w-3 border-2 border-secondary-text border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            itemsForDay.length > 0 &&
+            `${itemsForDay.length} item${itemsForDay.length !== 1 ? "s" : ""}`
+          )}
+        </span>
 
         {/* Indicators */}
         <div className="absolute top-7 bottom-1 left-1 right-1 overflow-y-auto flex flex-col justify-start gap-1">
+          {hotTubForDay.length > 0 && view === "Monthly" ? (
+            <span className="bg-blue-400/30 text-primary-text text-xs px-1 rounded">
+              {hotTubForDay.length} Hot Tub Job
+              {hotTubForDay.length > 1 ? "s" : ""}
+            </span>
+          ) : (
+            view === "Weekly" &&
+            hotTubForDay.map((job) => (
+              <span
+                key={job.id}
+                className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                <div className="bg-blue-500 rounded-full w-0.75 h-full"></div>
+                <div className="flex flex-col py-1 gap-1">
+                  <p className="font-semibold text-sm">Hot Tub Job</p>
+                  <p className="text-xs">{job.property_name}</p>
+                </div>
+              </span>
+            ))
+          )}
+
+          {laundryForDay.length > 0 && view === "Monthly" ? (
+            <span className="bg-purple-400/30 text-primary-text text-xs px-1 rounded">
+              {laundryForDay.length} Laundry Job
+              {laundryForDay.length > 1 ? "s" : ""}
+            </span>
+          ) : (
+            view === "Weekly" &&
+            laundryForDay.map((job) => (
+              <span
+                key={job.id}
+                className="bg-purple-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                <div className="bg-purple-500 rounded-full w-0.75 h-full"></div>
+                <div className="flex flex-col py-1 gap-1">
+                  <p className="font-semibold text-sm">Laundry Job</p>
+                  <p className="text-xs">{job.property_name}</p>
+                  <p className="text-xs text-secondary-text">
+                    {`${job.transport} ${
+                      job.splitType === "Start" && job.transport === "Client"
+                        ? "Dropoff"
+                        : job.splitType === "End" &&
+                          job.transport === "Dryden Services"
+                        ? "Dropoff"
+                        : "Pickup"
+                    }`}
+                  </p>
+                </div>
+              </span>
+            ))
+          )}
+
           {jobsForDay.length > 0 &&
             (view === "Weekly"
               ? jobsForDay.map((job) => (
                   <span
                     key={job.id}
-                    className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
-                    <div className="bg-blue-500 rounded-full w-0.75 h-full"></div>
+                    className="bg-pink-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                    <div className="bg-pink-500 rounded-full w-0.75 h-full"></div>
                     <div className="flex flex-col py-1 gap-1">
                       <p className="font-semibold text-sm">Changeover</p>
                       <p className="text-xs">{job.propertyDetails.name}</p>
@@ -254,19 +319,39 @@ export default function FullScreenCalendar() {
                   </span>
                 ))
               : view === "Monthly" && (
-                  <span className="bg-blue-400/30 text-primary-text text-xs px-1 rounded">
+                  <span className="bg-pink-400/30 text-primary-text text-xs px-1 rounded">
                     {jobsForDay.length} Changeover
                     {jobsForDay.length > 1 ? "s" : ""}
                   </span>
                 ))}
+
+          {cleanForDay.length > 0 && view === "Monthly" ? (
+            <span className="bg-green-400/30 text-primary-text text-xs px-1 rounded">
+              {cleanForDay.length} Cleaning Job
+              {cleanForDay.length > 1 ? "s" : ""}
+            </span>
+          ) : (
+            view === "Weekly" &&
+            cleanForDay.map((job) => (
+              <span
+                key={job.id}
+                className="bg-green-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
+                <div className="flex flex-col py-1 gap-1">
+                  <p className="font-semibold text-sm">Cleaning Job</p>
+                  <p className="text-xs">{job.property_name}</p>
+                </div>
+              </span>
+            ))
+          )}
 
           {meetingsForDay.length > 0 &&
             (view === "Weekly"
               ? meetingsForDay.map((meeting) => (
                   <span
                     key={meeting.id}
-                    className="bg-green-400/30 p-1 rounded flex flex-row gap-2">
-                    <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
+                    className="bg-orange-400/30 p-1 rounded flex flex-row gap-2">
+                    <div className="bg-orange-500 rounded-full w-0.75 h-full"></div>
                     <div className="flex flex-col py-1 gap-1">
                       <p className="text-sm font-semibold text-primary-text">
                         Meeting
@@ -287,7 +372,7 @@ export default function FullScreenCalendar() {
                   </span>
                 ))
               : view === "Monthly" && (
-                  <span className="bg-green-400/30 text-primary-text text-xs px-1 rounded">
+                  <span className="bg-orange-400/30 text-primary-text text-xs px-1 rounded">
                     {meetingsForDay.length} Meeting
                     {meetingsForDay.length > 1 ? "s" : ""}
                   </span>

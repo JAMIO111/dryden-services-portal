@@ -413,7 +413,7 @@ export const EmployeeFormSchema = z.object({
     .nullable(),
 });
 
-export const SingleJobFormSchema = z
+export const AdHocJobFormSchema = z
   .object({
     property_id: z
       .string({ message: "You must select a property" })

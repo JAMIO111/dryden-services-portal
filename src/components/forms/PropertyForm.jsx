@@ -485,7 +485,7 @@ const PropertyForm = () => {
         <div className="flex flex-row gap-3 bg-secondary-bg shadow-m rounded-2xl p-3">
           <CTAButton
             disabled={!isDirty}
-            width="flex-1"
+            width="w-[50%]"
             type="cancel"
             text="Revert Changes"
             icon={IoIosUndo}
@@ -497,7 +497,7 @@ const PropertyForm = () => {
           />
           <CTAButton
             disabled={!isDirty || !isValid || isSubmitting}
-            width="flex-1"
+            width="w-[50%]"
             type="success"
             text={isSubmitting ? "Saving..." : "Save Changes"}
             icon={FaCheck}

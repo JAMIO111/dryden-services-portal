@@ -9,6 +9,7 @@ import { IoRepeat, IoTodayOutline } from "react-icons/io5";
 import DatePicker from "../ui/DatePicker";
 import SlidingSelector from "../ui/SlidingSelectorGeneric";
 import { useGenerateRecurrences } from "../../hooks/useGenerateRecurrences";
+import { GoInfo } from "react-icons/go";
 
 const weekdays = [
   "Sunday",
@@ -22,7 +23,6 @@ const weekdays = [
 const ordinals = ["First", "Second", "Third", "Fourth", "Last"];
 
 const RecurrenceForm = ({ startDate }) => {
-  const [monthlyType, setMonthlyType] = useState("Day of Month");
   const [recurrences, setRecurrences] = useState([]);
   const { generateRecurrences } = useGenerateRecurrences();
   const { control, watch, handleSubmit } = useForm({
@@ -30,7 +30,7 @@ const RecurrenceForm = ({ startDate }) => {
       frequency: "weekly",
       interval: 1,
       daysOfWeek: [],
-      monthlyType: "DayofMonth",
+      monthlyType: "Day of Month",
       dayOfMonth: 1,
       monthlyOrdinal: { ordinal: "First", weekday: "Monday" },
       endCondition: null,
@@ -39,6 +39,7 @@ const RecurrenceForm = ({ startDate }) => {
     },
   });
 
+  const monthlyType = watch("monthlyType");
   const frequency = watch("frequency");
   const endCondition = watch("endCondition");
   const count = watch("interval");
@@ -48,6 +49,31 @@ const RecurrenceForm = ({ startDate }) => {
 
   const onSubmit = (data) => {
     console.log("Recurrence data:", data);
+  };
+
+  const getRecurrenceError = () => {
+    if (!startDate) return "Job start date is required";
+    if (!frequency) return "Frequency is required";
+
+    if (frequency === "weekly" && watch("daysOfWeek").length === 0)
+      return "Select at least one day of the week";
+
+    if (
+      frequency === "monthly" &&
+      monthlyType === "Ordinal Pattern" &&
+      (!watch("monthlyOrdinal.ordinal") || !watch("monthlyOrdinal.weekday"))
+    )
+      return "Select both ordinal and weekday for monthly pattern";
+
+    if (!endCondition) return "End condition is required";
+
+    if (endCondition === "after" && !watch("occurrences"))
+      return "Number of occurrences is required";
+
+    if (endCondition === "onDate" && !watch("endDate"))
+      return "End date is required";
+
+    return "";
   };
 
   return (
@@ -143,16 +169,21 @@ const RecurrenceForm = ({ startDate }) => {
             Monthly Options
           </label>
           <div className="mb-4">
-            <SlidingSelector
-              options={["Day of Month", "Ordinal Pattern"]}
-              value={monthlyType}
-              onChange={(value) => {
-                setMonthlyType(value);
-                setValue("monthlyType", value); // <-- important
-              }}
+            <Controller
+              name="monthlyType"
+              control={control}
+              render={({ field }) => (
+                <SlidingSelector
+                  options={["Day of Month", "Ordinal Pattern"]}
+                  value={field.value}
+                  onChange={(value) => {
+                    field.onChange(value);
+                  }}
+                />
+              )}
             />
           </div>
-          {monthlyType === "Day of Month" && (
+          {watch("monthlyType") === "Day of Month" && (
             <div className="my-5">
               <Controller
                 name="dayOfMonth"
@@ -169,7 +200,7 @@ const RecurrenceForm = ({ startDate }) => {
               />
             </div>
           )}
-          {monthlyType === "Ordinal Pattern" && (
+          {watch("monthlyType") === "Ordinal Pattern" && (
             <div>
               <span className="text-sm text-secondary-text">
                 Ordinal pattern:
@@ -262,15 +293,22 @@ const RecurrenceForm = ({ startDate }) => {
           />
         </div>
       )}
-      <div className="pt-4">
+      <div className="flex items-center pt-4">
         <CTAButton
           type="main"
           text="Preview Recurrences"
+          disabled={!!getRecurrenceError()}
           callbackFn={() => {
             const recurrences = generateRecurrences(startDate, watch());
             setRecurrences(recurrences);
           }}
         />
+        {getRecurrenceError() && (
+          <div className="flex flex-1 gap-2 items-center justify-start">
+            <GoInfo className="ml-4 h-5 w-5 text-error-color" />
+            <p className="text-xs text-error-color">{getRecurrenceError()}</p>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-2 mt-6">

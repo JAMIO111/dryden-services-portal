@@ -5,22 +5,24 @@ import { useUser } from "@/contexts/UserProvider";
 import CTAButton from "../CTAButton";
 import { useNavigate } from "react-router-dom";
 import { getGreeting } from "@/lib/HelperFunctions";
-import BookingsTable from "../BookingsTable";
-import { useBookings } from "@/hooks/useBookings";
-import { useBookingsFilters } from "@/hooks/useBookingsFilters";
+import AdHocJobsTable from "../AdHocJobsTable";
+import { useAdHocJobs } from "@/hooks/useAdHocJobs";
+import { useAdHocJobsFilters } from "@/hooks/useAdHocJobsFilters";
 import { useSearchParams } from "react-router-dom";
 import { useGlobalSearch } from "@/contexts/SearchProvider";
 import ActionsModal from "@components/ActionsModal";
 import IconButton from "@components/IconButton";
 import { BsSliders } from "react-icons/bs";
 import FilterPane from "@components/FilterPane";
+import { useModal } from "@/contexts/ModalContext";
+import AdHocJobForm from "../forms/AdHocJobForm";
 import { BiSolidArrowToRight } from "react-icons/bi";
 
-const BookingsDashboard = () => {
+const AdHocJobsDashboard = () => {
+  const { openModal } = useModal();
   const navigate = useNavigate();
   const { profile } = useUser();
-  const [aggregation, setAggregation] = useState("month");
-  const [sortColumn, setSortColumn] = useState("departure_date");
+  const [sortColumn, setSortColumn] = useState("sort_date");
   const [sortOrder, setSortOrder] = useState("desc");
   const [selectedItem, setSelectedItem] = useState(null); // Required
   const [modalPos, setModalPos] = useState(null); // Required
@@ -65,11 +67,11 @@ const BookingsDashboard = () => {
   };
 
   const {
-    data: bookingsData,
-    isFetching: isBookingsLoading,
+    data: adHocJobsData,
+    isFetching: isAdHocJobsLoading,
     error,
     refetch,
-  } = useBookings({
+  } = useAdHocJobs({
     sortColumn,
     sortOrder,
     page,
@@ -78,7 +80,7 @@ const BookingsDashboard = () => {
     endDate: memoisedRange.endDate,
   });
 
-  console.log("Bookings Dashboard Data:", bookingsData);
+  console.log("Ad-Hoc Jobs Dashboard - Ad-Hoc Jobs Data:", adHocJobsData);
 
   useEffect(() => {
     // Reset any local state that should clear when type changes
@@ -95,9 +97,9 @@ const BookingsDashboard = () => {
     }
   }, []);
 
-  const totalCount = bookingsData?.count || 0;
+  const totalCount = adHocJobsData?.count || 0;
   const { debouncedSearchTerm } = useGlobalSearch();
-  const { updateFilters } = useBookingsFilters();
+  const { updateFilters } = useAdHocJobsFilters();
 
   const isSelected = (id) => selectedRows.some((row) => row.id === id);
 
@@ -114,13 +116,6 @@ const BookingsDashboard = () => {
   const handleClearAll = () => {
     setSelectedRows([]);
   };
-
-  const totalRows = selectedRows.length;
-  const totalQuantity = selectedRows.reduce(
-    (acc, r) => acc + r.quantity_defective,
-    0
-  );
-  const totalCost = selectedRows.reduce((acc, r) => acc + r.total_cost, 0);
 
   useEffect(() => {
     updateFilters((prev) => ({ ...prev, search: debouncedSearchTerm }));
@@ -175,14 +170,25 @@ const BookingsDashboard = () => {
   ].filter((key) => searchParams.get(key));
   const filterCount = activeFilters.length;
 
-  console.log("Bookings Dashboard Data:", bookingsData);
+  const handleAdHocJob = () => {
+    openModal({
+      title: "Ad-Hoc Job Booking",
+      content: (
+        <div
+          className="min-w-[600px] overflow-hidden min-h-0 h-[80vh] p-4"
+          ref={modalRef}>
+          <AdHocJobForm />
+        </div>
+      ),
+    });
+  };
 
   return (
     <div className="flex bg-primary-bg flex-col flex-grow overflow-hidden">
       <div className="flex flex-col gap-2 xl:flex-row items-start  xl:items-center justify-between px-6 py-1 shadow-sm border-b border-border-color shrink-0 bg-primary-bg">
         <div className="flex flex-col">
           <h1 className="text-xl whitespace-nowrap text-primary-text">
-            Bookings Dashboard
+            Ad-hoc Jobs Dashboard
           </h1>
           <p className="text-sm text-secondary-text">
             {getGreeting()}, {profile?.first_name || "User"}!
@@ -191,17 +197,15 @@ const BookingsDashboard = () => {
         <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
           <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
             <CTAButton
-              callbackFn={() => navigate("/Jobs/Ad-hoc-Jobs")}
+              callbackFn={() => navigate("/Jobs/Bookings")}
               type="secondary"
-              text="Go to Ad-hoc Jobs"
+              text="Go to Bookings"
               icon={BiSolidArrowToRight}
             />
             <CTAButton
-              callbackFn={() => {
-                navigate("/Jobs/Bookings/New-Booking");
-              }}
+              callbackFn={handleAdHocJob}
               type="main"
-              text="Add Booking"
+              text="Create Job"
               icon={PiFilePlus}
             />
             <IconButton
@@ -236,12 +240,12 @@ const BookingsDashboard = () => {
         </div>
       </div>
       <div className="p-3 flex-1">
-        <BookingsTable
-          isLoading={isBookingsLoading}
+        <AdHocJobsTable
+          isLoading={isAdHocJobsLoading}
           onOpenModal={handleOpenModal}
           selectedItem={selectedItem}
           setSelectedItem={setSelectedItem}
-          data={bookingsData}
+          data={adHocJobsData}
           costData={costData}
           handleActiveModalType={handleActiveModalType}
           onRefresh={refetch}
@@ -268,4 +272,4 @@ const BookingsDashboard = () => {
   );
 };
 
-export default BookingsDashboard;
+export default AdHocJobsDashboard;

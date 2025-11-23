@@ -255,7 +255,7 @@ const BookingForm = () => {
         <div className="flex flex-row shadow-m gap-3 bg-secondary-bg rounded-2xl p-3">
           <CTAButton
             disabled={!isDirty}
-            width="flex-1"
+            width="w-[50%]"
             type="cancel"
             text="Revert Changes"
             icon={IoIosUndo}
@@ -277,7 +277,7 @@ const BookingForm = () => {
           />
           <CTAButton
             disabled={!isDirty || !isValid || isSubmitting}
-            width="flex-1"
+            width="w-[50%]"
             type="success"
             text={isSubmitting ? "Saving..." : "Save Changes"}
             icon={FaCheck}
@@ -313,7 +313,7 @@ const BookingForm = () => {
                 const result = await upsertBooking.mutateAsync(payload);
                 console.log("Upsert result:", result);
 
-                navigate("/Bookings");
+                navigate("/Jobs/Bookings");
 
                 showToast({
                   type: "success",
@@ -329,7 +329,7 @@ const BookingForm = () => {
                     ? "has made ammendments to a booking:"
                     : "has entered a new booking:",
                   metaData: {
-                    url: `/Bookings/${bookingId}`,
+                    url: `/Jobs/Bookings/${bookingId}`,
                     buttonText: "View Booking",
                   },
                   docRef: bookingId || result.booking_id,

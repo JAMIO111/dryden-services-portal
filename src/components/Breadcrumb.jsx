@@ -13,7 +13,7 @@ import { FiUsers } from "react-icons/fi";
 
 const iconMap = {
   Dashboard: <LuLayoutDashboard />,
-  Bookings: <IoReceiptOutline />,
+  Jobs: <IoReceiptOutline />,
   Inventory: <BsBoxes />,
   "Human-Resources": <BsPeople />,
   Settings: <BsGear />,

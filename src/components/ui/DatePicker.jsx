@@ -143,7 +143,9 @@ const DatePicker = ({
 
       {/* Input Box */}
       <div
-        className="flex items-center select-none justify-between transition-all duration-300 bg-text-input-color rounded-lg shadow-s hover:shadow-m p-2.5 text-sm text-primary-text cursor-pointer"
+        className={`${
+          open ? "border-brand-primary" : "border-transparent"
+        } border flex items-center select-none justify-between transition-all duration-300 bg-text-input-color rounded-lg shadow-s hover:shadow-m p-2.5 text-sm text-primary-text cursor-pointer`}
         onClick={() => {
           setOpen(!open);
           setMode(displayMode === "datetime" ? "date" : displayMode);
@@ -162,7 +164,7 @@ const DatePicker = ({
               ? format(
                   currentDate,
                   displayMode === "date"
-                    ? "PPP"
+                    ? "EEE, PPP"
                     : displayMode === "time"
                     ? "p"
                     : "PPP p"
@@ -195,11 +197,13 @@ const DatePicker = ({
                   </motion.span>
                   <div className="flex gap-2">
                     <button
+                      type="button"
                       onClick={() => handleMonthChange(-1)}
                       className="active:scale-95 hover:bg-border-color/50 shadow-s cursor-pointer flex justify-center items-center text-primary-text p-0.75 rounded">
                       <IoChevronDown className="w-4.5 h-4.5 rotate-90" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleMonthChange(1)}
                       className="active:scale-95 hover:bg-border-color/50 shadow-s flex justify-center items-center cursor-pointer text-primary-text p-0.75 rounded">
                       <IoChevronDown className="w-4.5 h-4.5 -rotate-90" />
@@ -227,6 +231,7 @@ const DatePicker = ({
 
                     return (
                       <button
+                        type="button"
                         key={i}
                         onClick={() => handleSelectDate(day)}
                         className={classes}>
@@ -251,11 +256,13 @@ const DatePicker = ({
                     </motion.span>
                     <div className="flex gap-2">
                       <button
+                        type="button"
                         onClick={() => handleYearChange(-1)}
                         className="active:scale-95 hover:bg-border-color/50 shadow-s cursor-pointer flex justify-center items-center text-primary-text p-0.75 rounded">
                         <IoChevronDown className="w-4.5 h-4.5 rotate-90" />
                       </button>
                       <button
+                        type="button"
                         onClick={() => handleYearChange(1)}
                         className="active:scale-95 hover:bg-border-color/50 shadow-s cursor-pointer flex justify-center items-center text-primary-text p-0.75 rounded">
                         <IoChevronDown className="w-4.5 h-4.5 -rotate-90" />
@@ -293,6 +300,7 @@ const DatePicker = ({
                 </div>
 
                 <button
+                  type="button"
                   onClick={handleGoToToday}
                   className="mt-4 cursor-pointer text-brand-primary hover:underline text-sm self-center">
                   Go to today
@@ -331,6 +339,7 @@ const DatePicker = ({
               </div>
               {displayMode !== "time" && (
                 <button
+                  type="button"
                   onClick={() => setMode("date")}
                   className="text-brand-primary hover:underline text-sm mt-2">
                   Back to Date
