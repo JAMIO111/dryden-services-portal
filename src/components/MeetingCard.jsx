@@ -5,7 +5,7 @@ const MeetingCard = ({ meeting }) => {
   const end = meeting?.end_date ? new Date(meeting.end_date) : null;
   console.log("Meeting Data:", meeting);
   return (
-    <div className="bg-tertiary-bg mb-5 flex flex-row gap-4 shadow-s rounded-lg p-3">
+    <div className="bg-tertiary-bg flex flex-row gap-4 shadow-s rounded-lg p-3">
       <div className="flex flex-col p-2 h-12 w-12 items-center rounded-md justify-center bg-primary-bg">
         <p className="text-xs font-[500] text-error-color">
           {start

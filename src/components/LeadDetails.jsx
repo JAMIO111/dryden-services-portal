@@ -103,7 +103,9 @@ const LeadDetails = () => {
           ) : engagementItems.length > 0 ? (
             engagementItems.map((item) =>
               item.type === "meeting" ? (
-                <LeadMeeting key={item.id} meeting={item} />
+                <div className="mb-5" key={item.id}>
+                  <LeadMeeting meeting={item} />
+                </div>
               ) : (
                 <LeadCorrespondence key={item.id} correspondence={item} />
               )

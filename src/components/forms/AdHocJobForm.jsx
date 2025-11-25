@@ -231,7 +231,7 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
                       required
                       options={[
                         { id: "Dryden Services", name: "Dryden Services" },
-                        { id: "Client Provided", name: "Client Provided" },
+                        { id: "Client", name: "Client Provided" },
                       ]}
                       placeholder="Select a transport type..."
                       icon={BsTruck}

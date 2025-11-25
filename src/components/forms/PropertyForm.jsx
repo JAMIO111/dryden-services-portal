@@ -22,11 +22,8 @@ import CardSelect from "@components/CardSelect";
 import { usePackages } from "@/hooks/useManagementPackages";
 import { HiOutlinePhone } from "react-icons/hi2";
 import { HiOutlineMail } from "react-icons/hi";
-import {
-  MdHotTub,
-  MdOutlineLocalLaundryService,
-  MdPublishedWithChanges,
-} from "react-icons/md";
+import { MdHotTub, MdPublishedWithChanges } from "react-icons/md";
+import { TbIroning3 } from "react-icons/tb";
 import Spinner from "@components/LoadingSpinner";
 import { useToast } from "../../contexts/ToastProvider";
 import ToggleButton from "../ui/ToggleButton";
@@ -347,7 +344,7 @@ const PropertyForm = () => {
                   {
                     id: "laundry",
                     name: "Laundry",
-                    icon: MdOutlineLocalLaundryService,
+                    icon: TbIroning3,
                   },
                   { id: "clean", name: "Clean", icon: GiMagicBroom },
                 ]}
@@ -371,7 +368,7 @@ const PropertyForm = () => {
                 onChange={field.onChange}
                 trueLabel="Yes"
                 falseLabel="No"
-                icon={MdOutlineLocalLaundryService}
+                icon={TbIroning3}
               />
             )}
           />
