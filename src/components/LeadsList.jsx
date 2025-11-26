@@ -144,8 +144,10 @@ export default function LeadList() {
                       width="w-full"
                       type="success"
                       text="Convert to Client"
-                      onClick={() =>
-                        alert(`Converting ${lead.company} to client`)
+                      callbackFn={() =>
+                        navigate(`/Client-Management/Owners/New-Owner`, {
+                          state: { lead },
+                        })
                       }
                     />
                   </div>

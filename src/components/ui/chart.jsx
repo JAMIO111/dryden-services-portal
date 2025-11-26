@@ -186,12 +186,12 @@ function ChartTooltipContent({
 
               <div
                 className={cn(
-                  "flex flex-1 min-w-0 gap-x-4 leading-none", // gap added, flex children allowed to grow
+                  "flex flex-1 min-w-0 gap-x-4 leading-[1.2]", // gap added, flex children allowed to grow
                   nestLabel ? "items-end" : "items-center"
                 )}>
                 <div className="min-w-0 flex-1 truncate">
                   {nestLabel ? tooltipLabel : null}
-                  <span className="block text-secondary-text truncate leading-3">
+                  <span className="block text-secondary-text truncate leading-[1.2]">
                     {item.subModeName || itemConfig?.label || item.name}
                   </span>
                 </div>

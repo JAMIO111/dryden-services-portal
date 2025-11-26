@@ -9,11 +9,18 @@ const fetchAdHocJobsCalendar = async (startDate, endDate) => {
       *
     `
     )
-    .gte("sort_date", startDate.toISOString())
-    .lte("sort_date", endDate.toISOString())
-    .order("sort_date", { ascending: true });
+    .lte("sort_date_start", endDate.toISOString()) // job starts before user range ends
+    .gte("sort_date_end", startDate.toISOString()) // job ends after user range starts
+    .order("sort_date_start", { ascending: true });
 
   if (error) throw new Error(error.message);
+
+  console.log(
+    "Fetched AdHocJobsCalendar with dates:",
+    startDate,
+    endDate,
+    data
+  );
   return data;
 };
 

@@ -8,7 +8,7 @@ import { getGreeting } from "@/lib/HelperFunctions";
 import AdHocJobsTable from "../AdHocJobsTable";
 import { useAdHocJobs } from "@/hooks/useAdHocJobs";
 import { useAdHocJobsFilters } from "@/hooks/useAdHocJobsFilters";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { useGlobalSearch } from "@/contexts/SearchProvider";
 import ActionsModal from "@components/ActionsModal";
 import IconButton from "@components/IconButton";
@@ -19,10 +19,11 @@ import AdHocJobForm from "../forms/AdHocJobForm";
 import { BiSolidArrowToRight } from "react-icons/bi";
 
 const AdHocJobsDashboard = () => {
+  const location = useLocation();
   const { openModal } = useModal();
   const navigate = useNavigate();
   const { profile } = useUser();
-  const [sortColumn, setSortColumn] = useState("sort_date");
+  const [sortColumn, setSortColumn] = useState("sort_date_start");
   const [sortOrder, setSortOrder] = useState("desc");
   const [selectedItem, setSelectedItem] = useState(null); // Required
   const [modalPos, setModalPos] = useState(null); // Required
@@ -40,9 +41,11 @@ const AdHocJobsDashboard = () => {
     return s;
   }, [today]);
 
-  const [selectedRange, setSelectedRange] = useState({
-    startDate: today,
-    endDate: end,
+  const [selectedRange, setSelectedRange] = useState(() => {
+    return {
+      startDate: location?.state?.startDate ?? today,
+      endDate: location?.state?.endDate ?? end,
+    };
   });
 
   const memoisedRange = useMemo(

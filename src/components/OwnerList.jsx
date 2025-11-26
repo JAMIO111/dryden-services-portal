@@ -3,17 +3,19 @@ import { MdPeopleOutline } from "react-icons/md";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import CTAButton from "./CTAButton";
 import { useNavigate } from "react-router-dom";
+import ToggleButton from "./ui/ToggleButton";
 
 const OwnerList = ({ onSelectOwner, selectedOwner, owners }) => {
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const [highlightStyle, setHighlightStyle] = useState({ top: 0, height: 0 });
+  const [activeStatus, setActiveStatus] = useState("Active");
 
   // Update highlight position when selection changes
   useEffect(() => {
     if (!selectedOwner || !containerRef.current) return;
 
-    const index = owners.findIndex((o) => o.id === selectedOwner.id);
+    const index = filteredOwners.findIndex((o) => o.id === selectedOwner.id);
     const listItem = containerRef.current.querySelectorAll("li")[index];
 
     if (listItem) {
@@ -27,12 +29,28 @@ const OwnerList = ({ onSelectOwner, selectedOwner, owners }) => {
     }
   }, [selectedOwner, owners]);
 
+  const filteredOwners =
+    activeStatus === "Active"
+      ? owners.filter((owner) => owner.is_active)
+      : owners;
+
   return (
     <div className="bg-secondary-bg w-1/4 rounded-2xl shadow-m flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="flex flex-row gap-3 items-center px-4 py-4 border-b border-border-color">
         <MdPeopleOutline className="w-7 h-7 text-primary-text" />
         <h2 className="text-xl text-primary-text font-semibold">Owner List</h2>
+        <div className="w-36">
+          <ToggleButton
+            checked={activeStatus === "Active"}
+            onChange={(isActive) =>
+              setActiveStatus(isActive ? "Active" : "All")
+            }
+            trueLabel="Active"
+            falseLabel="All"
+            verticalPadding={"py-1.5"}
+          />
+        </div>
       </div>
 
       {/* Scrollable List */}
@@ -52,14 +70,14 @@ const OwnerList = ({ onSelectOwner, selectedOwner, owners }) => {
         )}
 
         <ul className="relative z-10">
-          {owners.length === 0 ? (
+          {filteredOwners.length === 0 ? (
             <div className="p-3 text-center">
               <div className="bg-text-input-color text-secondary-text text-sm rounded-lg p-4">
                 No results found
               </div>
             </div>
           ) : (
-            owners
+            filteredOwners
               ?.sort((a, b) => a.first_name.localeCompare(b.first_name))
               .map((owner) => (
                 <li

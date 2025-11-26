@@ -19,7 +19,9 @@ const HRDashboard = lazy(() =>
 const BookingsDashboard = lazy(() =>
   import("./components/dashboard/BookingsDashboard.jsx")
 );
-
+const JobsDashboard = lazy(() =>
+  import("./components/dashboard/JobsDashboard.jsx")
+);
 const AdHocJobsDashboard = lazy(() =>
   import("./components/dashboard/AdHocJobsDashboard.jsx")
 );
@@ -96,7 +98,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Dashboard /> },
           { path: "Dashboard", element: <Dashboard /> },
-          { path: "Jobs", element: <BookingsDashboard /> },
+          { path: "Jobs", element: <JobsDashboard /> },
           {
             path: "Jobs/Bookings",
             element: <BookingsDashboard />,

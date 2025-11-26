@@ -11,6 +11,7 @@ const ToggleButton = forwardRef(
       onChange,
       trueLabel = "On",
       falseLabel = "Off",
+      verticalPadding = "py-2",
     },
     ref
   ) => {
@@ -18,7 +19,7 @@ const ToggleButton = forwardRef(
       <div className="flex flex-col gap-1 min-w-0 w-full">
         {label && <label className="block text-primary-text">{label}</label>}
         <div
-          className={`flex items-center shadow-s rounded-lg px-2 py-2 min-w-0 relative
+          className={`${verticalPadding} flex items-center shadow-s rounded-lg px-2 min-w-0 relative
             ${
               error
                 ? "border-error-color hover:border-error-color/70 focus-within:border-error-color focus-within:ring-3 focus-within:ring-error-color/20"

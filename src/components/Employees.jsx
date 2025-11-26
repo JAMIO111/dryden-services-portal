@@ -7,12 +7,14 @@ import { useModal } from "@/contexts/ModalContext";
 import EmployeeForm from "./forms/EmployeeForm.jsx";
 import { useEmployees } from "@/hooks/useEmployees";
 import { BiSolidShow, BiSolidHide } from "react-icons/bi";
+import ToggleButton from "./ui/ToggleButton";
 
 const Employees = () => {
   const { openModal } = useModal();
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const { data: employees, isLoading, error } = useEmployees();
   const [showHourlyRate, setShowHourlyRate] = useState(false);
+  const [activeStatus, setActiveStatus] = useState("All");
 
   const getInitials = (firstName, lastName) => {
     const firstInitial = firstName?.charAt(0)?.toUpperCase();
@@ -22,19 +24,24 @@ const Employees = () => {
 
   const { debouncedSearchTerm } = useGlobalSearch();
 
-  const filteredData = debouncedSearchTerm
-    ? employees?.filter((employee) => {
-        const term = debouncedSearchTerm.toLowerCase();
-        return (
-          employee.first_name?.toLowerCase().includes(term) ||
-          employee.surname?.toLowerCase().includes(term) ||
-          employee.job_title?.toLowerCase().includes(term) ||
-          employee.email?.toLowerCase().includes(term) ||
-          employee.phone?.toLowerCase().includes(term) ||
-          term === (employee.is_active ? "active" : "inactive")
-        );
-      })
-    : employees;
+  const filteredData = employees?.filter((employee) => {
+    // Filter by search term
+    const termMatch = debouncedSearchTerm
+      ? (
+          employee.first_name?.toLowerCase() +
+          employee.surname?.toLowerCase() +
+          employee.job_title?.toLowerCase() +
+          employee.email?.toLowerCase() +
+          employee.phone?.toLowerCase()
+        ).includes(debouncedSearchTerm.toLowerCase())
+      : true;
+
+    // Filter by active status toggle
+    const statusMatch =
+      activeStatus === "All" ? true : employee.is_active === true;
+
+    return termMatch && statusMatch;
+  });
 
   const handleAddEmployee = () => {
     openModal({
@@ -66,12 +73,23 @@ const Employees = () => {
   };
 
   return (
-    <div className="flex bg-primary-bg flex-1 overflow-auto flex-col gap-5 p-5">
-      <div className="flex flex-row justify-between h-7 items-center">
+    <div className="flex bg-primary-bg flex-1 overflow-auto flex-col gap-5 pt-5 p-3">
+      <div className="flex flex-row justify-between h-5 items-center">
         <p className="text-primary-text text-xl font-semibold pl-1">
           Employee Directory
         </p>
         <div className="flex flex-row gap-2">
+          <div className="w-56">
+            <ToggleButton
+              checked={activeStatus === "Active"}
+              onChange={(isActive) =>
+                setActiveStatus(isActive ? "Active" : "All")
+              }
+              trueLabel="Active Employees"
+              falseLabel="All Employees"
+              verticalPadding={"py-1.25"}
+            />
+          </div>
           {selectedEmployee && (
             <CTAButton
               text={"Edit Details"}

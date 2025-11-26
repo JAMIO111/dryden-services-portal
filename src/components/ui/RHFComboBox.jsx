@@ -167,7 +167,7 @@ const RHFComboBox = ({
                   ? "ring-3 ring-error-color/30"
                   : "border-brand-primary hover:border-brand-primary"
                 : "border-transparent"
-            } shadow-s border hover:shadow-m rounded-lg px-2 py-2 cursor-pointer bg-text-input-color flex items-center justify-between ${
+            } shadow-s border hover:shadow-m rounded-lg px-2 py-2 cursor-pointer bg-text-input-color flex items-center transition-all duration-300 justify-between ${
               (dependentValue === undefined || dependentValue === null) &&
               dependentKey
                 ? "pointer-events-none cursor-not-allowed"

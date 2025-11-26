@@ -35,7 +35,7 @@ const RHFTextAreaInput = forwardRef(
         )}
 
         <div
-          className={`flex border flex-row relative items-start shadow-s hover:shadow-m rounded-lg pl-2 pr-10 py-2 bg-text-input-color
+          className={`flex border flex-row relative transition-all duration-300 items-start shadow-s hover:shadow-m rounded-lg pl-2 pr-10 py-2 bg-text-input-color
              focus-within:border-brand-primary focus-within:hover:border-brand-primary min-w-0
             ${
               error

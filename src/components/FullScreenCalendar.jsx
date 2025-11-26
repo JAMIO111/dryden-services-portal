@@ -253,9 +253,9 @@ export default function FullScreenCalendar() {
             </span>
           ) : (
             view === "Weekly" &&
-            hotTubForDay.map((job) => (
+            hotTubForDay.map((job, index) => (
               <span
-                key={job.id}
+                key={index}
                 className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                 <div className="bg-blue-500 rounded-full w-0.75 h-full"></div>
                 <div className="flex flex-col py-1 gap-1">
@@ -273,9 +273,9 @@ export default function FullScreenCalendar() {
             </span>
           ) : (
             view === "Weekly" &&
-            laundryForDay.map((job) => (
+            laundryForDay.map((job, index) => (
               <span
-                key={job.id}
+                key={index}
                 className="bg-purple-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                 <div className="bg-purple-500 rounded-full w-0.75 h-full"></div>
                 <div className="flex flex-col py-1 gap-1">
@@ -298,9 +298,9 @@ export default function FullScreenCalendar() {
 
           {jobsForDay.length > 0 &&
             (view === "Weekly"
-              ? jobsForDay.map((job) => (
+              ? jobsForDay.map((job, index) => (
                   <span
-                    key={job.id}
+                    key={index}
                     className="bg-pink-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                     <div className="bg-pink-500 rounded-full w-0.75 h-full"></div>
                     <div className="flex flex-col py-1 gap-1">
@@ -332,9 +332,9 @@ export default function FullScreenCalendar() {
             </span>
           ) : (
             view === "Weekly" &&
-            cleanForDay.map((job) => (
+            cleanForDay.map((job, index) => (
               <span
-                key={job.id}
+                key={index}
                 className="bg-green-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                 <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
                 <div className="flex flex-col py-1 gap-1">
@@ -347,9 +347,9 @@ export default function FullScreenCalendar() {
 
           {meetingsForDay.length > 0 &&
             (view === "Weekly"
-              ? meetingsForDay.map((meeting) => (
+              ? meetingsForDay.map((meeting, index) => (
                   <span
-                    key={meeting.id}
+                    key={index}
                     className="bg-orange-400/30 p-1 rounded flex flex-row gap-2">
                     <div className="bg-orange-500 rounded-full w-0.75 h-full"></div>
                     <div className="flex flex-col py-1 gap-1">
@@ -380,9 +380,9 @@ export default function FullScreenCalendar() {
 
           {absencesForDay.length > 0 &&
             (view === "Weekly"
-              ? absencesForDay.map((absence) => (
+              ? absencesForDay.map((absence, index) => (
                   <span
-                    key={absence.id}
+                    key={index}
                     className="bg-red-400/30 p-1 rounded flex flex-row gap-2">
                     <div className="bg-red-500 rounded-full w-0.75 h-full"></div>
                     <div className="flex flex-col py-1 gap-1">

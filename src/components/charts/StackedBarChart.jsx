@@ -21,7 +21,7 @@ import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 export default function BookingVolumeChart({ data, subtitle }) {
   if (!data || !Array.isArray(data)) {
     return (
-      <div className="h-full flex justify-center items-center rounded-3xl shadow-m bg-secondary-bg text-secondary-text">
+      <div className="h-full flex justify-center items-center rounded-2xl shadow-m bg-secondary-bg text-secondary-text">
         No date range selected
       </div>
     );

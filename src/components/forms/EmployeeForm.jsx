@@ -315,7 +315,6 @@ const EmployeeForm = ({ employee }) => {
             control={control}
             render={({ field, fieldState }) => (
               <TextInput
-                required
                 dataType="number"
                 prefix="£"
                 label="Hourly Rate"

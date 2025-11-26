@@ -3,13 +3,15 @@ import JobList from "@components/JobList";
 import { useUser } from "@/contexts/UserProvider";
 import DateRangePicker from "@components/ui/DateRangePicker";
 import { getGreeting } from "@/lib/HelperFunctions";
-import { useJobs } from "@/hooks/useJobs";
 import StackedBarChart from "@components/charts/StackedBarChart";
 import { useBookingVolume } from "@/hooks/useBookingVolume";
 import { getPeriodLabel } from "@/lib/utils";
 import { CgClose } from "react-icons/cg";
 import JobSheetPrintModal from "../JobSheetPrintModal";
 import { useJobSheetJobs } from "@/hooks/useJobSheetJobs";
+import DashboardCard from "./DashboardCard";
+import { MdOutlinePublishedWithChanges } from "react-icons/md";
+import { TbIroning3 } from "react-icons/tb";
 
 const Dashboard = () => {
   const { profile, orgUsers } = useUser();
@@ -88,7 +90,7 @@ const Dashboard = () => {
         <div className="flex flex-col gap-2 xl:flex-row items-start xl:items-center justify-between px-6 py-1 shadow-sm border-b border-border-color shrink-0 bg-primary-bg">
           <div className="flex flex-col">
             <h1 className="text-xl whitespace-nowrap text-primary-text">
-              Business Dashboard
+              Jobs Dashboard
             </h1>
             <p className="text-sm text-secondary-text">
               {getGreeting()}, {profile?.first_name || "User"}!
@@ -116,41 +118,35 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="flex gap-3 p-3 flex-grow overflow-hidden">
-          <div className="flex flex-col gap-3 flex-6">
-            <div className="flex gap-3 flex-1">
-              <div className="flex-3">
-                <StackedBarChart
-                  data={data}
-                  subtitle={`Changeovers for ${getPeriodLabel(
-                    memoisedRange.startDate,
-                    memoisedRange.endDate,
-                    "current"
-                  )}`}
+          <div className="flex flex-col gap-3 flex-1">
+            <div className="flex flex-col gap-3 flex-1">
+              <div className="flex gap-3 h-30">
+                <DashboardCard
+                  title="Bookings"
+                  value={jobs?.filter((job) => job.itemType === "job").length}
+                  icon={MdOutlinePublishedWithChanges}
+                  link="/Jobs/Bookings"
+                  state={{
+                    startDate: memoisedRange.startDate,
+                    endDate: memoisedRange.endDate,
+                  }}
+                  isLoading={isLoading}
+                />
+                <DashboardCard
+                  title="Ad-Hoc Jobs"
+                  value={
+                    jobs?.filter((job) => job.itemType === "adHocJob").length
+                  }
+                  icon={TbIroning3}
+                  link="/Jobs/Ad-Hoc-Jobs"
+                  state={{
+                    startDate: memoisedRange.startDate,
+                    endDate: memoisedRange.endDate,
+                  }}
+                  isLoading={isLoading}
                 />
               </div>
               <div className="flex-2">
-                <StackedBarChart
-                  data={data}
-                  subtitle={`Changeovers for ${getPeriodLabel(
-                    memoisedRange.startDate,
-                    memoisedRange.endDate,
-                    "current"
-                  )}`}
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 flex-1">
-              <div className="flex-2">
-                <StackedBarChart
-                  data={data}
-                  subtitle={`Changeovers for ${getPeriodLabel(
-                    memoisedRange.startDate,
-                    memoisedRange.endDate,
-                    "current"
-                  )}`}
-                />
-              </div>
-              <div className="flex-3">
                 <StackedBarChart
                   data={data}
                   subtitle={`Changeovers for ${getPeriodLabel(
@@ -162,7 +158,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="flex-4">
+          <div className="flex-1">
             <JobList
               jobs={jobs}
               isLoading={isLoading}

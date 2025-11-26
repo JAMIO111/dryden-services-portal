@@ -84,7 +84,7 @@
   --hover-menu: 235, 235, 240;
   --active-menu: 225, 225, 245;
   --cta-color: var(--color-violet-700);
-  --muted-text: 120, 120, 120;
+  --muted-text: 150, 150, 150;
   --shadow-color: 220, 220, 220;
   --cta-btn-bg: var(--color-violet-300);
   --cta-btn-bg-hover: var(--color-violet-400);
@@ -146,7 +146,7 @@
   --hover-menu: 35, 35, 35;
   --active-menu: 55, 55, 65;
   --cta-color: var(--color-indigo-500);
-  --muted-text: 150, 150, 150;
+  --muted-text: 100, 100, 100;
   --shadow-color: 20, 20, 20;
   --cta-btn-bg: var(--color-indigo-900);
   --cta-btn-bg-hover: var(--color-indigo-800);

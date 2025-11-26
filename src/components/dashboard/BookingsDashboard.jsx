@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { PiFilePlus } from "react-icons/pi";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useUser } from "@/contexts/UserProvider";
@@ -18,6 +19,7 @@ import { BiSolidArrowToRight } from "react-icons/bi";
 
 const BookingsDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { profile } = useUser();
   const [aggregation, setAggregation] = useState("month");
   const [sortColumn, setSortColumn] = useState("departure_date");
@@ -38,9 +40,11 @@ const BookingsDashboard = () => {
     return s;
   }, [today]);
 
-  const [selectedRange, setSelectedRange] = useState({
-    startDate: today,
-    endDate: end,
+  const [selectedRange, setSelectedRange] = useState(() => {
+    return {
+      startDate: location?.state?.startDate ?? today,
+      endDate: location?.state?.endDate ?? end,
+    };
   });
 
   const memoisedRange = useMemo(

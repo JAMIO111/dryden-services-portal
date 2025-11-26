@@ -2,7 +2,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OwnerFormSchema } from "../../validationSchema";
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useOwnerById } from "@/hooks/useOwnerById";
 import TextInput from "../ui/TextInput";
 import { IoText } from "react-icons/io5";
@@ -19,30 +19,33 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../contexts/ToastProvider";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
 
-const defaultFormData = {
-  id: null,
-  first_name: "",
-  surname: "",
-  middle_name: "",
-  primary_email: "",
-  primary_phone: "",
-  secondary_email: "",
-  secondary_phone: "",
-  is_active: true,
-  created_at: null,
-  legacy_id: null,
-  location: "",
-};
-
 const OwnerForm = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
   const { showToast } = useToast();
   const { createNotification } = useCreateNotification();
   const { data: owner, isLoading } = useOwnerById(
     id !== "New-Owner" ? id : null
   );
+
+  console.log("Location state:", location.state);
+
+  const defaultFormData = {
+    id: null,
+    first_name: location.state?.lead?.first_name || "",
+    surname: location.state?.lead?.surname || "",
+    middle_name: location.state?.lead?.middle_name || "",
+    primary_email: location.state?.lead?.email || "",
+    primary_phone: location.state?.lead?.phone || "",
+    secondary_email: "",
+    secondary_phone: "",
+    is_active: true,
+    created_at: null,
+    legacy_id: null,
+    location: "",
+  };
 
   const upsertOwner = useUpsertOwner();
 
@@ -63,12 +66,31 @@ const OwnerForm = () => {
   });
 
   useEffect(() => {
-    if (id === "New-Owner") {
-      reset(defaultFormData);
-    } else if (owner) {
-      reset(owner);
+    const lead = location.state?.lead;
+
+    // Editing existing owner → wait until owner exists
+    if (id !== "New-Owner") {
+      if (owner) reset(owner);
+      return;
     }
-  }, [id, owner, reset]);
+
+    // Creating new owner from lead
+    if (lead) {
+      reset({
+        ...defaultFormData,
+        first_name: lead.first_name ?? "",
+        surname: lead.surname ?? "",
+        middle_name: lead.middle_name ?? "",
+        primary_email: lead.email ?? "",
+        primary_phone: lead.phone ?? "",
+        location: lead.title ?? "", // ← You probably want lead.title here
+      });
+      return;
+    }
+
+    // Creating blank new owner
+    reset(defaultFormData);
+  }, [id, owner, location.key]); // ← important
 
   console.log("Owner data:", owner);
 
@@ -114,7 +136,7 @@ const OwnerForm = () => {
             <TextInput
               required={true}
               label="First Name"
-              placeholder="Enter first name..."
+              placeholder="e.g. John"
               {...field}
               icon={IoText}
               error={fieldState.error}
@@ -128,7 +150,7 @@ const OwnerForm = () => {
             <TextInput
               required={true}
               label="Surname"
-              placeholder="Enter surname..."
+              placeholder="e.g. Doe"
               {...field}
               icon={IoText}
               error={fieldState.error}
@@ -141,7 +163,7 @@ const OwnerForm = () => {
           render={({ field, fieldState }) => (
             <TextInput
               label="Middle Name"
-              placeholder="Enter middle name..."
+              placeholder="e.g. Robert"
               {...field}
               icon={IoText}
               error={fieldState.error}
@@ -157,7 +179,7 @@ const OwnerForm = () => {
             <TextInput
               required={true}
               label="Primary Email"
-              placeholder="Enter primary email..."
+              placeholder="e.g. john.doe@example.com"
               {...field}
               icon={TfiEmail}
               error={fieldState.error}
@@ -170,7 +192,7 @@ const OwnerForm = () => {
           render={({ field, fieldState }) => (
             <TextInput
               label="Secondary Email"
-              placeholder="Enter secondary email..."
+              placeholder="e.g. robertdoe@example.co.uk"
               {...field}
               icon={TfiEmail}
               error={fieldState.error}
@@ -183,7 +205,7 @@ const OwnerForm = () => {
           render={({ field, fieldState }) => (
             <TextInput
               label="Primary Phone"
-              placeholder="Enter primary phone..."
+              placeholder="e.g. 07985 998712"
               {...field}
               icon={HiOutlinePhone}
               error={fieldState.error}
@@ -196,7 +218,7 @@ const OwnerForm = () => {
           render={({ field, fieldState }) => (
             <TextInput
               label="Secondary Phone"
-              placeholder="Enter secondary phone..."
+              placeholder="e.g. 01670 123456"
               {...field}
               icon={HiOutlinePhone}
               error={fieldState.error}
@@ -209,7 +231,7 @@ const OwnerForm = () => {
           render={({ field, fieldState }) => (
             <TextInput
               label="Location"
-              placeholder="Enter location..."
+              placeholder="e.g. Alnwick, Northumberland"
               {...field}
               icon={TfiEmail}
               error={fieldState.error}
@@ -242,7 +264,15 @@ const OwnerForm = () => {
             disabled={!isDirty || !isValid || isSubmitting}
             width="flex-1"
             type="success"
-            text={isSubmitting ? "Saving..." : "Save Changes"}
+            text={
+              isSubmitting
+                ? location.state
+                  ? "Converting..."
+                  : "Saving..."
+                : location.state
+                ? "Convert Lead"
+                : "Save Changes"
+            }
             icon={FaCheck}
             callbackFn={handleSubmit(async (data) => {
               try {

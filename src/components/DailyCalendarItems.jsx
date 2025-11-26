@@ -223,7 +223,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
             {groupedItems.job.map((job) => (
               <div
                 key={job.jobId}
-                className="bg-tertiary-bg p-3 rounded-lg shadow-s flex flex-row gap-3">
+                className="bg-tertiary-bg p-3 rounded-lg shadow-s flex flex-row gap-5">
                 <div className="bg-primary-bg rounded-lg shadow-s h-18 w-18 flex items-center justify-center">
                   <MdPublishedWithChanges className="w-12 h-12 text-pink-500 m-2" />
                 </div>

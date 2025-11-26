@@ -45,6 +45,7 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
             }
             trueLabel="Active"
             falseLabel="All"
+            verticalPadding={"py-1.5"}
           />
         </div>
         <CTAButton

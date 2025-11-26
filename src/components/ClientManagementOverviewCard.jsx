@@ -211,10 +211,10 @@ export default function ClientManagementOverviewCard({
           Make sure all their details are up to date.
         </p>
 
-        <div className="flex gap-5 items-center justify-between">
+        <div className="flex gap-3 items-center justify-between">
           <div
             ref={containerRef}
-            className="flex gap-5 overflow-hidden flex-nowrap flex-grow">
+            className="flex gap-3 overflow-hidden flex-nowrap flex-grow">
             {active === "Owners"
               ? activeOwners
                   .sort(
@@ -223,6 +223,7 @@ export default function ClientManagementOverviewCard({
                   .slice(0, visibleCount)
                   .map((owner, i) => (
                     <button
+                      title={`${owner.first_name || ""} ${owner.surname || ""}`}
                       onClick={() =>
                         navigate(`/Client-Management/Owners/${owner.id}`)
                       }
@@ -257,11 +258,14 @@ export default function ClientManagementOverviewCard({
                   .slice(0, visibleCount)
                   .map((property, i) => (
                     <button
+                      title={property.name}
                       onClick={() =>
-                        navigate(`/Client-Management/Properties/${property.id}`)
+                        navigate(
+                          `/Client-Management/Properties/${property.name}`
+                        )
                       }
                       key={i}
-                      className="flex flex-col items-center flex-shrink-0">
+                      className="flex flex-col cursor-pointer items-center flex-shrink-0">
                       {property.image ? (
                         <img
                           src={property.image || `No Image`}

@@ -1,14 +1,23 @@
-import React from "react";
 import CTAButton from "./CTAButton";
 import { HiOutlineDocumentText } from "react-icons/hi2";
+import { useNavigate } from "react-router-dom";
 
 const JobList = ({ jobs = [], isLoading, error, openModal }) => {
+  const navigate = useNavigate();
+
+  const typeClasses = {
+    Changeover: "bg-pink-500/10 text-pink-600",
+    Clean: "bg-green-500/10 text-green-600",
+    Maintenance: "bg-yellow-500/10 text-yellow-600",
+    Laundry: "bg-purple-500/10 text-purple-600",
+    "Hot Tub": "bg-blue-500/10 text-blue-600",
+  };
   return (
-    <div className="flex flex-col bg-secondary-bg p-2 h-full rounded-3xl shadow-m">
+    <div className="flex flex-col bg-secondary-bg p-2 h-full rounded-2xl shadow-m">
       {/* Header */}
 
-      <div className="flex flex-row justify-between items-center px-3 pt-3 pb-4">
-        <h2 className="text-xl text-primary-text font-semibold">
+      <div className="flex flex-row justify-between items-center pt-2 pb-3 px-1">
+        <h2 className="text-xl px-1 text-primary-text font-semibold">
           Upcoming Jobs
         </h2>
         <CTAButton
@@ -30,10 +39,12 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
       </div>
 
       <div className="flex flex-1 bg-tertiary-bg flex-col border border-border-color h-full rounded-2xl overflow-hidden">
-        <div className="grid grid-cols-[2.5fr_2fr_2fr] border-b border-border-color text-sm bg-primary-bg text-secondary-text">
+        <div className="grid grid-cols-[1.5fr_2.5fr_2fr_2fr_140px] border-b border-border-color text-sm bg-primary-bg text-secondary-text">
+          <div className="p-2 border-r border-border-color">Job No.</div>
           <div className="p-2 border-r border-border-color">Property</div>
           <div className="p-2 border-r border-border-color">Job Date</div>
-          <div className="p-2">Move In</div>
+          <div className="p-2 border-r border-border-color">Move In</div>
+          <div className="p-2 text-center">Job Type</div>
         </div>
 
         {/* Body */}
@@ -46,9 +57,12 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
                   index % 2 === 0 ? "bg-tertiary-bg" : "bg-secondary-bg"
                 } ${
                   index !== jobs.length ? "border-b" : ""
-                } border-border-color grid grid-cols-[2.5fr_2fr_2fr] text-sm text-primary-text hover:bg-brand-primary/30 cursor-pointer`}>
+                } border-border-color grid grid-cols-[1.5fr_2.5fr_2fr_2fr_140px] text-xs text-primary-text hover:bg-brand-primary/15`}>
+                <div className="flex hover:underline cursor-pointer font-medium items-center px-2 py-1">
+                  {job.jobId || "N/A"}
+                </div>
                 <div className="flex font-medium items-center px-2 py-1">
-                  {job.propertyDetails.name}
+                  {job.propertyName}
                 </div>
                 <div className="flex items-center px-3 py-1">
                   {job.jobDate
@@ -67,6 +81,16 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
                         month: "short",
                       })
                     : "No Booking"}
+                </div>
+                <div className=" justify-center items-center px-3 py-1">
+                  <p
+                    className={`py-0.5 px-2 text-center shadow-s rounded-md ${
+                      typeClasses[
+                        job.itemType === "job" ? "Changeover" : job.type
+                      ]
+                    }`}>
+                    {job.itemType === "job" ? "Changeover" : job.type}
+                  </p>
                 </div>
               </div>
             ))

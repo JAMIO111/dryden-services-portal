@@ -6,10 +6,17 @@ import {
   IoReceiptOutline,
   IoCalendarOutline,
 } from "react-icons/io5";
-import { BsBoxes, BsGear, BsPeople, BsBuildingGear } from "react-icons/bs";
+import {
+  BsBoxes,
+  BsGear,
+  BsPeople,
+  BsBuildingGear,
+  BsHouseAdd,
+} from "react-icons/bs";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { MdOutlineHolidayVillage } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
+import { IoPersonAddOutline } from "react-icons/io5";
 
 const iconMap = {
   Dashboard: <LuLayoutDashboard />,
@@ -21,6 +28,8 @@ const iconMap = {
   Owners: <FiUsers />,
   "Client-Management": <BsBuildingGear />,
   Calendar: <IoCalendarOutline />,
+  "New-Owner": <IoPersonAddOutline />,
+  "New-Property": <BsHouseAdd />,
 };
 
 function formatSegment(segment) {

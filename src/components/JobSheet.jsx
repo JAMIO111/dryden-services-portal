@@ -266,7 +266,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
           </section>
         )}
       </section>
-      {job?.propertyDetails.service_type?.includes("changeover") &&
+      {job?.propertyDetails?.service_type?.includes("changeover") &&
         job?.propertyDetails?.hired_laundry && (
           <section className="flex-1 rounded-lg overflow-hidden border mb-3">
             <h2 className="p-1 border-b font-semibold bg-gray-200">
@@ -352,8 +352,8 @@ const JobSheet = forwardRef(({ job }, ref) => {
         </section>
       </section>
 
-      {(job?.propertyDetails.service_type?.includes("changeover") ||
-        job?.propertyDetails.service_type?.includes("clean")) && (
+      {(job?.propertyDetails?.service_type?.includes("changeover") ||
+        job?.propertyDetails?.service_type?.includes("clean")) && (
         <section className="flex-1 rounded-lg overflow-hidden border mb-3">
           <h2 className="p-1 border-b font-semibold bg-gray-200">
             Quality Checks

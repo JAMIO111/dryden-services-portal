@@ -83,11 +83,11 @@ const TextInput = forwardRef(
         )}
 
         <div
-          className={`flex border flex-row relative items-center shadow-s hover:shadow-m rounded-lg pl-2 pr-10 py-2 bg-text-input-color
+          className={`flex border flex-row relative items-center shadow-s transition-all duration-300 hover:shadow-m rounded-lg pl-2 pr-10 py-2 bg-text-input-color
              focus-within:border-brand-primary focus-within:hover:border-brand-primary min-w-0
             ${
               error
-                ? "border border-error-color hover:border-error-color/70 hover:focus-within:border-error-color focus-within:border-error-color focus-within:ring-3 focus-within:ring-error-color/20"
+                ? "border-error-color hover:border-error-color/70 hover:focus-within:border-error-color focus-within:border-error-color focus-within:ring-3 focus-within:ring-error-color/20"
                 : "border-transparent"
             }`}>
           {error ? (

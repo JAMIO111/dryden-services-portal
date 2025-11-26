@@ -18,6 +18,7 @@ const DashboardCard = ({
   isPositiveGood = true,
   previousPeriodLabel = "Previous Period",
   link = null,
+  state = {},
 }) => {
   const colorMap = {
     lime: {
@@ -167,7 +168,7 @@ const DashboardCard = ({
       </div>
       {link && (
         <button
-          onClick={() => navigate(link)}
+          onClick={() => navigate(link, { state })}
           className="absolute bottom-3 text-icon-color right-3 hover:shadow-s p-1 rounded-lg active:scale-95">
           <TbExternalLink className="w-6 h-6" />
         </button>

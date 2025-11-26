@@ -41,8 +41,9 @@ export const useAdHocJobs = ({
       query = query
         .order(sortColumn, { ascending: sortOrder === "asc" })
         .range(from, to)
-        .gte("sort_date", startDate.toISOString())
-        .lte("sort_date", endDate.toISOString());
+        .lte("sort_date_start", endDate.toISOString()) // job starts before user range ends
+        .gte("sort_date_end", startDate.toISOString()) // job ends after user range starts
+        .order("sort_date_start", { ascending: true });
 
       if (search) {
         query = query.or(`property_name.ilike.%${search}%`);

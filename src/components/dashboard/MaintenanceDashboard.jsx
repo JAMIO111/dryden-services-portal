@@ -62,10 +62,13 @@ const MaintenanceDashboard = () => {
       </div>
       <div className="flex flex-col flex-1 ">
         <div className="flex flex-row p-3 gap-3">
-          <DashboardCard title="Jobs Pending" icon={PiUsersThree} />
-          <DashboardCard title="Jobs Completed" icon={FaUmbrellaBeach} />
-          <DashboardCard title="Sick Leave" icon={MdOutlineSick} />
-          <DashboardCard title="New Hires" icon={PiUsersThree} />
+          <DashboardCard title="Jobs Pending" value={5} icon={PiUsersThree} />
+          <DashboardCard
+            title="Jobs Completed"
+            value={8}
+            icon={FaUmbrellaBeach}
+          />
+          <DashboardCard title="Contractors" value={18} icon={MdOutlineSick} />
         </div>
         <div className="flex flex-row flex-1 p-3 pt-0 gap-3">
           <div className="flex-3 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
