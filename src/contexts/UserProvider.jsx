@@ -28,7 +28,9 @@ export const UserProvider = ({ children }) => {
         // Fetch current user profile
         const { data: profileData, error: profileError } = await supabase
           .from("Employees")
-          .select("first_name, surname, job_title, avatar, id, auth_id")
+          .select(
+            "first_name, surname, job_title, avatar, id, auth_id, notification_preferences"
+          )
           .eq("auth_id", authUser.id)
           .maybeSingle();
 

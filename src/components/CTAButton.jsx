@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const CTAButton = ({
   type,
@@ -12,6 +13,7 @@ const CTAButton = ({
   textSize = "text-md",
   borderRadius = "rounded-lg",
   disabled = false,
+  isLoading = false,
 }) => {
   const baseClass =
     "flex flex-row gap-2 py-1 px-2 truncate items-center justify-center transition-transform duration-200 ease-in-out";
@@ -47,7 +49,15 @@ const CTAButton = ({
         height,
         borderRadius
       )}>
-      {Icon && <Icon className={iconSize} />}
+      {Icon && !isLoading ? (
+        <Icon className={iconSize} />
+      ) : (
+        isLoading && (
+          <AiOutlineLoading3Quarters
+            className={clsx(iconSize, "animate-spin")}
+          />
+        )
+      )}
       {text}
     </button>
   );

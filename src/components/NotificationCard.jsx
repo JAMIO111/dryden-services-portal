@@ -4,6 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 const NotificationCard = ({ notification, closePane, userId }) => {
+  const isEmptyObject = (v) =>
+    v &&
+    typeof v === "object" &&
+    !Array.isArray(v) &&
+    Object.keys(v).length === 0;
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   return (
@@ -38,7 +44,7 @@ const NotificationCard = ({ notification, closePane, userId }) => {
           <span className="font-semibold text-sm">{notification.doc_ref}</span>
         </p>
         <div className="flex w-full justify-start items-center mt-2 gap-3">
-          {notification?.meta_data && (
+          {!isEmptyObject(notification?.meta_data) && (
             <CTAButton
               type="main"
               title="View"

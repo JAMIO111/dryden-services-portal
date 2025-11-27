@@ -276,6 +276,7 @@ const BookingForm = () => {
             }
           />
           <CTAButton
+            isLoading={isSubmitting}
             disabled={!isDirty || !isValid || isSubmitting}
             width="w-[50%]"
             type="success"
@@ -329,10 +330,10 @@ const BookingForm = () => {
                     ? "has made ammendments to a booking:"
                     : "has entered a new booking:",
                   metaData: {
-                    url: `/Jobs/Bookings/${bookingId}`,
+                    url: `/Jobs/Bookings/${result.booking_id}`,
                     buttonText: "View Booking",
                   },
-                  docRef: bookingId || result.booking_id,
+                  docRef: result.booking_id,
                 });
               } catch (error) {
                 console.error("Save failed:", error.message);

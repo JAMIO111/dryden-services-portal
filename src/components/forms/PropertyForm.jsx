@@ -45,6 +45,7 @@ const defaultFormData = {
   what_3_words: undefined,
   package: null,
   service_type: null,
+  hired_laundry: false,
   KeyCodes: [],
   Owners: [],
 };
@@ -493,6 +494,7 @@ const PropertyForm = () => {
             }
           />
           <CTAButton
+            isLoading={isSubmitting}
             disabled={!isDirty || !isValid || isSubmitting}
             width="w-[50%]"
             type="success"
@@ -500,16 +502,19 @@ const PropertyForm = () => {
             icon={FaCheck}
             callbackFn={handleSubmit(async (data) => {
               try {
-                // For new properties, id will be undefined
                 const payload = { ...data, id: watch("id") };
 
                 console.log("Payload Data:", payload);
 
-                await upsertProperty.mutateAsync({
+                // 1. Capture mutation result so we get the real property ID
+                const result = await upsertProperty.mutateAsync({
                   propertyData: payload,
                   keyCodesForm: keyCodeFields,
                   ownersForm: ownerFields,
                 });
+
+                // These are the IDs involved
+                const propertyId = result?.id || payload.id; // Correct ID for both create + update
 
                 showToast({
                   type: "success",
@@ -520,6 +525,21 @@ const PropertyForm = () => {
                 });
 
                 navigate("/Client-Management/Properties");
+
+                // 2. Use the actual ID from the mutation result
+                await createNotification({
+                  title: payload.id
+                    ? `Existing Property Updated.`
+                    : `New Property Created.`,
+                  body: payload.id
+                    ? `updated the details of property:`
+                    : `added a new property:`,
+                  metaData: {
+                    url: `/Client-Management/Properties/${payload.name}`,
+                    buttonText: "View Property",
+                  },
+                  docRef: payload.name,
+                });
               } catch (error) {
                 console.error("Save Failed:", error);
 

@@ -261,6 +261,7 @@ const OwnerForm = () => {
             }
           />
           <CTAButton
+            isLoading={isSubmitting}
             disabled={!isDirty || !isValid || isSubmitting}
             width="flex-1"
             type="success"
@@ -279,28 +280,39 @@ const OwnerForm = () => {
                 const payload = id !== "New-Owner" ? { id, ...data } : data;
 
                 console.log("Submitting payload:", payload);
-                await upsertOwner.mutateAsync(payload);
+
+                // 1. Get the real owner from the mutation result
+                const result = await upsertOwner.mutateAsync(payload);
+
+                // 2. Extract the real ID
+                const ownerId = result?.id || id;
 
                 navigate("/Client-Management/Owners");
 
                 showToast({
                   type: "success",
-                  title: id ? "Owner Updated" : "Owner Created",
-                  message: id
-                    ? "The owner has been successfully updated."
-                    : "New owner successfully created.",
+                  title: id !== "New-Owner" ? "Owner Updated" : "Owner Created",
+                  message:
+                    id !== "New-Owner"
+                      ? "The owner has been successfully updated."
+                      : "New owner successfully created.",
                 });
 
-                const notif = await createNotification({
-                  title: id ? `Existing Owner Updated.` : `New Owner Created.`,
-                  body: id
-                    ? `updated the account of owner:`
-                    : `added a new owner:`,
+                // 3. Use the real ID in the notification
+                await createNotification({
+                  title:
+                    id !== "New-Owner"
+                      ? `Existing Owner Updated.`
+                      : `New Owner Created.`,
+                  body:
+                    id !== "New-Owner"
+                      ? `updated the account of owner:`
+                      : `added a new owner:`,
                   metaData: {
-                    url: `/Client-Management/Owners/${id}`,
+                    url: `/Client-Management/Owners/${ownerId}`,
                     buttonText: "View Owner",
                   },
-                  docRef: id,
+                  docRef: ownerId,
                 });
               } catch (error) {
                 console.error("Save failed:", error.message);

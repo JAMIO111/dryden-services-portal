@@ -26,6 +26,7 @@ import { HiOutlinePhone } from "react-icons/hi2";
 import { TfiEmail } from "react-icons/tfi";
 import { useToast } from "../../contexts/ToastProvider";
 import { useModal } from "@/contexts/ModalContext";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 
 const defaultFormData = {
   id: null,
@@ -47,6 +48,7 @@ const defaultFormData = {
 };
 
 const EmployeeForm = ({ employee }) => {
+  const { createNotification } = useCreateNotification();
   const queryClient = useQueryClient();
   const upsertEmployee = useUpsertEmployee();
   const { showToast } = useToast();
@@ -70,13 +72,12 @@ const EmployeeForm = ({ employee }) => {
 
   const onSubmit = async (data) => {
     try {
-      const payload = {
-        ...data,
-      };
+      const payload = { ...data };
 
-      // include ID if editing
+      // add ID when editing
       if (employee?.id) payload.id = employee.id;
 
+      // Save employee and get the returned row
       const saved = await upsertEmployee.mutateAsync(payload);
 
       closeModal();
@@ -87,6 +88,14 @@ const EmployeeForm = ({ employee }) => {
         message: employee
           ? "The employee has been successfully updated."
           : "A new employee has been successfully created.",
+      });
+
+      await createNotification({
+        title: employee ? "Employee Updated" : "Employee Created",
+        body: employee
+          ? "has made amendments to an employee record:"
+          : "has added a new employee:",
+        docRef: `${saved?.first_name} ${saved?.surname}`, // <-- use fresh ID from DB
       });
     } catch (error) {
       showToast({
@@ -114,12 +123,6 @@ const EmployeeForm = ({ employee }) => {
       });
     }
   }, [employee, reset]);
-
-  console.log("Rendering EmployeeForm with employee:", employee);
-  console.log("Form errors:", errors);
-  console.log("Form is dirty:", isDirty);
-  console.log("Form is valid:", isValid);
-  console.log("Form Values Employee", watch());
 
   return (
     <form
@@ -290,7 +293,7 @@ const EmployeeForm = ({ employee }) => {
             )}
           />
         </div>
-        <div className="col-span-1">
+        <div className="col-span-2">
           <Controller
             name="start_date"
             control={control}

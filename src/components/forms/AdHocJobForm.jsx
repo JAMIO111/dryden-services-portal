@@ -16,6 +16,7 @@ import ToggleButton from "../ui/ToggleButton";
 import RecurrenceForm from "./RecurrenceForm";
 import { useModal } from "@/contexts/ModalContext";
 import { FaRegNoteSticky } from "react-icons/fa6";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 
 const defaultFormData = {
   type: "Clean",
@@ -28,6 +29,7 @@ const defaultFormData = {
 };
 
 const AdHocJobForm = ({ adHocJob, navigate }) => {
+  const { createNotification } = useCreateNotification();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const upsertAdHocJob = useUpsertAdHocJob();
@@ -86,10 +88,17 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
 
   const onSubmit = async (data) => {
     try {
-      const payload = { ...data };
-      if (adHocJob?.id) payload.id = adHocJob.id;
+      // Prepare payload: include ID only if editing
+      const payload = {
+        ...data,
+        ...(adHocJob?.id ? { id: adHocJob.id } : {}),
+      };
 
-      await upsertAdHocJob.mutateAsync(payload);
+      // 1. Capture the result (important!)
+      const result = await upsertAdHocJob.mutateAsync(payload);
+
+      // Use the correct ID: new or existing
+      const adHocJobId = result?.ad_hoc_job_id || adHocJob?.id;
 
       reset(defaultFormData);
 
@@ -104,7 +113,17 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
               data.type === "Clean" ? "cleaning" : data.type
             } job has been successfully created.`,
       });
+
       closeModal();
+
+      // 2. Use the resolved ID in the notification
+      await createNotification({
+        title: adHocJob ? "Ad-Hoc Job Updated" : "Ad-Hoc Job Created",
+        body: adHocJob
+          ? "has made ammendments to a job:"
+          : "has entered a new job:",
+        docRef: adHocJobId,
+      });
     } catch (error) {
       showToast({
         type: "error",

@@ -46,6 +46,9 @@ const SettingsDataManagement = lazy(() =>
 const SettingsAccount = lazy(() =>
   import("./components/Settings/SettingsAccount.jsx")
 );
+const SettingsNotifications = lazy(() =>
+  import("./components/Settings/SettingsNotifications.jsx")
+);
 const Employees = lazy(() => import("./components/Employees.jsx"));
 const BookingForm = lazy(() => import("./components/forms/BookingForm.jsx"));
 const FullScreenCalendar = lazy(() =>
@@ -174,7 +177,11 @@ const router = createBrowserRouter([
               },
               {
                 path: "Notifications",
-                element: <div>Notifications</div>,
+                element: (
+                  <div>
+                    <SettingsNotifications />
+                  </div>
+                ),
               },
               { path: "Admin", element: <div>Admin Settings</div> },
             ],

@@ -1,14 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import JobList from "@components/JobList";
 import { useUser } from "@/contexts/UserProvider";
 import DateRangePicker from "@components/ui/DateRangePicker";
 import { getGreeting } from "@/lib/HelperFunctions";
-import { useJobs } from "@/hooks/useJobs";
 import StackedBarChart from "@components/charts/StackedBarChart";
 import { useBookingVolume } from "@/hooks/useBookingVolume";
 import { getPeriodLabel } from "@/lib/utils";
 import { CgClose } from "react-icons/cg";
-import JobSheetPrintModal from "../JobSheetPrintModal";
 import { useJobSheetJobs } from "@/hooks/useJobSheetJobs";
 
 const Dashboard = () => {
@@ -34,14 +31,7 @@ const Dashboard = () => {
     [selectedRange.startDate, selectedRange.endDate]
   );
 
-  const {
-    data: jobs,
-    isLoading,
-    error,
-  } = useJobSheetJobs(memoisedRange.startDate, memoisedRange.endDate);
-
   console.log("memoisedRange:", memoisedRange);
-  console.log("Jobs Data:", jobs);
 
   const { data } = useBookingVolume(
     memoisedRange.startDate,
@@ -74,13 +64,7 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="h-full overflow-y-auto p-2">
-              <JobSheetPrintModal
-                startDate={memoisedRange.startDate}
-                endDate={memoisedRange.endDate}
-                jobs={jobs}
-              />
-            </div>
+            <div className="h-full overflow-y-auto p-2"></div>
           </div>
         </div>
       )}
@@ -162,14 +146,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="flex-4">
-            <JobList
-              jobs={jobs}
-              isLoading={isLoading}
-              error={error}
-              openModal={() => setPreviewModalOpen(true)}
-            />
-          </div>
+          <div className="flex-4"></div>
         </div>
       </div>
     </div>
