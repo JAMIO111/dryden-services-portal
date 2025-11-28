@@ -9,6 +9,7 @@ import CTAButton from "../CTAButton";
 import { useInsertMeeting } from "@/hooks/useInsertMeeting";
 import DatePicker from "../ui/DatePicker";
 import { IoLocationOutline } from "react-icons/io5";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 
 const defaultFormData = {
   id: null,
@@ -29,7 +30,8 @@ const defaultFormData = {
   })(),
 };
 
-const MeetingForm = ({ leadId }) => {
+const MeetingForm = ({ leadId, leadTitle }) => {
+  const { createNotification } = useCreateNotification();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const insertMeeting = useInsertMeeting();
@@ -141,20 +143,20 @@ const MeetingForm = ({ leadId }) => {
 
             const { date, start_time, end_time, ...rest } = data;
 
-            const calculatedStart = combineDateAndTime(date, start_time);
-            const calculatedEnd = combineDateAndTime(date, end_time);
+            const calculatedStart = combineDateAndTime(
+              date,
+              start_time
+            ).toISOString();
+            const calculatedEnd = combineDateAndTime(
+              date,
+              end_time
+            ).toISOString();
 
             const meetingData = {
               ...rest, // the remaining fields
               start_date: calculatedStart,
               end_date: calculatedEnd,
             };
-
-            console.log("Submitting Meeting Data:", {
-              ...meetingData,
-              start_date: calculatedStart,
-              end_date: calculatedEnd,
-            });
 
             try {
               await insertMeeting.mutateAsync({
@@ -170,14 +172,37 @@ const MeetingForm = ({ leadId }) => {
                 title: "Meeting Scheduled",
                 message: "The meeting has been successfully scheduled.",
               });
-            } catch (error) {
-              showToast({
-                type: "error",
-                title: "Submission Failed",
-                message:
-                  error?.message ||
-                  "An error occurred while scheduling the meeting.",
+              await createNotification({
+                title: "Meeting Scheduled",
+                body: "has scheduled a new meeting for lead:",
+                metaData: {
+                  url: `/Client-Management/Leads/${leadTitle}`,
+                  buttonText: "View Lead",
+                },
+                docRef: leadTitle,
               });
+            } catch (error) {
+              if (
+                error instanceof Error &&
+                error.message.includes(
+                  "overlaps with another meeting in the same location"
+                )
+              ) {
+                // Specific toast for overlapping meeting
+                showToast({
+                  type: "error",
+                  title: "Meeting Conflict",
+                  message:
+                    "This meeting overlaps with another meeting in the same location. Please choose a different time.",
+                });
+              } else {
+                // Generic error toast
+                showToast({
+                  type: "error",
+                  title: "Submission Failed",
+                  message: error?.message || "An unexpected error occurred.",
+                });
+              }
             }
           })}
         />

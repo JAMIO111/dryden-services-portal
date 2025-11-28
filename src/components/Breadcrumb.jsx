@@ -50,7 +50,10 @@ function splitPath(pathname) {
 
 const Breadcrumb = () => {
   const location = useLocation();
-  const segments = splitPath(location.pathname);
+  const segments = splitPath(location.pathname).filter(
+    (seg) => seg.toLowerCase() !== "leads"
+  );
+
   const scrollRef = useRef(null);
 
   useEffect(() => {

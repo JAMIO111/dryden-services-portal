@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import CTAButton from "../CTAButton";
 import { useUpsertLead } from "@/hooks/useUpsertLead";
 import CardSelect from "../CardSelect";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 
 const defaultFormData = {
   title: "",
@@ -23,6 +24,7 @@ const LeadForm = ({ lead, navigate }) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const upsertLead = useUpsertLead();
+  const { createNotification } = useCreateNotification();
 
   const {
     register,
@@ -83,6 +85,17 @@ const LeadForm = ({ lead, navigate }) => {
         message: lead
           ? "The lead has been successfully updated."
           : "A new lead has been successfully created.",
+      });
+      await createNotification({
+        title: lead ? "Lead Updated" : "Lead Created",
+        body: lead
+          ? "has made amendments to a lead:"
+          : "has entered a new lead:",
+        metaData: {
+          url: `/Client-Management/Leads/${newTitle}`,
+          buttonText: "View Lead",
+        },
+        docRef: newTitle,
       });
     } catch (error) {
       showToast({

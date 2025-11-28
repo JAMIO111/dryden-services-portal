@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import TextAreaInput from "../ui/RHFTextArea";
 import CTAButton from "../CTAButton";
 import { useInsertCorrespondence } from "@/hooks/useInsertCorrespondence";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 
 const defaultFormData = {
   title: "",
@@ -17,7 +18,8 @@ const defaultFormData = {
   tag: "",
 };
 
-const CorrespondenceForm = ({ leadId }) => {
+const CorrespondenceForm = ({ leadId, leadTitle }) => {
+  const { createNotification } = useCreateNotification();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const insertCorrespondence = useInsertCorrespondence();
@@ -104,6 +106,15 @@ const CorrespondenceForm = ({ leadId }) => {
                 type: "success",
                 title: "Correspondence Added",
                 message: "The correspondence has been successfully added.",
+              });
+              await createNotification({
+                title: "Correspondence Added",
+                body: "has added new correspondence for lead:",
+                metaData: {
+                  url: `/Client-Management/Leads/${leadTitle}`,
+                  buttonText: "View Lead",
+                },
+                docRef: leadTitle,
               });
             } catch (error) {
               showToast({

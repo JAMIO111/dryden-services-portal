@@ -140,9 +140,11 @@ const LeadDetails = () => {
         {lead?.id ? (
           <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:hidden">
             {selectedTab === "Correspondence" && (
-              <CorrespondenceForm leadId={lead?.id} />
+              <CorrespondenceForm leadId={lead?.id} leadTitle={lead?.title} />
             )}
-            {selectedTab === "Meeting" && <MeetingForm leadId={lead?.id} />}
+            {selectedTab === "Meeting" && (
+              <MeetingForm leadId={lead?.id} leadTitle={lead?.title} />
+            )}
             {selectedTab === "Lead Details" && (
               <LeadForm lead={lead} navigate={navigate} />
             )}
