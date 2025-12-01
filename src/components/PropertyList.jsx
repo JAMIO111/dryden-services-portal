@@ -74,7 +74,10 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
                     ? "bg-brand-primary/10"
                     : "hover:bg-brand-primary/5"
                 }`}
-                onClick={() => onSelectProperty(property)}>
+                onClick={() => onSelectProperty(property)}
+                onDoubleClick={() =>
+                  navigate(`/Client-Management/Properties/${property.name}`)
+                }>
                 {/* Property Image */}
                 {property.avatar ? (
                   <img

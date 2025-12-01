@@ -96,6 +96,8 @@ const EmployeeForm = ({ employee }) => {
           ? "has made amendments to an employee record:"
           : "has added a new employee:",
         docRef: `${saved?.first_name} ${saved?.surname}`, // <-- use fresh ID from DB
+        category: "Employees",
+        type: !!employee ? "update" : "new",
       });
     } catch (error) {
       showToast({

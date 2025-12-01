@@ -10,6 +10,7 @@ import CTAButton from "../CTAButton";
 import { useUpsertLead } from "@/hooks/useUpsertLead";
 import CardSelect from "../CardSelect";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useModal } from "@/contexts/ModalContext";
 
 const defaultFormData = {
   title: "",
@@ -21,6 +22,7 @@ const defaultFormData = {
 };
 
 const LeadForm = ({ lead, navigate }) => {
+  const { closeModal } = useModal();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const upsertLead = useUpsertLead();
@@ -96,7 +98,10 @@ const LeadForm = ({ lead, navigate }) => {
           buttonText: "View Lead",
         },
         docRef: newTitle,
+        category: "Leads",
+        type: lead ? "update" : "new",
       });
+      closeModal();
     } catch (error) {
       showToast({
         type: "error",

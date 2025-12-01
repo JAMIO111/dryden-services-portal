@@ -123,6 +123,8 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
           ? "has made ammendments to a job:"
           : "has entered a new job:",
         docRef: adHocJobId,
+        category: "Ad-Hoc Jobs",
+        type: !!adHocJobId ? "update" : "new",
       });
     } catch (error) {
       showToast({

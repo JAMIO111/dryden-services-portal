@@ -313,6 +313,8 @@ const OwnerForm = () => {
                     buttonText: "View Owner",
                   },
                   docRef: ownerId,
+                  category: "Owners",
+                  type: !!ownerId ? "update" : "new",
                 });
               } catch (error) {
                 console.error("Save failed:", error.message);

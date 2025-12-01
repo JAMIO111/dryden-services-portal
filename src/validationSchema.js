@@ -130,6 +130,12 @@ export const PropertyFormSchema = z.object({
   package: z.number(),
   service_type: z.array(z.string()),
   hired_laundry: z.boolean(),
+  notes: z
+    .string()
+    .max(1000, { message: "Notes must not exceed 1000 characters" })
+    .optional()
+    .nullable()
+    .or(z.literal("")),
   owner_ref: z.string().optional().nullable().or(z.literal("")),
   property_ref: z.string().optional().nullable().or(z.literal("")),
 });
@@ -158,7 +164,10 @@ export const OwnerFormSchema = z.object({
   primary_email: z
     .string({ required_error: "Email is required" })
     .email({ message: "Invalid email address" })
-    .max(255, { message: "Email must not be more than 255 characters long" }),
+    .max(255, { message: "Email must not be more than 255 characters long" })
+    .optional()
+    .nullable()
+    .or(z.literal("")), // ✅ allow blank strings,
   primary_phone: z
     .string()
     .min(6, { message: "Phone number must be at least 6 characters long" })

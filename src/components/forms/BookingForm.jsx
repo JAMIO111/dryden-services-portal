@@ -324,7 +324,7 @@ const BookingForm = () => {
                     : "New booking successfully entered.",
                 });
 
-                createNotification({
+                await createNotification({
                   title: bookingId ? "Booking Updated" : "Booking Created",
                   body: bookingId
                     ? "has made ammendments to a booking:"
@@ -334,6 +334,8 @@ const BookingForm = () => {
                     buttonText: "View Booking",
                   },
                   docRef: result.booking_id,
+                  category: "Bookings",
+                  type: bookingId ? "update" : "new",
                 });
               } catch (error) {
                 console.error("Save failed:", error.message);

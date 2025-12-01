@@ -180,6 +180,8 @@ const MeetingForm = ({ leadId, leadTitle }) => {
                   buttonText: "View Lead",
                 },
                 docRef: leadTitle,
+                category: "Meetings",
+                type: "new",
               });
             } catch (error) {
               if (

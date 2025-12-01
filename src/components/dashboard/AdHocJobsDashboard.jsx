@@ -164,13 +164,9 @@ const AdHocJobsDashboard = () => {
     };
   }, [modalPos]);
 
-  const activeFilters = [
-    "property",
-    "leadGuest",
-    "bookingRef",
-    "managementPackage",
-    "type",
-  ].filter((key) => searchParams.get(key));
+  const activeFilters = ["property", "notes", "bookingId", "type"].filter(
+    (key) => searchParams.get(key)
+  );
   const filterCount = activeFilters.length;
 
   const handleAdHocJob = () => {

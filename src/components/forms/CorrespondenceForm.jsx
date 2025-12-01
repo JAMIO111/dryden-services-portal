@@ -115,6 +115,8 @@ const CorrespondenceForm = ({ leadId, leadTitle }) => {
                   buttonText: "View Lead",
                 },
                 docRef: leadTitle,
+                category: "Correspondence",
+                type: "new",
               });
             } catch (error) {
               showToast({

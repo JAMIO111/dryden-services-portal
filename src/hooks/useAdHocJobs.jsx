@@ -46,7 +46,9 @@ export const useAdHocJobs = ({
         .order("sort_date_start", { ascending: true });
 
       if (search) {
-        query = query.or(`property_name.ilike.%${search}%`);
+        query = query.or(
+          `property_name.ilike.%${search}%,notes.ilike.%${search}%,ad_hoc_job_id.ilike.%${search}%,type.ilike.%${search}%`
+        );
       }
 
       const { data, count, error } = await query;

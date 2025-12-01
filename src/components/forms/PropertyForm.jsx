@@ -30,6 +30,8 @@ import ToggleButton from "../ui/ToggleButton";
 import ProfileImageSection from "../ProfileImageSection";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import RHFTextAreaInput from "../ui/RHFTextArea";
+import { FaRegNoteSticky } from "react-icons/fa6";
 
 const defaultFormData = {
   id: undefined,
@@ -46,6 +48,7 @@ const defaultFormData = {
   package: null,
   service_type: null,
   hired_laundry: false,
+  notes: "",
   KeyCodes: [],
   Owners: [],
 };
@@ -480,6 +483,22 @@ const PropertyForm = () => {
             )}
           </div>
         </div>
+        <div className="bg-secondary-bg shadow-m rounded-2xl p-3">
+          <Controller
+            name="notes"
+            control={control}
+            render={({ field, fieldState }) => (
+              <RHFTextAreaInput
+                rows={3}
+                icon={FaRegNoteSticky}
+                label="Notes"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error}
+              />
+            )}
+          />
+        </div>
         <div className="flex flex-row gap-3 bg-secondary-bg shadow-m rounded-2xl p-3">
           <CTAButton
             disabled={!isDirty}
@@ -539,6 +558,8 @@ const PropertyForm = () => {
                     buttonText: "View Property",
                   },
                   docRef: payload.name,
+                  category: "Properties",
+                  type: !!propertyId ? "update" : "new",
                 });
               } catch (error) {
                 console.error("Save Failed:", error);

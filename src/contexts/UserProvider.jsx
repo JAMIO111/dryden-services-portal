@@ -1,3 +1,4 @@
+// UserProvider.js
 import { createContext, useContext, useEffect, useState } from "react";
 import supabase from "../supabase-client";
 import { useAuth } from "./AuthProvider";
@@ -17,15 +18,11 @@ export const UserProvider = ({ children }) => {
       return;
     }
 
-    // Load cached profile first
     const cached = localStorage.getItem("user_profile");
-    if (cached) {
-      setProfile(JSON.parse(cached));
-    }
+    if (cached) setProfile(JSON.parse(cached));
 
     const fetchData = async () => {
       try {
-        // Fetch current user profile
         const { data: profileData, error: profileError } = await supabase
           .from("Employees")
           .select(
@@ -35,27 +32,28 @@ export const UserProvider = ({ children }) => {
           .maybeSingle();
 
         if (profileError) {
-          console.error("Error fetching profile", profileError);
+          console.error(profileError);
           setProfile(null);
         } else if (profileData) {
           setProfile(profileData);
           localStorage.setItem("user_profile", JSON.stringify(profileData));
         }
 
-        // Fetch all org users with auth_id
         const { data: usersData, error: usersError } = await supabase
           .from("Employees")
-          .select("first_name, surname, job_title, avatar, id, auth_id")
-          .not("auth_id", "is", null); // only employees with auth_id
+          .select(
+            "first_name, surname, job_title, avatar, id, auth_id, notification_preferences"
+          )
+          .not("auth_id", "is", null);
 
         if (usersError) {
-          console.error("Error fetching org users", usersError);
+          console.error(usersError);
           setOrgUsers([]);
         } else {
           setOrgUsers(usersData || []);
         }
       } catch (err) {
-        console.error("Unexpected error fetching users", err);
+        console.error(err);
         setProfile(null);
         setOrgUsers([]);
       }
@@ -64,8 +62,26 @@ export const UserProvider = ({ children }) => {
     fetchData();
   }, [authUser]);
 
+  // Add this function to update profile
+  const updateProfile = async (updates) => {
+    if (!profile?.id) return;
+
+    const newProfile = { ...profile, ...updates };
+    setProfile(newProfile); // update local state immediately
+
+    localStorage.setItem("user_profile", JSON.stringify(newProfile));
+
+    const { error } = await supabase
+      .from("Employees")
+      .update(updates)
+      .eq("id", profile.id);
+
+    if (error) console.error("Error updating profile:", error);
+  };
+
   return (
-    <UserContext.Provider value={{ profile, setProfile, orgUsers }}>
+    <UserContext.Provider
+      value={{ profile, setProfile, orgUsers, updateProfile }}>
       {children}
     </UserContext.Provider>
   );
