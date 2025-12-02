@@ -116,6 +116,7 @@ const Login = () => {
                 </p>
               )}
               <Link
+                to="/forgot-password"
                 className={`${
                   errors.password?.message ? "w-fit" : "w-full text-right"
                 } text-link-color hover:underline text-sm ${

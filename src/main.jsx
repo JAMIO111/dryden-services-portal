@@ -16,6 +16,11 @@ const Dashboard = lazy(() => import("./components/dashboard/Dashboard.jsx"));
 const HRDashboard = lazy(() =>
   import("./components/dashboard/HRDashboard.jsx")
 );
+const PasswordResetEmail = lazy(() =>
+  import("./components/PasswordResetEmail.jsx")
+);
+const ResetPassword = lazy(() => import("./components/ResetPassword.jsx"));
+const ResetLinkSent = lazy(() => import("./components/ResetLinkSent.jsx"));
 const BookingsDashboard = lazy(() =>
   import("./components/dashboard/BookingsDashboard.jsx")
 );
@@ -88,6 +93,18 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "forgot-password",
+        element: <PasswordResetEmail />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
+      },
+      {
+        path: "reset-link-sent",
+        element: <ResetLinkSent />,
       },
     ],
   },
