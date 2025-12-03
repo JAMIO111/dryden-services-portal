@@ -42,8 +42,8 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
         <div className="grid grid-cols-[1.5fr_2.5fr_2fr_2fr_140px] border-b border-border-color text-sm bg-primary-bg text-secondary-text">
           <div className="p-2 border-r border-border-color">Job No.</div>
           <div className="p-2 border-r border-border-color">Property</div>
-          <div className="p-2 border-r border-border-color">Job Date</div>
-          <div className="p-2 border-r border-border-color">Move In</div>
+          <div className="p-2 border-r border-border-color">Start Date</div>
+          <div className="p-2 border-r border-border-color">End Date</div>
           <div className="p-2 text-center">Job Type</div>
         </div>
 
@@ -52,7 +52,7 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
           {jobs.length > 0 ? (
             jobs.map((job, index) => (
               <div
-                key={job.jobId || index}
+                key={index}
                 className={`${
                   index % 2 === 0 ? "bg-tertiary-bg" : "bg-secondary-bg"
                 } ${
@@ -62,25 +62,45 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
                   {job.jobId || "N/A"}
                 </div>
                 <div className="flex font-medium items-center px-2 py-1">
-                  {job.propertyName}
+                  {job.propertyDetails
+                    ? job.propertyDetails.name
+                    : "Unknown Property"}
                 </div>
                 <div className="flex items-center px-3 py-1">
-                  {job.jobDate
+                  {job?.itemType === "job" && job.jobDate
                     ? new Date(job.jobDate).toLocaleDateString("en-GB", {
                         weekday: "short",
                         day: "numeric",
                         month: "short",
                       })
-                    : "N/A"}
+                    : job?.itemType === "adHocJob" && job?.type === "Laundry"
+                    ? new Date(job.start_date).toLocaleDateString("en-GB", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                      })
+                    : new Date(job.single_date).toLocaleDateString("en-GB", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                      })}
                 </div>
                 <div className="flex items-center px-3 py-1">
-                  {job.nextArrival
+                  {job?.itemType === "job" && !job.nextArrival
+                    ? "No Booking"
+                    : job?.itemType === "job" && job.nextArrival
                     ? new Date(job.nextArrival).toLocaleDateString("en-GB", {
                         weekday: "short",
                         day: "numeric",
                         month: "short",
                       })
-                    : "No Booking"}
+                    : job?.itemType === "adHocJob" && job?.type === "Laundry"
+                    ? new Date(job.end_date).toLocaleDateString("en-GB", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                      })
+                    : "-"}
                 </div>
                 <div className=" justify-center items-center px-3 py-1">
                   <p

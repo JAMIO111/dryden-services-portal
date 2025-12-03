@@ -7,9 +7,7 @@ const Settings = () => {
   const [expandedItem, setExpandedItem] = useState(null);
 
   const toggleExpand = (index, hasSub) => {
-    if (hasSub) {
-      setExpandedItem((prev) => (prev === index ? null : index));
-    }
+    if (hasSub) setExpandedItem((prev) => (prev === index ? null : index));
   };
 
   return (
@@ -23,60 +21,45 @@ const Settings = () => {
         <div className="flex flex-col p-2 overflow-y-auto min-h-0">
           {SettingMenuStructure.map((item, index) => {
             const resolvedPath = useResolvedPath(item.path);
-            const match = useMatch({
-              path: resolvedPath.pathname,
-              end: false,
-            });
-
+            const match = useMatch({ path: resolvedPath.pathname, end: false });
             const isExpanded = expandedItem === index;
+
+            const rowClasses = `flex flex-row cursor-pointer justify-between items-center px-4 py-2 gap-2 rounded-xl ${
+              match
+                ? "bg-gradient-to-r from-cta-color to-transparent text-white"
+                : "hover:bg-gradient-to-r hover:from-border-color/50 hover:to-transparent text-primary-text"
+            }`;
 
             return (
               <div
                 key={index}
-                className={`flex flex-col gap-1 mt-2 rounded-l-xl ${
-                  match
-                    ? "bg-gradient-to-r from-cta-color to-transparent"
-                    : "hover:bg-border-color/30"
-                }`}>
+                className="flex flex-col gap-1 mt-2 rounded-l-xl">
                 {/* PARENT ROW */}
-                <div
-                  className="flex flex-row cursor-pointer justify-between items-center px-4 py-2 gap-2 rounded-xl"
-                  onClick={() => toggleExpand(index, item.subMenu.length > 0)}>
-                  <div className="flex flex-row items-center gap-2">
-                    {item.icon ? (
-                      <item.icon
-                        className={`${
-                          match ? "text-white" : "text-primary-text"
-                        } h-6 w-6 `}
-                      />
-                    ) : (
-                      <GoDatabase
-                        className={`${
-                          match ? "text-white" : "text-primary-text"
-                        } h-6 w-6`}
-                      />
-                    )}
-
-                    {/* If no submenu, clicking this should navigate */}
-                    {item.subMenu.length === 0 ? (
-                      <Link
-                        to={item.path}
-                        className={`${
-                          match ? "text-white" : "text-primary-text"
-                        }`}>
-                        {item.name}
-                      </Link>
-                    ) : (
-                      <span
-                        className={`${
-                          match ? "text-white" : "text-primary-text"
-                        }`}>
-                        {item.name}
-                      </span>
-                    )}
-                  </div>
-
-                  {item.subMenu.length > 0 && (
+                {item.subMenu.length === 0 ? (
+                  // No submenu: wrap entire row in Link
+                  <Link to={item.path} className={rowClasses}>
+                    <div className="flex flex-row items-center gap-2">
+                      {item.icon ? (
+                        <item.icon className="h-6 w-6" />
+                      ) : (
+                        <GoDatabase className="h-6 w-6" />
+                      )}
+                      <span>{item.name}</span>
+                    </div>
+                  </Link>
+                ) : (
+                  // Has submenu: toggle expand on click
+                  <div
+                    className={rowClasses}
+                    onClick={() => toggleExpand(index, true)}>
+                    <div className="flex flex-row items-center gap-2">
+                      {item.icon ? (
+                        <item.icon className="h-6 w-6" />
+                      ) : (
+                        <GoDatabase className="h-6 w-6" />
+                      )}
+                      <span>{item.name}</span>
+                    </div>
                     <div
                       className={`transition-transform duration-200 ${
                         isExpanded ? "rotate-180" : ""
@@ -95,8 +78,8 @@ const Settings = () => {
                         />
                       </svg>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* SUBMENU */}
                 {isExpanded && item.subMenu.length > 0 && (

@@ -57,7 +57,7 @@ const SettingsNotifications = () => {
                 callbackFn={() => setPrefs(profile.notification_preferences)}
               />
               <CTAButton
-                type="success"
+                type="main"
                 text="Save Changes"
                 callbackFn={handleSave}
               />

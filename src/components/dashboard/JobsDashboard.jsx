@@ -40,7 +40,7 @@ const Dashboard = () => {
     data: jobs,
     isLoading,
     error,
-  } = useJobSheetJobs(memoisedRange.startDate, memoisedRange.endDate);
+  } = useJobSheetJobs(memoisedRange.startDate, memoisedRange.endDate, false);
 
   console.log("memoisedRange:", memoisedRange);
   console.log("Jobs Data:", jobs);

@@ -2,6 +2,7 @@ import supabase from "@/supabase-client";
 import CTAButton from "./CTAButton";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 
 const NotificationCard = ({ notification, closePane, userId }) => {
   const isEmptyObject = (v) =>
@@ -13,7 +14,13 @@ const NotificationCard = ({ notification, closePane, userId }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   return (
-    <div className="flex bg-secondary-bg shadow-md gap-3 items-start p-3 border border-border-color rounded-xl">
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.25 }}
+      className="flex bg-secondary-bg shadow-md gap-3 items-start p-3 border border-border-color rounded-xl">
       <div className="flex justify-center items-center border border-border-color rounded-full h-10 aspect-square">
         <img
           src={notification.avatar}
@@ -80,13 +87,17 @@ const NotificationCard = ({ notification, closePane, userId }) => {
                 }
 
                 console.log("Updated notification:", data);
-                queryClient.invalidateQueries(["Notifications", userId]);
+                queryClient.setQueryData(["Notifications", userId], (old) =>
+                  old?.map((n) =>
+                    n.id === notification.id ? { ...n, read: true } : n
+                  )
+                );
               }}
             />
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
