@@ -121,77 +121,85 @@ const PropertyDetails = ({ property, selectedProperty }) => {
               <p className="text-xl text-primary-text font-semibold">
                 Property Owners
               </p>
-              {owners?.map((owner) => (
-                <div
-                  key={owner.id}
-                  className="mt-3 flex rounded-2xl border border-brand-primary/30 bg-brand-primary/20 p-2 flex-row gap-2">
-                  {owner.avatar ? (
-                    <img
-                      className="rounded-xl w-24 h-24 object-cover"
-                      src={owner?.avatar}
-                      alt={owner?.first_name}
-                    />
-                  ) : (
-                    <div className="rounded-xl w-24 h-24 bg-secondary-bg flex items-center justify-center">
-                      <p className="text-secondary-text text-2xl">
-                        {owner?.owner?.first_name?.charAt(0)}
-                        {owner?.owner?.surname?.charAt(0)}{" "}
-                      </p>
-                    </div>
-                  )}
-                  <div className="ml-2 flex flex-1 flex-col gap-2 h-full justify-around min-w-0">
-                    <div className="flex items-center gap-3">
-                      <BsFillPersonVcardFill className="text-primary-text w-6 h-6 shrink-0" />
-                      <p
-                        className="text-xl truncate min-w-0 text-primary-text font-semibold text-left"
-                        title={`${owner?.owner?.first_name} ${owner?.owner?.surname}`}>
-                        {owner?.owner?.first_name} {owner?.owner?.surname}
-                      </p>
-                    </div>
+              {owners?.length > 0 ? (
+                owners.map((owner) => (
+                  <div
+                    key={owner.id}
+                    className="mt-3 flex rounded-2xl border border-brand-primary/30 bg-brand-primary/20 p-2 flex-row gap-2">
+                    {owner.avatar ? (
+                      <img
+                        className="rounded-xl w-24 h-24 object-cover"
+                        src={owner?.avatar}
+                        alt={owner?.first_name}
+                      />
+                    ) : (
+                      <div className="rounded-xl w-24 h-24 bg-secondary-bg flex items-center justify-center">
+                        <p className="text-secondary-text text-2xl">
+                          {owner?.owner?.first_name?.charAt(0)}
+                          {owner?.owner?.surname?.charAt(0)}{" "}
+                        </p>
+                      </div>
+                    )}
+                    <div className="ml-2 flex flex-1 flex-col gap-2 h-full justify-around min-w-0">
+                      <div className="flex items-center gap-3">
+                        <BsFillPersonVcardFill className="text-primary-text w-6 h-6 shrink-0" />
+                        <p
+                          className="text-xl truncate min-w-0 text-primary-text font-semibold text-left"
+                          title={`${owner?.owner?.first_name} ${owner?.owner?.surname}`}>
+                          {owner?.owner?.first_name} {owner?.owner?.surname}
+                        </p>
+                      </div>
 
-                    <div className="flex items-center gap-3">
-                      <HiOutlinePhone className="text-primary-text w-6 h-6 shrink-0" />
-                      <p
-                        className="truncate min-w-0 text-lg text-primary-text font-medium text-left"
-                        title={owner?.owner?.primary_phone}>
-                        {owner?.owner?.primary_phone || "No Phone"}
-                      </p>
-                    </div>
+                      <div className="flex items-center gap-3">
+                        <HiOutlinePhone className="text-primary-text w-6 h-6 shrink-0" />
+                        <p
+                          className="truncate min-w-0 text-lg text-primary-text font-medium text-left"
+                          title={owner?.owner?.primary_phone}>
+                          {owner?.owner?.primary_phone || "No Phone"}
+                        </p>
+                      </div>
 
-                    {/* Email */}
-                    <div className="flex items-center gap-3 max-w-full">
-                      <TfiEmail className="text-primary-text w-5 h-5 shrink-0" />
-                      <p
-                        className="ml-1 truncate text-sm text-primary-text text-left min-w-0"
-                        title={owner?.owner?.primary_email}>
-                        {owner?.owner?.primary_email || "No Email"}
-                      </p>
+                      {/* Email */}
+                      <div className="flex items-center gap-3 max-w-full">
+                        <TfiEmail className="text-primary-text w-5 h-5 shrink-0" />
+                        <p
+                          className="ml-1 truncate text-sm text-primary-text text-left min-w-0"
+                          title={owner?.owner?.primary_email}>
+                          {owner?.owner?.primary_email || "No Email"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2 h-full justify-around">
+                      <CTAButton
+                        width="full"
+                        type="success"
+                        text="View details"
+                        callbackFn={() =>
+                          navigate(`/Client-Management/Owners`, {
+                            state: { owner: owner?.owner },
+                          })
+                        }
+                      />
+                      <CTAButton
+                        width="full"
+                        type="neutral"
+                        text="Edit details"
+                        callbackFn={() =>
+                          navigate(
+                            `/Client-Management/Owners/${owner?.owner?.id}`
+                          )
+                        }
+                      />
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 h-full justify-around">
-                    <CTAButton
-                      width="full"
-                      type="success"
-                      text="View details"
-                      callbackFn={() =>
-                        navigate(`/Client-Management/Owners`, {
-                          state: { owner: owner?.owner },
-                        })
-                      }
-                    />
-                    <CTAButton
-                      width="full"
-                      type="neutral"
-                      text="Edit details"
-                      callbackFn={() =>
-                        navigate(
-                          `/Client-Management/Owners/${owner?.owner?.id}`
-                        )
-                      }
-                    />
-                  </div>
+                ))
+              ) : (
+                <div className="mt-3 flex items-center justify-center h-20 border border-dashed border-border-color rounded-xl bg-primary-bg">
+                  <p className="text-primary-text">
+                    No owners assigned to this property.
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </>

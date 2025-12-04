@@ -14,6 +14,7 @@ const ModalImageUploader = ({
   userId, // UUID or PK
   existingUrl = null,
   onUploadComplete,
+  aspectRatio,
 }) => {
   const [preview, setPreview] = useState(existingUrl || null);
   const [file, setFile] = useState(null);
@@ -127,11 +128,11 @@ const ModalImageUploader = ({
         </h2>
 
         {preview ? (
-          <div className="relative">
+          <div className={`relative ${aspectRatio}`}>
             <img
               src={preview}
               alt="Preview"
-              className="rounded-xl w-full h-64 object-cover border"
+              className="rounded-xl w-full h-full object-cover border"
             />
             <button
               onClick={handleRemove}

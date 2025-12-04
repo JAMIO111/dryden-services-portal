@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OwnerList from "./OwnerList";
 import OwnerDetails from "./OwnerDetails";
 import { useOwners } from "@/hooks/useOwners";
@@ -11,8 +11,13 @@ const Owners = () => {
   const [selectedOwner, setSelectedOwner] = useState(
     location?.state?.owner ?? null
   );
+  const [activeStatus, setActiveStatus] = useState("Active");
   const { data: owners, isLoading } = useOwners();
   const { debouncedSearchTerm } = useGlobalSearch();
+
+  useEffect(() => {
+    setSelectedOwner(null);
+  }, [debouncedSearchTerm, activeStatus]);
 
   if (isLoading) return <Spinner />;
 
@@ -33,6 +38,8 @@ const Owners = () => {
         onSelectOwner={setSelectedOwner}
         selectedOwner={selectedOwner}
         owners={filteredOwners}
+        activeStatus={activeStatus}
+        setActiveStatus={setActiveStatus}
       />
       <OwnerDetails owner={selectedOwner} />
     </div>

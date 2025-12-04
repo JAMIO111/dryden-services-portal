@@ -1,7 +1,13 @@
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import CTAButton from "../CTAButton";
 
-const PropertyNavigation = ({ onPrev, onNext, currentIndex, total }) => {
+const PropertyNavigation = ({
+  onPrev,
+  onNext,
+  currentIndex,
+  total,
+  isLoading,
+}) => {
   const isPrevDisabled = total === 0 || currentIndex <= 1;
   const isNextDisabled = total === 0 || currentIndex >= total;
 
@@ -24,7 +30,9 @@ const PropertyNavigation = ({ onPrev, onNext, currentIndex, total }) => {
       {/* Counter */}
       <div className="flex-1 text-center">
         <p className="text-primary-text text-lg font-medium">
-          {total > 0
+          {isLoading
+            ? "Loading..."
+            : total > 0
             ? `Property ${currentIndex} of ${total}`
             : "No properties assigned"}
         </p>

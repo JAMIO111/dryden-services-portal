@@ -10,8 +10,15 @@ import Pill from "@components/Pill";
 import { FaBed, FaBath } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { BsHouseAdd } from "react-icons/bs";
+import { useModal } from "@/contexts/ModalContext";
+import OwnerPropertyForm from "./forms/OwnerPropertyForm";
+import { IoKeySharp } from "react-icons/io5";
+import { HiOutlineHomeModern } from "react-icons/hi2";
+import { TbExternalLink } from "react-icons/tb";
+import { FaHouseChimneyUser } from "react-icons/fa6";
 
 const OwnerDetails = ({ owner }) => {
+  const { openModal } = useModal();
   const navigate = useNavigate();
   const { data: properties, isLoading } = usePropertiesByOwner(owner?.id);
   console.log("Properties:", properties);
@@ -44,13 +51,28 @@ const OwnerDetails = ({ owner }) => {
     setCurrentIndex((prev) => (prev === properties.length - 1 ? 0 : prev + 1));
   };
 
+  const openAddPropertyModal = () => {
+    openModal({
+      title: "Assign Property to Owner",
+      content: (
+        <OwnerPropertyForm owner={owner} defaultProperties={properties} />
+      ),
+    });
+  };
+
   return (
     <div className="bg-secondary-bg flex-1 h-full flex flex-col rounded-2xl shadow-m">
       {!owner ? (
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="gap-5 flex flex-col text-primary-text text-xl text-center border border-border-color bg-primary-bg p-10 rounded-xl">
-            <p>No owner selected</p>
-            <p>Select an owner to view details</p>
+        <div className="w-full h-full flex items-center justify-center rounded-2xl">
+          <div className="flex flex-col items-center gap-4 p-12 rounded-2xl bg-primary-bg border border-border-color shadow-md text-center">
+            <FaHouseChimneyUser className="text-cta-color w-24 h-24 mb-4" />
+            <h2 className="text-2xl font-semibold text-primary-text">
+              No Owner Selected
+            </h2>
+            <p className="text-base text-secondary-text max-w-xs">
+              Select an owner from the list to view their details and manage
+              their properties.
+            </p>
           </div>
         </div>
       ) : (
@@ -218,13 +240,37 @@ const OwnerDetails = ({ owner }) => {
 
             {/* Right Column */}
             <div className="flex flex-col w-[40%] h-full overflow-y-auto gap-3">
-              {properties?.length > 0 ? (
+              {isLoading ? (
+                <div className="flex justify-center bg-tertiary-bg shadow-s rounded-2xl items-center h-200">
+                  <p className="text-secondary-text animate-pulse">
+                    Loading properties...
+                  </p>
+                </div>
+              ) : properties?.length > 0 && !isLoading ? (
                 <div className="flex h-200 flex-col bg-tertiary-bg rounded-2xl border border-border-color overflow-hidden">
-                  <img
-                    src="/mansion-1.jpg"
-                    alt={`${owner?.first_name} ${owner?.surname}`}
-                    className="w-full aspect-video object-cover"
-                  />
+                  <div className="relative">
+                    <div
+                      onClick={() =>
+                        navigate(
+                          `/Client-Management/Properties/${selectedProperty?.property?.name}`
+                        )
+                      }
+                      className="absolute bg-secondary-bg/50 p-1 rounded-lg hover:shadow-s group top-2 right-2">
+                      <TbExternalLink className="cursor-pointer text-secondary-text group-hover:text-primary-text w-6 h-6" />
+                    </div>
+                    {selectedProperty?.property?.avatar ? (
+                      <img
+                        src={selectedProperty?.property?.avatar}
+                        alt={selectedProperty?.property?.name}
+                        className="w-full aspect-video object-cover"
+                      />
+                    ) : (
+                      <div className="w-full aspect-video flex flex-col items-center justify-center bg-primary-bg border-b border-border-color">
+                        <HiOutlineHomeModern className="w-12 h-12 text-secondary-text mb-2" />
+                        <span className="text-secondary-text">No Image</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="p-3">
                     <h3 className="text-lg mb-2 font-semibold text-primary-text">
                       {selectedProperty?.property?.name}
@@ -288,6 +334,7 @@ const OwnerDetails = ({ owner }) => {
                     type="main"
                     text="Assign Property"
                     icon={BsHouseAdd}
+                    callbackFn={openAddPropertyModal}
                   />
                 </div>
               )}
@@ -296,6 +343,7 @@ const OwnerDetails = ({ owner }) => {
                 onNext={handleNext}
                 currentIndex={currentIndex + 1}
                 total={properties?.length || 0}
+                isLoading={isLoading}
               />
             </div>
           </div>

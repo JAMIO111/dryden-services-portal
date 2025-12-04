@@ -163,7 +163,6 @@ const LeadForm = ({ lead, navigate }) => {
         control={control}
         render={({ field, fieldState }) => (
           <TextInput
-            required={true}
             label="Phone No."
             placeholder="e.g 07965 412387"
             {...field}
@@ -178,7 +177,6 @@ const LeadForm = ({ lead, navigate }) => {
         control={control}
         render={({ field, fieldState }) => (
           <TextInput
-            required={true}
             label="Email Address"
             placeholder="e.g ben.button@example.com"
             {...field}

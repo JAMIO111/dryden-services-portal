@@ -5,11 +5,16 @@ import CTAButton from "./CTAButton";
 import { useNavigate } from "react-router-dom";
 import ToggleButton from "./ui/ToggleButton";
 
-const OwnerList = ({ onSelectOwner, selectedOwner, owners }) => {
+const OwnerList = ({
+  onSelectOwner,
+  selectedOwner,
+  owners,
+  activeStatus,
+  setActiveStatus,
+}) => {
   const navigate = useNavigate();
   const containerRef = useRef(null);
   const [highlightStyle, setHighlightStyle] = useState({ top: 0, height: 0 });
-  const [activeStatus, setActiveStatus] = useState("Active");
 
   // Update highlight position when selection changes
   useEffect(() => {

@@ -119,7 +119,7 @@ const PropertyForm = () => {
       title: "Manage Property Owners",
       content: (
         <PropertyOwnerForm
-          propertyId={property.id}
+          propertyId={property?.id}
           defaultOwners={ownerFields.map((field) => field)}
           onSave={(updatedOwners) => {
             replaceOwners(updatedOwners); // replaces entire array in form state

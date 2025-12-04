@@ -63,6 +63,7 @@ const ProfileImageSection = ({
         userId={item?.id}
         existingUrl={item?.avatar || null}
         onUploadComplete={handleUploadComplete}
+        aspectRatio={aspectRatio}
       />
     </div>
   );
