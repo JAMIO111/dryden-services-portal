@@ -2,6 +2,7 @@ import Logo from "@assets/dryden-logo.png";
 import { forwardRef } from "react";
 
 const JobSheet = forwardRef(({ job }, ref) => {
+  const publicKeyCodes = job?.keyCodes.filter((kc) => !kc.is_private);
   console.log("Job data:", job);
   return (
     <div
@@ -87,8 +88,8 @@ const JobSheet = forwardRef(({ job }, ref) => {
         <section className="flex-1 rounded-lg overflow-hidden border mb-3">
           <h2 className="p-1 border-b font-semibold bg-gray-200">Key Codes</h2>
           <div className="p-2">
-            {job?.keyCodes ? (
-              job?.keyCodes.map((keyCode, index) => (
+            {publicKeyCodes.length > 0 ? (
+              publicKeyCodes.map((keyCode, index) => (
                 <div className="flex gap-3 flex-row mb-1.5" key={index}>
                   <div className="flex-1 font-semibold">
                     {`${keyCode?.code} - `}
@@ -206,7 +207,11 @@ const JobSheet = forwardRef(({ job }, ref) => {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
-                  })} (${job?.ad_hoc_job_id} - Start)`}
+                  })} (${job?.ad_hoc_job_id} - ${
+                    job?.transport === "Client"
+                      ? "Client Drop-off"
+                      : "Dryden Services Pick-up"
+                  })`}
                 </div>
               </div>
 
@@ -218,7 +223,11 @@ const JobSheet = forwardRef(({ job }, ref) => {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
-                  })} (${job?.ad_hoc_job_id} - End)`}
+                  })} (${job?.ad_hoc_job_id} - ${
+                    job?.transport === "Client"
+                      ? "Client Pick-up"
+                      : "Dryden Services Drop-off"
+                  })`}
                 </div>
               </div>
             </div>
@@ -431,6 +440,42 @@ const JobSheet = forwardRef(({ job }, ref) => {
               )}
             </div>
           </section>
+        </section>
+      )}
+      {job?.propertyDetails?.service_type?.includes("laundry") && (
+        <section className="flex-2 rounded-lg mb-3 overflow-hidden border">
+          <h2 className="p-1 border-b font-semibold bg-gray-200">
+            Laundry Used{" "}
+            <span className="text-[10px]">(Record quantity used)</span>
+          </h2>
+          <div className="flex flex-wrap gap-5 p-1">
+            {[
+              [
+                "Super King Sheets",
+                "Super King Duvet Covers",
+                "Super King Protectors",
+              ],
+              ["King Sheets", "King Duvet Covers", "King Protectors"],
+              ["Double Sheets", "Double Duvet Covers", "Double Protectors"],
+              ["Single Sheets", "Single Duvet Covers", "Single Protectors"],
+              ["Pillowcases", "Duvets", "Pillows"],
+              ["Hand Towels", "Bath Towels", "Bath Sheets"],
+              ["Bath Mats", "Bathrobes", "Face Cloths"],
+              ["Oven Gloves", "Tea Towels", "Table Cloths"],
+              ["Cushion Covers", "Throws", "Rugs"],
+            ].map((group, i) => (
+              <div key={i} className="flex flex-col flex-1 min-w-[200px] gap-1">
+                {group.map((item) => (
+                  <div
+                    key={item}
+                    className="flex justify-between gap-2 items-center flex-row">
+                    <div className="h-6 w-6 border rounded" />
+                    <div className="flex-1 text-left font-semibold">{item}</div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </section>
       )}
 

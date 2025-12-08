@@ -239,14 +239,14 @@ export default function ClientManagementOverviewCard({
                           className="w-14 h-14 object-cover rounded-xl border border-border-color"
                         />
                       ) : (
-                        <div className="w-14 h-14 flex items-center justify-center rounded-xl border border-border-color bg-primary-bg">
+                        <div className="w-14 hover:shadow-s h-14 flex items-center justify-center rounded-xl border border-border-color bg-primary-bg">
                           <p className="text-lg font-semibold text-primary-text">
                             {(owner.first_name?.[0] || "").toUpperCase()}
                             {(owner.surname?.[0] || "").toUpperCase()}
                           </p>
                         </div>
                       )}
-                      <span className="text-sm text-secondary-text mt-2 truncate max-w-[4rem]">
+                      <span className="text-xs text-secondary-text mt-2 truncate max-w-[4rem]">
                         {owner.first_name || owner.surname}
                       </span>
                     </button>
@@ -270,14 +270,14 @@ export default function ClientManagementOverviewCard({
                         <img
                           src={property.image || `No Image`}
                           alt={"No Image"}
-                          className="w-20 h-14 object-cover rounded-xl border border-border-color"
+                          className="w-20 h-14 hover:shadow-s object-cover rounded-xl border border-border-color"
                         />
                       ) : (
-                        <div className="w-20 h-14 flex items-center justify-center rounded-xl border border-border-color bg-primary-bg">
+                        <div className="w-20 h-14 hover:shadow-s flex items-center justify-center rounded-xl border border-border-color bg-primary-bg">
                           <Building2 className="w-6 h-6 text-secondary-text" />
                         </div>
                       )}
-                      <span className="text-sm text-secondary-text mt-2 truncate max-w-[4rem]">
+                      <span className="text-xs text-secondary-text mt-2 truncate max-w-[4rem]">
                         {property.name}
                       </span>
                     </button>

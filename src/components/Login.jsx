@@ -32,7 +32,7 @@ const Login = () => {
       if (error.message.includes("Invalid login credentials")) {
         setMessage("Invalid email or password. Please try again.");
       } else {
-        alert(error.message);
+        showToast(error.message, "error");
         console.error("Login failed:", error.message);
       }
     } finally {

@@ -22,7 +22,7 @@ const weekdays = [
 ];
 const ordinals = ["First", "Second", "Third", "Fourth", "Last"];
 
-const RecurrenceForm = ({ startDate }) => {
+const RecurrenceForm = ({ startDate, onRecurrencesChange }) => {
   const [recurrences, setRecurrences] = useState([]);
   const { generateRecurrences } = useGenerateRecurrences();
   const { control, watch, handleSubmit } = useForm({
@@ -299,10 +299,14 @@ const RecurrenceForm = ({ startDate }) => {
           text="Preview Recurrences"
           disabled={!!getRecurrenceError()}
           callbackFn={() => {
-            const recurrences = generateRecurrences(startDate, watch());
-            setRecurrences(recurrences);
+            const generated = generateRecurrences(startDate, watch());
+            setRecurrences(generated);
+
+            // Pass dates up to parent
+            if (onRecurrencesChange) onRecurrencesChange(generated);
           }}
         />
+
         {getRecurrenceError() && (
           <div className="flex flex-1 gap-2 items-center justify-start">
             <GoInfo className="ml-4 h-5 w-5 text-error-color" />

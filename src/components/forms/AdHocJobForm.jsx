@@ -35,6 +35,7 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
   const upsertAdHocJob = useUpsertAdHocJob();
   const { data: properties } = useProperties();
   const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrenceDates, setRecurrenceDates] = useState([]);
   const { closeModal } = useModal();
 
   console.log("AdHocJobForm - adHocJob:", adHocJob);
@@ -87,6 +88,15 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
   }, [watchType, setValue, adHocJob]);
 
   const onSubmit = async (data) => {
+    if (isRecurring && recurrenceDates.length === 0) {
+      showToast({
+        type: "error",
+        title: "No Recurrence Dates",
+        message:
+          "Please preview and confirm recurrence dates before submitting.",
+      });
+      return;
+    }
     try {
       // Prepare payload: include ID only if editing
       const payload = {
@@ -95,7 +105,7 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
       };
 
       // 1. Capture the result (important!)
-      const result = await upsertAdHocJob.mutateAsync(payload);
+      const result = await upsertAdHocJob.mutateAsync(payload, recurrenceDates);
 
       // Use the correct ID: new or existing
       const adHocJobId = result?.ad_hoc_job_id || adHocJob?.id;
@@ -318,7 +328,10 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
                 Recurring Job Details
               </h2>
               <div className="overflow-y-auto min-h-0">
-                <RecurrenceForm startDate={watch("single_date")} />
+                <RecurrenceForm
+                  startDate={watch("single_date")}
+                  onRecurrencesChange={(dates) => setRecurrenceDates(dates)}
+                />
               </div>
             </div>
           </div>

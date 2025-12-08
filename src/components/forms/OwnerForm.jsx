@@ -83,7 +83,6 @@ const OwnerForm = () => {
         middle_name: lead.middle_name ?? "",
         primary_email: lead.email ?? "",
         primary_phone: lead.phone ?? "",
-        location: lead.title ?? "", // ← You probably want lead.title here
       });
       return;
     }
