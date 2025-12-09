@@ -18,6 +18,11 @@ import { useUpsertOwner } from "@/hooks/useUpsertOwner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../contexts/ToastProvider";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useFieldArray } from "react-hook-form";
+import OwnerPropertyForm from "./OwnerPropertyForm";
+import { usePropertiesByOwner } from "@/hooks/usePropertiesByOwner";
+import { useModal } from "@/contexts/ModalContext";
+import { IoLocationOutline } from "react-icons/io5";
 
 const OwnerForm = () => {
   const queryClient = useQueryClient();
@@ -26,9 +31,12 @@ const OwnerForm = () => {
   const location = useLocation();
   const { showToast } = useToast();
   const { createNotification } = useCreateNotification();
-  const { data: owner, isLoading } = useOwnerById(
+  const { data: owner, isLoading: isOwnerLoading } = useOwnerById(
     id !== "New-Owner" ? id : null
   );
+  const { data: properties, isLoading: isPropertiesLoading } =
+    usePropertiesByOwner(id !== "New-Owner" ? id : null);
+  const { openModal, closeModal } = useModal();
 
   console.log("Location state:", location.state);
 
@@ -45,6 +53,7 @@ const OwnerForm = () => {
     created_at: null,
     legacy_id: null,
     location: "",
+    Properties: [],
   };
 
   const upsertOwner = useUpsertOwner();
@@ -65,6 +74,43 @@ const OwnerForm = () => {
     delayError: 250,
   });
 
+  const {
+    fields: propertyFields,
+    append: appendProperty,
+    remove: removeProperty,
+    update: updateProperty,
+    replace: replaceProperties,
+  } = useFieldArray({
+    control,
+    name: "Properties",
+    keyName: "formId",
+  });
+  console.log("Property fields:", propertyFields);
+  const openManagePropertiesModal = () => {
+    openModal({
+      title: "Manage Owner's Properties",
+      content: (
+        <OwnerPropertyForm
+          ownerId={owner?.id}
+          defaultProperties={propertyFields.map((field) => field)}
+          onSave={(updatedProperties) => {
+            replaceProperties(updatedProperties); // replaces entire array in form state
+            trigger("Properties");
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      ),
+    });
+  };
+
+  useEffect(() => {
+    if (properties && properties.length > 0) {
+      // Map properties to match the structure your form expects
+      replaceProperties(properties);
+    }
+  }, [properties, replaceProperties]);
+
   useEffect(() => {
     const lead = location.state?.lead;
 
@@ -83,6 +129,7 @@ const OwnerForm = () => {
         middle_name: lead.middle_name ?? "",
         primary_email: lead.email ?? "",
         primary_phone: lead.phone ?? "",
+        Properties: [],
       });
       return;
     }
@@ -92,6 +139,7 @@ const OwnerForm = () => {
   }, [id, owner, location.key]); // ← important
 
   console.log("Owner data:", owner);
+  console.log("Property data:", properties);
 
   const firstName = watch("first_name") || "";
   const surname = watch("surname") || "";
@@ -99,18 +147,10 @@ const OwnerForm = () => {
   // Build initials
   const initials = `${firstName.charAt(0)}${surname.charAt(0)}`.toUpperCase();
 
-  console.log("isDirty:", isDirty, "isValid:", isValid);
-  console.log("Form Errors:", errors);
-  const invalidFields = Object.keys(errors);
-  console.log("Invalid fields:", invalidFields);
-  console.log("Form Values:", watch());
-  console.log("Owner:", owner);
-  console.log("Owner ID:", id);
-
-  if (isLoading) return <p>Loading...</p>;
+  if (isOwnerLoading || isPropertiesLoading) return <p>Loading...</p>;
 
   return (
-    <div className="flex bg-primary-bg flex-1 flex-row p-3 gap-3">
+    <div className="flex bg-primary-bg flex-1 h-full flex-row p-3 gap-3">
       <div className="bg-secondary-bg flex-1 rounded-2xl border p-3 border-border-color flex flex-col gap-3 h-full overflow-hidden">
         <div className="mb-5">
           <ProfileImageSection
@@ -247,7 +287,77 @@ const OwnerForm = () => {
         />
       </div>
       <div className="flex flex-1 flex-col gap-3 h-full">
-        <div className="bg-secondary-bg flex-1 rounded-2xl border p-3 border-border-color flex flex-col gap-3overflow-hidden"></div>
+        <div className="bg-secondary-bg flex-1 rounded-2xl border p-3 border-border-color flex flex-col overflow-hidden">
+          <h2 className="text-lg pb-2 pl-2 font-semibold text-primary-text">
+            Properties
+          </h2>
+          {isPropertiesLoading ? (
+            <div className="flex flex-1 w-full items-start justify-center">
+              <p className="flex items-center justify-center text-sm border border-dashed border-border-dark-color w-full text-center h-40 rounded-lg text-primary-text">
+                Loading properties...
+              </p>
+            </div>
+          ) : propertyFields.length === 0 ? (
+            <div className="flex flex-1 w-full items-start justify-center">
+              <p className="flex items-center justify-center text-sm border border-dashed border-border-dark-color w-full text-center h-40 rounded-lg text-primary-text">
+                No properties added yet.
+              </p>
+            </div>
+          ) : (
+            <ul className="flex flex-col flex-1 min-h-0 overflow-y-auto p-1 gap-2">
+              {propertyFields.map((property, index) => {
+                const propertyData = property.property || property;
+                return (
+                  <li
+                    key={propertyData.id}
+                    className="flex flex-col items-start px-3 justify-between p-2 bg-tertiary-bg rounded-xl shadow-s">
+                    {propertyData?.avatar ? (
+                      <img
+                        src={propertyData?.avatar}
+                        alt={`${propertyData?.name}`}
+                        className="w-full aspect-video rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center shadow-s w-full aspect-video rounded-lg bg-primary-bg">
+                        <p className="text-lg font-semibold text-primary-text">
+                          {propertyData?.name.toUpperCase()}
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex flex-col py-3 gap-2 flex-1">
+                      <span className="font-semibold text-primary-text">
+                        {propertyData?.name}
+                      </span>
+                      <div className="flex items-start gap-1.5">
+                        <IoLocationOutline className="text-secondary-text" />
+
+                        <span className="text-sm text-secondary-text">
+                          {[
+                            propertyData?.line_1,
+                            propertyData?.line_2,
+                            propertyData?.town,
+                            propertyData?.postcode,
+                          ]
+                            .filter(Boolean)
+                            .join(", ") || "No address provided"}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <div className="mt-3">
+            <CTAButton
+              width="w-full"
+              type="main"
+              text="Manage Properties"
+              icon={IoLocationOutline}
+              callbackFn={openManagePropertiesModal}
+            />
+          </div>
+        </div>
         <div className="flex flex-row gap-3 bg-secondary-bg border border-border-color rounded-2xl p-3">
           <CTAButton
             disabled={!isDirty}
@@ -281,7 +391,10 @@ const OwnerForm = () => {
                 console.log("Submitting payload:", payload);
 
                 // 1. Get the real owner from the mutation result
-                const result = await upsertOwner.mutateAsync(payload);
+                const result = await upsertOwner.mutateAsync({
+                  ownerData: payload, // your owner object
+                  propertiesForm: [], // or the actual properties form data
+                });
 
                 // 2. Extract the real ID
                 const ownerId = result?.id || id;
@@ -311,7 +424,7 @@ const OwnerForm = () => {
                     url: `/Client-Management/Owners/${ownerId}`,
                     buttonText: "View Owner",
                   },
-                  docRef: ownerId,
+                  docRef: result.first_name + " " + result.surname,
                   category: "Owners",
                   type: !!ownerId ? "update" : "new",
                 });

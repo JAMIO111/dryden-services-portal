@@ -45,6 +45,9 @@ export const useBookings = ({
     ],
     queryFn: async () => {
       let query = supabase.from("v_bookings").select("*", { count: "exact" });
+
+      query = query.is("deleted_at", null);
+
       query = query
         .order(sortColumn, { ascending: sortOrder === "asc" })
         .range(from, to)

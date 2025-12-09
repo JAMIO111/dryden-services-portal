@@ -52,7 +52,7 @@ export default function LeadList() {
   };
 
   return (
-    <div className="bg-secondary-bg border border-border-color rounded-3xl h-full flex flex-col overflow-hidden">
+    <div className="bg-secondary-bg shadow-m p-0.5 rounded-3xl h-full flex flex-col overflow-hidden">
       {/* Make this the scroll container */}
       <div
         id="lead-list-scroll"

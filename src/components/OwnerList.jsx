@@ -40,12 +40,17 @@ const OwnerList = ({
       : owners;
 
   return (
-    <div className="bg-secondary-bg w-1/4 rounded-2xl shadow-m flex flex-col h-full overflow-hidden">
+    <div className="bg-secondary-bg w-1/4 p-0.5 rounded-2xl shadow-m flex flex-col h-full overflow-hidden relative">
       {/* Header */}
-      <div className="flex flex-row gap-3 items-center px-4 py-4 border-b border-border-color">
+      <div
+        className="
+      sticky top-0 z-10 p-3 flex flex-row gap-3 items-center
+      backdrop-blur-md bg-secondary-bg/70 border-b border-transparent
+      data-[scrolled=true]:border-border-color/60 rounded-2xl
+    ">
         <MdPeopleOutline className="w-7 h-7 text-primary-text" />
         <h2 className="text-xl text-primary-text font-semibold">Owner List</h2>
-        <div className="w-36">
+        <div className="w-36 ml-auto">
           <ToggleButton
             checked={activeStatus === "Active"}
             onChange={(isActive) =>
@@ -60,7 +65,6 @@ const OwnerList = ({
 
       {/* Scrollable List */}
       <div className="flex-1 p-3 overflow-y-auto relative" ref={containerRef}>
-        {/* Sliding Highlight */}
         {selectedOwner && (
           <div
             className="absolute left-0 right-0 bg-primary-bg rounded-2xl shadow-s transition-all duration-300"
@@ -134,8 +138,12 @@ const OwnerList = ({
         </ul>
       </div>
 
-      {/* Add Owner Button */}
-      <div className="p-3 border-t border-border-color">
+      {/* Footer */}
+      <div
+        className="
+      sticky bottom-0 z-10 p-3 border-t border-transparent
+      backdrop-blur-md bg-secondary-bg/70 rounded-2xl
+    ">
         <CTAButton
           width="w-full"
           type="main"

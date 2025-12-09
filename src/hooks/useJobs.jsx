@@ -35,6 +35,7 @@ export function useJobs(startDate, endDate) {
           )
         `
         )
+        .is("deleted_at", null)
         .gte("departure_date", startDate.toISOString())
         .lte("departure_date", endDate.toISOString())
         .order("departure_date", { ascending: true });
@@ -48,6 +49,7 @@ export function useJobs(startDate, endDate) {
         .select(
           "id, property_id, booking_id, arrival_date, departure_date, is_return_guest, is_owner_booking, adults, children, infants, pets, cots, highchairs, stairgates, notes"
         )
+        .is("deleted_at", null)
         .order("arrival_date", { ascending: true });
 
       if (allErr) throw allErr;

@@ -11,14 +11,14 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex flex-row p-2 gap-3 w-full h-full grow bg-primary-bg min-h-0">
+    <div className="flex flex-row p-2 gap-3 w-full flex-1 bg-primary-bg min-h-0">
       {/* Sidebar */}
       <div className="flex flex-col bg-secondary-bg rounded-2xl shadow-s w-65 min-w-65 min-h-0">
         <h1 className="text-primary-text text-2xl pl-3 py-2 border-b border-border-color font-semibold">
           Settings
         </h1>
 
-        <div className="flex flex-col p-2 overflow-y-auto min-h-0">
+        <div className="flex flex-col p-2">
           {SettingMenuStructure.map((item, index) => {
             const resolvedPath = useResolvedPath(item.path);
             const match = useMatch({ path: resolvedPath.pathname, end: false });
@@ -101,7 +101,7 @@ const Settings = () => {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-grow p-3 shadow-s h-full bg-secondary-bg rounded-2xl flex flex-col min-h-0">
+      <div className="flex flex-col flex-1 shadow-s overflow-hidden rounded-2xl min-h-0">
         <Outlet />
       </div>
     </div>

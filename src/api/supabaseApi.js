@@ -75,6 +75,14 @@ export const deleteRow = async (table, id) => {
   if (error) throw new Error(error.message);
 };
 
+export const softDeleteRow = async (table, id) => {
+  const { error } = await supabase
+    .from(table)
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+};
+
 export const getNextNCId = async (table, field) => {
   try {
     const year = new Date().getFullYear().toString().slice(-2); // e.g., '25'

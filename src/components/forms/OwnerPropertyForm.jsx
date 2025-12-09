@@ -12,6 +12,10 @@ const normalize = (p) => ({
   id: p?.property?.id ?? p.id,
   name: p?.property?.name ?? p.name,
   avatar: p?.property?.avatar ?? p.avatar ?? null,
+  line_1: p?.property?.line_1 ?? p.line_1 ?? "",
+  line_2: p?.property?.line_2 ?? p.line_2 ?? "",
+  town: p?.property?.town ?? p.town ?? "",
+  postcode: p?.property?.postcode ?? p.postcode ?? "",
 });
 
 const OwnerPropertyForm = ({ owner, defaultProperties = [], onSave }) => {
@@ -89,6 +93,10 @@ const OwnerPropertyForm = ({ owner, defaultProperties = [], onSave }) => {
   };
 
   const handleSubmit = () => {
+    if (onSave) {
+      onSave(currentProperties);
+      return;
+    }
     upsertOwner.mutate(
       {
         ownerData: owner,
@@ -116,7 +124,7 @@ const OwnerPropertyForm = ({ owner, defaultProperties = [], onSave }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-[50vh] min-w-[30vw] gap-4 p-4">
+    <div className="flex flex-col min-h-[60vh] min-w-[40vw] gap-4 p-4">
       <RHFComboBox
         label="Select Property"
         icon={FaUser}
@@ -132,9 +140,11 @@ const OwnerPropertyForm = ({ owner, defaultProperties = [], onSave }) => {
 
       <ul className="flex flex-1 flex-col p-1 gap-2 max-h-60 overflow-y-auto">
         {currentProperties.length === 0 && (
-          <li className="text-sm text-primary-text">
-            No properties added yet.
-          </li>
+          <div className="flex flex-1 w-full items-start">
+            <span className="text-sm w-full text-primary-text border border-dashed border-secondary-text rounded-lg p-4 text-center">
+              No properties added yet.
+            </span>
+          </div>
         )}
 
         {currentProperties.map((property) => (
@@ -145,10 +155,10 @@ const OwnerPropertyForm = ({ owner, defaultProperties = [], onSave }) => {
               <img
                 src={property.avatar}
                 alt={property.name}
-                className="w-10 h-10 rounded-lg object-cover"
+                className="aspect-video h-10 rounded-lg object-cover"
               />
             ) : (
-              <div className="flex items-center justify-center shadow-s w-10 h-10 rounded-lg bg-primary-bg">
+              <div className="flex items-center justify-center shadow-s aspect-video h-10 rounded-lg bg-primary-bg">
                 <p className="text-lg font-semibold text-primary-text">
                   {(property.name || "").substring(0, 2).toUpperCase()}
                 </p>

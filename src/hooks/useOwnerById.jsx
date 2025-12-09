@@ -4,7 +4,7 @@ import supabase from "../supabase-client";
 const fetchOwnersById = async (ownerId) => {
   const { data, error } = await supabase
     .from("Owners")
-    .select("*")
+    .select(`*`)
     .eq("id", ownerId)
     .single();
   if (error) throw new Error(error.message);

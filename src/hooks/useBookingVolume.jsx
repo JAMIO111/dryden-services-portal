@@ -26,6 +26,7 @@ export const useBookingVolume = (startDate, endDate) => {
       const { data: bookings, error } = await supabase
         .from("Bookings")
         .select("id, departure_date")
+        .is("deleted_at", null)
         .gte("departure_date", startDate.toISOString())
         .lte("departure_date", endDate.toISOString());
 
