@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { IoChevronDown } from "react-icons/io5";
 import { TbCalendarTime, TbCalendar, TbClock } from "react-icons/tb";
+import { MdErrorOutline } from "react-icons/md";
 import { motion } from "framer-motion";
 import {
   startOfMonth,
@@ -42,6 +43,7 @@ const DatePicker = ({
   placeholder,
   defaultPageDate,
   required = false,
+  error,
 }) => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -143,15 +145,33 @@ const DatePicker = ({
 
       {/* Input Box */}
       <div
-        className={`${
-          open ? "border-brand-primary" : "border-transparent"
-        } border flex items-center select-none justify-between transition-all duration-300 bg-text-input-color rounded-lg shadow-s hover:shadow-m p-2.5 text-sm text-primary-text cursor-pointer`}
+        className={`
+    border
+    flex items-center select-none justify-between
+    transition-all duration-300 bg-text-input-color rounded-lg
+    shadow-s hover:shadow-m p-2.5 text-sm text-primary-text cursor-pointer
+
+    ${
+      error
+        ? "border-error-color hover:border-error-color/70"
+        : open
+        ? "border-brand-primary hover:border-brand-primary"
+        : "border-transparent"
+    }
+
+    ${open && error ? "ring-3 ring-error-color/30" : ""}
+  `}
         onClick={() => {
           setOpen(!open);
           setMode(displayMode === "datetime" ? "date" : displayMode);
         }}>
         <div className="flex items-center gap-2">
-          {displayMode === "datetime" ? (
+          {error ? (
+            <MdErrorOutline
+              title={error.message}
+              className="w-5 h-5 text-error-color mr-2 flex-shrink-0"
+            />
+          ) : displayMode === "datetime" ? (
             <TbCalendarTime className="w-5 h-5 text-primary-text" />
           ) : displayMode === "date" ? (
             <TbCalendar className="w-5 h-5 text-primary-text" />

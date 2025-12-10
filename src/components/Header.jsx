@@ -43,11 +43,19 @@ const Header = () => {
           </span>
           <span className="text-right text-secondary-text">{jobTitle}</span>
         </div>
-        <img
-          className="rounded-xl border-1 border-border-color w-12 h-12 object-cover"
-          src={profile?.avatar ? profile.avatar : "/Logo-black-on-yellow.png"}
-          alt="Profile Pic"
-        />
+        {profile?.avatar ? (
+          <img
+            className="rounded-xl border-1 border-border-color w-12 h-12 object-cover"
+            src={profile.avatar}
+            alt="Profile Pic"
+          />
+        ) : (
+          <div className="rounded-xl border-1 border-border-color w-12 h-12 flex items-center justify-center bg-primary-bg">
+            <span className="text-secondary-text">{`${profile.first_name.charAt(
+              0
+            )}${profile.surname.charAt(0)}`}</span>
+          </div>
+        )}
       </div>
     </header>
   );

@@ -79,9 +79,30 @@ export const UserProvider = ({ children }) => {
     if (error) console.error("Error updating profile:", error);
   };
 
+  const refreshProfile = async () => {
+    if (!authUser) return;
+
+    const { data, error } = await supabase
+      .from("Employees")
+      .select(
+        "first_name, surname, job_title, avatar, id, auth_id, notification_preferences"
+      )
+      .eq("auth_id", authUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error refreshing profile:", error);
+      setProfile(null);
+      return;
+    }
+
+    setProfile(data);
+    localStorage.setItem("user_profile", JSON.stringify(data));
+  };
+
   return (
     <UserContext.Provider
-      value={{ profile, setProfile, orgUsers, updateProfile }}>
+      value={{ profile, setProfile, orgUsers, updateProfile, refreshProfile }}>
       {children}
     </UserContext.Provider>
   );

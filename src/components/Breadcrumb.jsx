@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { BiHome } from "react-icons/bi";
 import {
   IoFolderOpenOutline,
   IoReceiptOutline,
@@ -69,16 +68,12 @@ const Breadcrumb = () => {
     <nav
       ref={scrollRef}
       className="flex items-center gap-1 text-sm text-secondary-text font-semibold overflow-x-auto whitespace-nowrap [&::-webkit-scrollbar]:hidden">
-      <BiHome />
-      <Link to="/Dashboard" className="hover:underline">
-        Home
-      </Link>
-
       {segments.map((segment, index) => {
-        const path = "/" + segments.slice(0, index + 1).join("/");
+        const path = segments.slice(0, index + 1).join("/");
+
         return (
           <React.Fragment key={path}>
-            <span className="mx-1">/</span>
+            {index > 0 && <span className="mx-1">/</span>}
             {iconMap[segment] || <IoFolderOpenOutline />}
             <Link to={path} className="hover:underline capitalize">
               {formatSegment(decodeURIComponent(segment))}

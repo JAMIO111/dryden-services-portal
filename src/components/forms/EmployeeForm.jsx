@@ -45,6 +45,7 @@ const defaultFormData = {
   is_cscs: false,
   is_active: true,
   hourly_rate: "",
+  contract_type: "",
 };
 
 const EmployeeForm = ({ employee }) => {
@@ -70,9 +71,19 @@ const EmployeeForm = ({ employee }) => {
     employee?.surname?.[0] ?? ""
   }`.toUpperCase();
 
+  const formatDateForDateColumn = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const onSubmit = async (data) => {
     try {
-      const payload = { ...data };
+      const payload = {
+        ...data,
+        dob: data.dob ? formatDateForDateColumn(new Date(data.dob)) : null,
+      };
 
       // add ID when editing
       if (employee?.id) payload.id = employee.id;
@@ -331,6 +342,20 @@ const EmployeeForm = ({ employee }) => {
             )}
           />
         </div>
+
+        <Controller
+          name="contract_type"
+          control={control}
+          render={({ field, fieldState }) => (
+            <TextInput
+              label="Contract Type"
+              placeholder="e.g. Full-Time, Part-Time"
+              icon={IoText}
+              {...field}
+              error={fieldState.error}
+            />
+          )}
+        />
 
         {/* NI Number */}
         <Controller

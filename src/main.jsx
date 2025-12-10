@@ -9,6 +9,7 @@ import { UserProvider } from "./contexts/UserProvider.jsx";
 import { OrganisationProvider } from "./contexts/OrganisationProvider.jsx";
 import { ModalProvider } from "./contexts/ModalContext";
 import LoadingSpinner from "./components/LoadingSpinner.jsx";
+import RequireProfile from "./components/RequireProfile.jsx";
 import "./index.css";
 
 const App = lazy(() => import("./App.jsx"));
@@ -30,6 +31,7 @@ const JobsDashboard = lazy(() =>
 const AdHocJobsDashboard = lazy(() =>
   import("./components/dashboard/AdHocJobsDashboard.jsx")
 );
+const Onboarding = lazy(() => import("./components/Onboarding.jsx"));
 const ClientManagementDashboard = lazy(() =>
   import("./components/dashboard/ClientManagementDashboard.jsx")
 );
@@ -108,106 +110,112 @@ const router = createBrowserRouter([
       },
     ],
   },
+  { path: "onboarding", element: <Onboarding /> },
   {
-    path: "/", // base path for protected routes
-    element: <ProtectedRoute />, // MUST render <Outlet /> inside!
+    path: "/",
+    element: <ProtectedRoute />,
     errorElement: <NotFound />,
     children: [
       {
-        element: <App />, // App contains the Navbar/Header + <Outlet />
+        element: <RequireProfile />, // <- New layer here
         children: [
-          { index: true, element: <Dashboard /> },
-          { path: "Dashboard", element: <Dashboard /> },
-          { path: "Jobs", element: <JobsDashboard /> },
           {
-            path: "Jobs/Bookings",
-            element: <BookingsDashboard />,
-          },
-          {
-            path: "Jobs/Bookings/New-Booking",
-            element: <BookingForm />,
-          },
-          {
-            path: "Jobs/Bookings/:bookingId",
-            element: <BookingForm />,
-          },
-          {
-            path: "Jobs/Ad-hoc-Jobs",
-            element: <AdHocJobsDashboard />,
-          },
-          {
-            path: "Client-Management",
-            element: <ClientManagementDashboard />,
-          },
-          {
-            path: "Client-Management/Properties",
-            element: <Properties />,
-          },
-          {
-            path: "Client-Management/Properties/:name",
-            element: <PropertyForm />,
-          },
-          {
-            path: "Client-Management/Properties/New-Property",
-            element: <PropertyForm />,
-          },
-          {
-            path: "Client-Management/Owners/New-Owner",
-            element: <OwnerForm />,
-          },
-          {
-            path: "Client-Management/Owners",
-            element: <Owners />,
-          },
-          {
-            path: "Client-Management/Owners/:id",
-            element: <OwnerForm />,
-          },
-          {
-            path: "Client-Management/Leads/:title",
-            element: <LeadDetails />,
-          },
-          {
-            path: "Settings",
-            element: <Settings />,
+            element: <App />, // App holds your nav + <Outlet />
             children: [
+              { index: true, element: <Dashboard /> },
+              { path: "Dashboard", element: <Dashboard /> },
+              { path: "Jobs", element: <JobsDashboard /> },
               {
-                path: "General",
-                element: <div>General Settings</div>,
-              },
-              { path: "Account", element: <SettingsAccount /> },
-              {
-                path: "System-Preferences",
-                element: (
-                  <div>
-                    <SettingsSystemPreferences />
-                  </div>
-                ),
+                path: "Jobs/Bookings",
+                element: <BookingsDashboard />,
               },
               {
-                path: "Data-Management",
-                element: <SettingsDataManagement />,
+                path: "Jobs/Bookings/New-Booking",
+                element: <BookingForm />,
               },
               {
-                path: "Notifications",
-                element: <SettingsNotifications />,
+                path: "Jobs/Bookings/:bookingId",
+                element: <BookingForm />,
               },
-              { path: "Admin", element: <div>Admin Settings</div> },
+              {
+                path: "Jobs/Ad-hoc-Jobs",
+                element: <AdHocJobsDashboard />,
+              },
+              {
+                path: "Client-Management",
+                element: <ClientManagementDashboard />,
+              },
+              {
+                path: "Client-Management/Properties",
+                element: <Properties />,
+              },
+              {
+                path: "Client-Management/Properties/:name",
+                element: <PropertyForm />,
+              },
+              {
+                path: "Client-Management/Properties/New-Property",
+                element: <PropertyForm />,
+              },
+              {
+                path: "Client-Management/Owners/New-Owner",
+                element: <OwnerForm />,
+              },
+              {
+                path: "Client-Management/Owners",
+                element: <Owners />,
+              },
+              {
+                path: "Client-Management/Owners/:id",
+                element: <OwnerForm />,
+              },
+              {
+                path: "Client-Management/Leads/:title",
+                element: <LeadDetails />,
+              },
+              {
+                path: "Settings",
+                element: <Settings />,
+                children: [
+                  {
+                    path: "General",
+                    element: <div>General Settings</div>,
+                  },
+                  { path: "Account", element: <SettingsAccount /> },
+                  {
+                    path: "System-Preferences",
+                    element: (
+                      <div>
+                        <SettingsSystemPreferences />
+                      </div>
+                    ),
+                  },
+                  {
+                    path: "Data-Management",
+                    element: <SettingsDataManagement />,
+                  },
+                  {
+                    path: "Notifications",
+                    element: <SettingsNotifications />,
+                  },
+                  { path: "Admin", element: <div>Admin Settings</div> },
+                ],
+              },
+              {
+                path: "Maintenance",
+                element: <MaintenanceDashboard />,
+              },
+              {
+                path: "Human-Resources",
+                element: <HRDashboard />,
+              },
+              {
+                path: "Human-Resources/Employees",
+                element: <Employees />,
+              },
+              { path: "Calendar", element: <FullScreenCalendar /> },
             ],
           },
-          {
-            path: "Maintenance",
-            element: <MaintenanceDashboard />,
-          },
-          {
-            path: "Human-Resources",
-            element: <HRDashboard />,
-          },
-          {
-            path: "Human-Resources/Employees",
-            element: <Employees />,
-          },
-          { path: "Calendar", element: <FullScreenCalendar /> },
         ],
       },
     ],

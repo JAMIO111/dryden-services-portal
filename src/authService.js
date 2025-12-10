@@ -6,7 +6,7 @@ export const signUp = async (email, password, showToast) => {
     email,
     password,
     options: {
-      emailRedirectTo: "http://localhost:5173/Onboarding",
+      emailRedirectTo: "http://localhost:5173/onboarding",
     },
   });
 

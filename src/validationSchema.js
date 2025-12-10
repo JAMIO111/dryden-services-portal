@@ -380,9 +380,7 @@ export const EmployeeFormSchema = z.object({
   surname: z
     .string({ required_error: "Surname is required" })
     .min(1, { message: "Surname is required" }),
-  address: z.string({ required_error: "Address is required" }).min(5, {
-    message: "Address must be at least 5 characters long",
-  }),
+  address: z.string({ required_error: "Address is required" }),
   email: z
     .string()
     .email("Invalid email format")
@@ -414,6 +412,9 @@ export const EmployeeFormSchema = z.object({
   is_active: z.boolean(),
   is_driver: z.boolean(),
   is_cscs: z.boolean(),
+  contract_type: z
+    .string()
+    .max(50, { message: "Contract type must not exceed 50 characters" }),
   hourly_rate: z
     .union([z.string(), z.number()])
     .transform((val) =>

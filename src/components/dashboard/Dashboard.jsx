@@ -6,7 +6,6 @@ import StackedBarChart from "@components/charts/StackedBarChart";
 import { useBookingVolume } from "@/hooks/useBookingVolume";
 import { getPeriodLabel } from "@/lib/utils";
 import { CgClose } from "react-icons/cg";
-import { useJobSheetJobs } from "@/hooks/useJobSheetJobs";
 
 const Dashboard = () => {
   const { profile, orgUsers } = useUser();

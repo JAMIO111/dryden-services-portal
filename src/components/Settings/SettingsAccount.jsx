@@ -198,6 +198,7 @@ const SettingsAccount = () => {
                 type="main"
                 text={savingInfo ? "Saving..." : "Save Changes"}
                 callbackFn={handleSaveInfo}
+                disabled={!infoDirty || savingInfo}
               />
               {infoDirty && (
                 <CTAButton
