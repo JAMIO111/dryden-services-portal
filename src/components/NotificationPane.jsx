@@ -16,6 +16,15 @@ const NotificationPane = () => {
   const { data: notifications, isLoading, isError } = useNotifications();
   console.log("Notifications:", notifications);
 
+  const filtered = notifications
+    ? notifications.filter((n) => {
+        if (typeFilter === "All") return true;
+        if (typeFilter === "New") return n.read === false;
+        if (typeFilter === "Read") return n.read === true;
+        return true;
+      })
+    : [];
+
   if (typeof window === "undefined") return null;
   const root = document.getElementById("notification-root");
   if (!root) return null;
@@ -61,34 +70,21 @@ const NotificationPane = () => {
             {/* Notifications List */}
             <div className="flex-1 overflow-y-auto flex flex-col gap-2 p-4">
               {isLoading ? (
-                <div className="flex-col text-center items-center justify-center text-secondary-text border border-dashed border-border-color/50 p-6 rounded-xl">
-                  Loading Notifications...
-                </div>
+                <LoadingCard />
               ) : isError ? (
-                <div className="flex-col text-center items-center justify-center text-error-color border border-dashed border-border-color/50 p-6 rounded-xl">
-                  Error loading notifications.
-                </div>
-              ) : notifications && notifications.length > 0 ? (
-                notifications
-                  .filter((notification) => {
-                    if (typeFilter === "All") return true;
-                    if (typeFilter === "New")
-                      return notification.read === false;
-                    if (typeFilter === "Read")
-                      return notification.read === true;
-                    return true;
-                  })
-                  .map((notification) => (
-                    <NotificationCard
-                      key={notification.id}
-                      notification={notification}
-                      closePane={closePane}
-                      userId={profile.auth_id}
-                    />
-                  ))
+                <ErrorCard />
+              ) : filtered.length > 0 ? (
+                filtered.map((notification) => (
+                  <NotificationCard
+                    key={notification.id}
+                    notification={notification}
+                    closePane={closePane}
+                    userId={profile.auth_id}
+                  />
+                ))
               ) : (
-                <div className="flex-col text-center items-center justify-center text-secondary-text border border-dashed border-border-color/50 p-6 rounded-xl">
-                  No Notifications to show.
+                <div className="flex flex-col items-center justify-center text-secondary-text border border-dashed border-border-color/50 p-6 rounded-xl">
+                  No notifications to show.
                 </div>
               )}
             </div>

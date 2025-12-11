@@ -7,7 +7,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
   return (
     <div
       ref={ref}
-      className="job-sheet"
+      className="job-sheet flex flex-col"
       style={{
         fontSize: "9pt",
         width: "210mm",
@@ -42,7 +42,15 @@ const JobSheet = forwardRef(({ job }, ref) => {
           {(() => {
             switch (job?.itemType) {
               case "job":
-                return "- Changeover";
+                switch (job?.sheetType) {
+                  case "changeover":
+                    return "- Changeover";
+                  case "hot_tub":
+                    return "- Changeover Hot Tub";
+
+                  default:
+                    break;
+                }
               case "adHocJob":
                 switch (job?.type) {
                   case "Clean":
@@ -60,9 +68,10 @@ const JobSheet = forwardRef(({ job }, ref) => {
       </section>
       <section className="flex gap-3">
         <section className="flex-2 rounded-lg overflow-hidden border mb-3">
-          <h2 className="p-1 border-b font-semibold bg-gray-200">
-            Property Details
-          </h2>
+          <div className="p-1 pr-2 flex justify-between items-center border-b bg-gray-200">
+            <h2 className="font-semibold">Property Details</h2>
+            <p></p>
+          </div>
           <div className="p-2">
             <div className="flex gap-3 flex-row mb-1.5">
               <div className="flex-1 font-semibold">Name</div>
@@ -104,7 +113,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
         </section>
       </section>
 
-      <section className="flex-1 rounded-lg overflow-hidden border mb-3">
+      <section className="rounded-lg overflow-hidden border mb-3">
         <h2 className="p-1 border-b  font-semibold bg-gray-200">Job Details</h2>
         <div className="p-2">
           {job?.itemType === "job" && (
@@ -232,10 +241,19 @@ const JobSheet = forwardRef(({ job }, ref) => {
               </div>
             </div>
           )}
+
+          {job?.itemType === "adHocJob" && (
+            <div className="flex gap-3 mt-1.5 flex-row">
+              <div className="flex-1 font-semibold">Job Description</div>
+              <div className="flex-5">
+                {job?.notes || "No description provided."}
+              </div>
+            </div>
+          )}
         </div>
       </section>
       {job?.itemType === "job" && (
-        <section className="flex-1 rounded-lg overflow-hidden border mb-3">
+        <section className="rounded-lg overflow-hidden border mb-3">
           <h2 className="p-1 border-b font-semibold bg-gray-200">
             Booking Details
           </h2>
@@ -352,9 +370,9 @@ const JobSheet = forwardRef(({ job }, ref) => {
           </section>
         )}
       </section>
-      {job?.propertyDetails?.service_type?.includes("changeover") &&
+      {job?.sheetType === "changeover" &&
         job?.propertyDetails?.hired_laundry && (
-          <section className="flex-1 rounded-lg overflow-hidden border mb-3">
+          <section className="rounded-lg overflow-hidden border mb-3">
             <h2 className="p-1 border-b font-semibold bg-gray-200">
               Laundry{" "}
               <span className="text-[10px]">(Record quantity used)</span>
@@ -384,7 +402,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
             </div>
           </section>
         )}
-      {job?.itemType === "job" && (
+      {job?.sheetType === "changeover" && (
         <section className="flex gap-3 mb-3">
           <section className="flex-2 rounded-lg overflow-hidden border">
             <h2 className="p-1 border-b font-semibold bg-gray-200">
@@ -443,12 +461,12 @@ const JobSheet = forwardRef(({ job }, ref) => {
         </section>
       )}
       {job?.propertyDetails?.service_type?.includes("laundry") && (
-        <section className="flex-2 rounded-lg mb-3 overflow-hidden border">
+        <section className="rounded-lg mb-3 overflow-hidden border">
           <h2 className="p-1 border-b font-semibold bg-gray-200">
             Laundry Used{" "}
             <span className="text-[10px]">(Record quantity used)</span>
           </h2>
-          <div className="flex flex-wrap gap-5 p-1">
+          <div className="flex flex-wrap gap-2 p-1">
             {[
               [
                 "Super King Sheets",
@@ -464,7 +482,9 @@ const JobSheet = forwardRef(({ job }, ref) => {
               ["Oven Gloves", "Tea Towels", "Table Cloths"],
               ["Cushion Covers", "Throws", "Rugs"],
             ].map((group, i) => (
-              <div key={i} className="flex flex-col flex-1 min-w-[200px] gap-1">
+              <div
+                key={i}
+                className="flex flex-col flex-1 min-w-[200px] gap-0.5">
                 {group.map((item) => (
                   <div
                     key={item}
@@ -479,8 +499,8 @@ const JobSheet = forwardRef(({ job }, ref) => {
         </section>
       )}
 
-      {(job?.itemType === "job" || job?.type === "Clean") && (
-        <section className="flex-1 rounded-lg overflow-hidden border mb-3">
+      {(job?.sheetType === "changeover" || job?.type === "Clean") && (
+        <section className="rounded-lg overflow-hidden border mb-3">
           <h2 className="p-1 border-b font-semibold bg-gray-200">
             Quality Checks
             <span className="text-[10px] ml-2">(Tick upon completion)</span>
@@ -506,6 +526,11 @@ const JobSheet = forwardRef(({ job }, ref) => {
           </div>
         </section>
       )}
+
+      <section className="border rounded-lg flex-1 overflow-hidden mb-3">
+        <h2 className="p-1 border-b font-semibold bg-gray-200">Comments</h2>
+        <div className="p-3 flex h-24 flex-col gap-5"></div>
+      </section>
 
       <section className="border rounded-lg overflow-hidden">
         <h2 className="p-1 border-b font-semibold bg-gray-200">Sign-Off</h2>

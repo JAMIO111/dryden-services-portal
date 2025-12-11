@@ -42,8 +42,8 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
         <div className="grid grid-cols-[1.5fr_2.5fr_2fr_2fr_140px] border-b border-border-color text-sm bg-primary-bg text-secondary-text">
           <div className="p-2 border-r border-border-color">Job No.</div>
           <div className="p-2 border-r border-border-color">Property</div>
-          <div className="p-2 border-r border-border-color">Start Date</div>
-          <div className="p-2 border-r border-border-color">End Date</div>
+          <div className="p-2 border-r border-border-color">Job Date</div>
+          <div className="p-2 border-r border-border-color">Next Arrival</div>
           <div className="p-2 text-center">Job Type</div>
         </div>
 
@@ -109,7 +109,13 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
                         job.itemType === "job" ? "Changeover" : job.type
                       ]
                     }`}>
-                    {job.itemType === "job" ? "Changeover" : job.type}
+                    {job.itemType === "job"
+                      ? job.sheetType
+                        ? job.sheetType
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())
+                        : "Changeover"
+                      : job.type}
                   </p>
                 </div>
               </div>

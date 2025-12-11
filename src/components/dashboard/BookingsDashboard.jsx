@@ -266,6 +266,7 @@ const BookingsDashboard = () => {
           item={selectedItem}
           position={modalPos}
           onClose={handleCloseModal}
+          ref={modalRef}
         />
       )}
     </div>

@@ -13,12 +13,34 @@ export const useJobSheetJobs = (startDate, endDate, split = true) => {
 
   const items = useMemo(() => {
     // Standard Jobs
-    const standardJobs = jobs.map((j) => ({
-      ...j,
-      itemType: "job",
-      date: new Date(j.jobDate),
-      jobId: j.bookingId,
-    }));
+    const standardJobs = jobs.flatMap((j) => {
+      const types = Array.isArray(j.propertyDetails.service_type)
+        ? j.propertyDetails.service_type
+        : [];
+
+      // We're only interested in splitting these:
+      const sheetTypes = types.filter((t) =>
+        ["changeover", "hot_tub"].includes(t)
+      );
+
+      const base = {
+        ...j,
+        itemType: "job",
+        date: new Date(j.jobDate),
+        jobId: j.bookingId,
+      };
+
+      // If job contains changeover/hot_tub → create one item per type
+      if (sheetTypes.length > 0) {
+        return sheetTypes.map((type) => ({
+          ...base,
+          sheetType: type,
+        }));
+      }
+
+      // Otherwise return a single, normal job
+      return [base];
+    });
 
     // Ad-hoc Jobs
     const expandedAdHoc = adHocJobs.flatMap((job) => {

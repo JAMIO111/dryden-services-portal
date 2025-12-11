@@ -27,6 +27,7 @@ const BookingsTable = ({
   setPage,
   setPageSize,
 }) => {
+  const modalRef = useRef(null);
   const [openModalRowId, setOpenModalRowId] = useState(null);
   const [modalPos, setModalPos] = useState(null);
   const [activeModalType, setActiveModalType] = useState(null); // Required

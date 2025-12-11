@@ -39,6 +39,7 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
   const { closeModal } = useModal();
 
   console.log("AdHocJobForm - adHocJob:", adHocJob);
+  console.log("AdHocJobForm - recurrenceDates:", recurrenceDates);
 
   const {
     register,
@@ -79,6 +80,7 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
     if (adHocJob) return;
 
     if (watchType === "Laundry") {
+      setIsRecurring(false);
       setValue("single_date", null, { shouldValidate: true });
     } else {
       setValue("transport", null, { shouldValidate: true });
@@ -97,18 +99,19 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
       });
       return;
     }
-    try {
-      // Prepare payload: include ID only if editing
-      const payload = {
-        ...data,
-        ...(adHocJob?.id ? { id: adHocJob.id } : {}),
-      };
 
-      // 1. Capture the result (important!)
-      const result = await upsertAdHocJob.mutateAsync(payload, recurrenceDates);
+    try {
+      // Wrap in object matching hook signature
+      const result = await upsertAdHocJob.mutateAsync({
+        adHocJobData: {
+          ...data,
+          ...(adHocJob?.id ? { id: adHocJob.id } : {}),
+        },
+        recurrenceDates,
+      });
 
       // Use the correct ID: new or existing
-      const adHocJobId = result?.ad_hoc_job_id || adHocJob?.id;
+      const adHocJobId = adHocJob ? adHocJob?.id : result?.ad_hoc_job_id;
 
       reset(defaultFormData);
 
@@ -126,11 +129,10 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
 
       closeModal();
 
-      // 2. Use the resolved ID in the notification
       await createNotification({
         title: adHocJob ? "Ad-Hoc Job Updated" : "Ad-Hoc Job Created",
         body: adHocJob
-          ? "has made ammendments to a job:"
+          ? "has made amendments to a job:"
           : "has entered a new job:",
         docRef: adHocJobId,
         category: "Ad-Hoc Jobs",
@@ -294,13 +296,15 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
         {/* Buttons */}
         <div className="flex flex-wrap items-end mt-3 gap-3 justify-end">
           <div className="w-48 mr-auto">
-            <ToggleButton
-              label="Reccurring Job"
-              checked={isRecurring}
-              onChange={() => setIsRecurring(!isRecurring)}
-              falseLabel="Single Job"
-              trueLabel="Recurring Job"
-            />
+            {watchType !== "Laundry" && (
+              <ToggleButton
+                label="Reccurring Job"
+                checked={isRecurring}
+                onChange={() => setIsRecurring(!isRecurring)}
+                falseLabel="Single Job"
+                trueLabel="Recurring Job"
+              />
+            )}
           </div>
           <CTAButton
             type="cancel"

@@ -31,7 +31,8 @@ export function useJobs(startDate, endDate) {
             check_in,
             check_out,
             service_type,
-            hired_laundry
+            hired_laundry,
+            notes
           )
         `
         )

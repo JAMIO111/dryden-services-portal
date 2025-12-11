@@ -35,7 +35,7 @@ const BookingRow = ({
     const modalWidth = 176;
     const modalHeight = 190;
 
-    let top = rect.bottom + window.scrollY - 25;
+    let top = rect.bottom + window.scrollY - 32;
     let left = rect.left + window.scrollX - 180;
 
     if (left + modalWidth > window.innerWidth)

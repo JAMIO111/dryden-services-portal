@@ -18,7 +18,7 @@ export default function JobSheetPrintModal({ jobs, startDate, endDate }) {
       onClick={(e) => e.stopPropagation()}
       className="flex flex-col h-full max-h-[90vh] p-3 pt-0">
       {/* Fixed Button */}
-      <div className="flex justify-between items-center flex-shrink-0 pb-2 border-b border-border-color mb-3">
+      <div className="flex justify-between items-center flex-shrink-0 pb-2 border-b border-border-color">
         <div className="flex flex-col gap-1">
           <p className="font-semibold text-primary-text">{`${jobs.length} Job${
             jobs.length !== 1 ? "s" : ""
@@ -49,7 +49,7 @@ export default function JobSheetPrintModal({ jobs, startDate, endDate }) {
       </div>
 
       {/* Scrollable Job Sheets */}
-      <div ref={printRef} className="flex-1 overflow-y-auto">
+      <div ref={printRef} className="flex-1 overflow-y-auto pr-1 -mr-3 mb-2">
         <JobSheetPrintView jobs={jobs} />
       </div>
     </div>

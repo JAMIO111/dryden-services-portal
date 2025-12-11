@@ -7,8 +7,9 @@ import { softDeleteRow } from "../api/supabaseApi";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../contexts/ToastProvider";
 import { useConfirm } from "../contexts/ConfirmationModalProvider";
+import { forwardRef } from "react";
 
-const ActionsModal = ({ item, position, onClose }) => {
+const ActionsModal = forwardRef(({ item, position, onClose }, ref) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const confirm = useConfirm();
@@ -51,6 +52,7 @@ const ActionsModal = ({ item, position, onClose }) => {
 
   return createPortal(
     <div
+      ref={ref}
       className="w-44 h-fit bg-secondary-bg rounded-xl border border-border-color shadow-lg flex flex-col justify-center items-center"
       style={{
         position: "absolute",
@@ -79,6 +81,6 @@ const ActionsModal = ({ item, position, onClose }) => {
     </div>,
     document.getElementById("modal-root")
   );
-};
+});
 
 export default ActionsModal;
