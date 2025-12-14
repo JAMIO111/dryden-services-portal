@@ -64,6 +64,14 @@ const BookingForm = () => {
 
   const upsertBooking = useUpsertBooking();
 
+  const filteredProperties = properties?.filter(
+    (prop) =>
+      (prop.is_active &&
+        (prop?.service_type?.includes("changeover") ||
+          prop?.service_type?.includes("hot_tub"))) ||
+      prop.id === booking?.property_id
+  );
+
   const {
     register,
     control,
@@ -143,7 +151,7 @@ const BookingForm = () => {
               name="property_id"
               control={control}
               label="Property"
-              options={properties || []}
+              options={filteredProperties || []}
               placeholder="Select a property..."
               required={true}
               icon={BsHouse}

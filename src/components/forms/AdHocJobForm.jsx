@@ -148,11 +148,14 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
   };
 
   const filteredProperties = properties?.filter((prop) => {
-    return (
-      prop.is_active === true &&
+    const matchesService =
       Array.isArray(prop.service_type) &&
-      prop.service_type.includes(watchType.toLowerCase().replace(" ", "_"))
-    );
+      prop.service_type.includes(watchType.toLowerCase().replace(" ", "_"));
+
+    const isActiveOrCurrent =
+      prop.is_active === true || prop.id === adHocJob?.property_id;
+
+    return matchesService && isActiveOrCurrent;
   });
 
   return (

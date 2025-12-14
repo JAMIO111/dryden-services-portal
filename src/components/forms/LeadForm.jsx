@@ -18,7 +18,7 @@ const defaultFormData = {
   surname: "",
   phone: "",
   email: "",
-  status: "",
+  status: "New",
 };
 
 const LeadForm = ({ lead, navigate }) => {
@@ -231,9 +231,14 @@ const LeadForm = ({ lead, navigate }) => {
           }}
         />
         <CTAButton
+          title={
+            lead?.status === "Converted" ? "Cannot update a converted lead" : ""
+          }
           type="success"
           text={lead ? "Update Lead" : "Save Lead"}
-          disabled={!isValid || isSubmitting || !isDirty}
+          disabled={
+            !isValid || isSubmitting || !isDirty || lead?.status === "Converted"
+          }
           callbackFn={handleSubmit(onSubmit)}
         />
       </div>

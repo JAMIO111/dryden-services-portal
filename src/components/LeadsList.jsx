@@ -18,6 +18,7 @@ export default function LeadList() {
     "Hot Lead": "bg-red-400/20 text-red-500",
     "Follow-up": "bg-yellow-400/20 text-yellow-500",
     "Cold Lead": "bg-blue-400/20 text-blue-500",
+    Converted: "bg-green-400/20 text-green-500",
   };
 
   useEffect(() => {
@@ -132,24 +133,26 @@ export default function LeadList() {
                   <div className="flex gap-6 mt-4 flex-row justify-between items-center">
                     <CTAButton
                       icon={LuArrowUpRight}
-                      width="w-full"
+                      width="w-1/2"
                       type="main"
                       text="View Details"
                       callbackFn={() =>
                         navigate(`/Client-Management/Leads/${lead.title}`)
                       }
                     />
-                    <CTAButton
-                      icon={AiOutlineUserAdd}
-                      width="w-full"
-                      type="success"
-                      text="Convert to Client"
-                      callbackFn={() =>
-                        navigate(`/Client-Management/Owners/New-Owner`, {
-                          state: { lead },
-                        })
-                      }
-                    />
+                    {lead.status !== "Converted" && (
+                      <CTAButton
+                        icon={AiOutlineUserAdd}
+                        width="w-1/2"
+                        type="success"
+                        text="Convert to Client"
+                        callbackFn={() =>
+                          navigate(`/Client-Management/Owners/New-Owner`, {
+                            state: { lead },
+                          })
+                        }
+                      />
+                    )}
                   </div>
                 </div>
               </div>

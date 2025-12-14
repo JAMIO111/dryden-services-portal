@@ -23,6 +23,7 @@ import OwnerPropertyForm from "./OwnerPropertyForm";
 import { usePropertiesByOwner } from "@/hooks/usePropertiesByOwner";
 import { useModal } from "@/contexts/ModalContext";
 import { IoLocationOutline } from "react-icons/io5";
+import supabase from "@/supabase-client";
 
 const OwnerForm = () => {
   const queryClient = useQueryClient();
@@ -371,7 +372,7 @@ const OwnerForm = () => {
           />
           <CTAButton
             isLoading={isSubmitting}
-            disabled={!isDirty || !isValid || isSubmitting}
+            disabled={!isValid || isSubmitting || (!isDirty && !location.state)}
             width="flex-1"
             type="success"
             text={
@@ -388,17 +389,54 @@ const OwnerForm = () => {
               try {
                 const payload = id !== "New-Owner" ? { id, ...data } : data;
 
-                console.log("Submitting payload:", payload);
+                let result;
+                let ownerId;
 
-                // 1. Get the real owner from the mutation result
-                const result = await upsertOwner.mutateAsync({
-                  ownerData: payload, // your owner object
-                  propertiesForm: [], // or the actual properties form data
+                // 🔒 ATOMIC PATH: Lead → Owner conversion
+                if (location.state?.lead) {
+                  const { data: rpcResult, error } = await supabase.rpc(
+                    "convert_lead_and_upsert_owner",
+                    {
+                      _lead_id: location.state.lead.id,
+                      _owner: payload,
+                    }
+                  );
+
+                  if (error) throw error;
+
+                  result = rpcResult;
+                  ownerId = rpcResult.id;
+                }
+                // 🧍 NORMAL PATH: No lead involved
+                else {
+                  result = await upsertOwner.mutateAsync({
+                    ownerData: payload,
+                    propertiesForm: [],
+                  });
+
+                  ownerId = result?.id || id;
+                }
+
+                // 🔔 Notifications (now safe — DB is consistent)
+                await createNotification({
+                  title:
+                    id !== "New-Owner"
+                      ? "Existing Owner Updated."
+                      : "New Owner Created.",
+                  body:
+                    id !== "New-Owner"
+                      ? "updated the account of owner:"
+                      : "added a new owner:",
+                  metaData: {
+                    url: `/Client-Management/Owners/${ownerId}`,
+                    buttonText: "View Owner",
+                  },
+                  docRef: `${result.first_name} ${result.surname}`,
+                  category: "Owners",
+                  type: id !== "New-Owner" ? "update" : "new",
                 });
 
-                // 2. Extract the real ID
-                const ownerId = result?.id || id;
-
+                // 🧭 Navigate last
                 navigate("/Client-Management/Owners");
 
                 showToast({
@@ -409,30 +447,12 @@ const OwnerForm = () => {
                       ? "The owner has been successfully updated."
                       : "New owner successfully created.",
                 });
-
-                // 3. Use the real ID in the notification
-                await createNotification({
-                  title:
-                    id !== "New-Owner"
-                      ? `Existing Owner Updated.`
-                      : `New Owner Created.`,
-                  body:
-                    id !== "New-Owner"
-                      ? `updated the account of owner:`
-                      : `added a new owner:`,
-                  metaData: {
-                    url: `/Client-Management/Owners/${ownerId}`,
-                    buttonText: "View Owner",
-                  },
-                  docRef: result.first_name + " " + result.surname,
-                  category: "Owners",
-                  type: !!ownerId ? "update" : "new",
-                });
               } catch (error) {
-                console.error("Save failed:", error.message);
+                console.error("Save failed:", error);
+
                 showToast({
                   type: "error",
-                  title: "Save Failed. Unexpected error.",
+                  title: "Save Failed",
                   message:
                     error?.message ||
                     "An error occurred while saving the owner.",

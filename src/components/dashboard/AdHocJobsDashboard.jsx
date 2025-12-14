@@ -238,7 +238,7 @@ const AdHocJobsDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="p-3 flex-1">
+      <div className="p-3 flex flex-1 overflow-hidden">
         <AdHocJobsTable
           isLoading={isAdHocJobsLoading}
           onOpenModal={handleOpenModal}

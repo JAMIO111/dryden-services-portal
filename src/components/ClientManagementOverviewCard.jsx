@@ -131,6 +131,10 @@ export default function ClientManagementOverviewCard({
     return () => window.removeEventListener("resize", updateVisibleCount);
   }, []);
 
+  const activeList = active === "Owners" ? activeOwners : activeProperties;
+
+  const overflowCount = Math.max(activeList.length - visibleCount, 0);
+
   return (
     <div className="bg-secondary-bg shadow-m text-primary-text p-5 rounded-3xl">
       {/* Header */}
@@ -214,7 +218,7 @@ export default function ClientManagementOverviewCard({
         <div className="flex gap-3 items-center justify-between">
           <div
             ref={containerRef}
-            className="flex gap-3 overflow-hidden flex-nowrap flex-grow">
+            className="flex gap-3 pl-2 overflow-hidden flex-nowrap flex-grow">
             {active === "Owners"
               ? activeOwners
                   .sort(
@@ -283,20 +287,12 @@ export default function ClientManagementOverviewCard({
                     </button>
                   ))}
 
-            {activeOwners.length > visibleCount ? (
+            {overflowCount > 0 && (
               <div className="flex flex-col items-center justify-start">
-                <div className="w-14 h-14 flex items-center text-white pr-1 text-lg justify-center rounded-xl bg-neutral-700">
-                  +{activeOwners.length - visibleCount + 1}
+                <div className="w-14 h-14 flex items-center pr-1 text-lg justify-center rounded-xl bg-neutral-700 text-white">
+                  +{overflowCount}
                 </div>
               </div>
-            ) : (
-              activeProperties.length > visibleCount && (
-                <div className="flex flex-col items-center text-white justify-start">
-                  <div className="w-14 h-14 flex items-center pr-1 text-lg justify-center rounded-xl bg-neutral-700">
-                    +{activeProperties.length - visibleCount + 1}
-                  </div>
-                </div>
-              )
             )}
           </div>
 

@@ -126,8 +126,12 @@ const LeadDetails = () => {
       <div className="bg-secondary-bg flex flex-col flex-4 overflow-hidden rounded-3xl border border-border-color h-full">
         {/* Fixed Header */}
         <div className="p-4 border-b border-border-color sticky top-0 bg-secondary-bg z-10">
-          <h2 className="text-xl text-primary-text font-semibold mb-4">
-            Add New Engagement
+          <h2 className="text-lg text-primary-text font-semibold mb-2">
+            {selectedTab === "Lead Details"
+              ? "Edit Lead Details"
+              : selectedTab === "Meeting"
+              ? "Add New Meeting"
+              : "Add New Correspondence"}
           </h2>
           <SlidingSelector
             options={["Lead Details", "Meeting", "Correspondence"]}

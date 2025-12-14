@@ -7,6 +7,7 @@ import { getGreeting } from "@/lib/HelperFunctions";
 import { useState, useMemo } from "react";
 import DashboardCard from "./DashboardCard";
 import { useEmployees } from "@/hooks/useEmployees";
+import AbsenceList from "../AbsenceList";
 
 const HRDashboard = () => {
   const { profile } = useUser();
@@ -30,7 +31,9 @@ const HRDashboard = () => {
   }, [selectedRange]);
 
   return (
-    <div className="flex flex-col bg-primary-bg h-full w-full">
+    // HRDashboard
+    <div className="flex flex-col h-full bg-primary-bg w-full">
+      {/* Header */}
       <div className="flex flex-col gap-2 xl:flex-row items-start xl:items-center justify-between px-6 py-1 shadow-sm border-b border-border-color shrink-0 bg-primary-bg">
         <div className="flex flex-col">
           <h1 className="text-xl whitespace-nowrap text-primary-text">
@@ -62,8 +65,10 @@ const HRDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col flex-1 ">
-        <div className="flex flex-row p-3 gap-3">
+
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col overflow-hidden p-3 gap-3">
+        <div className="flex flex-row gap-3 shrink-0">
           <DashboardCard
             title="Total Employees"
             value={employees?.filter((emp) => emp.is_active).length}
@@ -73,13 +78,20 @@ const HRDashboard = () => {
           />
           <DashboardCard title="Holidays" icon={FaUmbrellaBeach} />
           <DashboardCard title="Sick Leave" icon={MdOutlineSick} />
-          <DashboardCard title="New Hires" icon={PiUsersThree} />
         </div>
-        <div className="flex flex-row flex-1 p-3 pt-0 gap-3">
-          <div className="flex-3 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
-            More to come soon!
+
+        {/* Absence List + Placeholder */}
+        <div className="flex flex-1 flex-row gap-3 overflow-hidden">
+          {/* Absence List */}
+          <div className="flex-[2] flex flex-col overflow-hidden rounded-2xl shadow-s bg-secondary-bg">
+            <AbsenceList
+              startDate={selectedRange.startDate}
+              endDate={selectedRange.endDate}
+            />
           </div>
-          <div className="flex-2 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
+
+          {/* Placeholder */}
+          <div className="flex-[2] flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
             More to come soon!
           </div>
         </div>

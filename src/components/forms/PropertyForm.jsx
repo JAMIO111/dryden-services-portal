@@ -6,7 +6,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { IoIosMan, IoIosUndo } from "react-icons/io";
 import { FaBed, FaBath, FaCheck, FaTreeCity } from "react-icons/fa6";
 import { IoTrashOutline, IoLocation, IoHome } from "react-icons/io5";
-import { BsMailbox2Flag, BsFillBuildingsFill, BsPencil } from "react-icons/bs";
+import {
+  BsMailbox2Flag,
+  BsFillBuildingsFill,
+  BsPencil,
+  BsActivity,
+} from "react-icons/bs";
 import { PiNumberThreeFill } from "react-icons/pi";
 import { GiMagicBroom } from "react-icons/gi";
 import { SlLock } from "react-icons/sl";
@@ -176,76 +181,90 @@ const PropertyForm = () => {
   return (
     <div className="flex bg-primary-bg h-full flex-row p-3 gap-3">
       <div className="flex flex-1 gap-3 flex-col">
-        <div className="flex flex-1 justify-between flex-col bg-secondary-bg shadow-m rounded-2xl p-3">
-          <ProfileImageSection
-            item={property}
-            bucket="avatars"
-            path="properties"
-            table="Properties"
-            noImageText="No Image"
-            aspectRatio="aspect-video"
-            width="w-full"
-            onImageChange={(url) => {
-              // Optional: update your parent state, e.g. via TanStack Query invalidate
-              queryClient.invalidateQueries(["Property", property.name]);
-              console.log("New avatar URL:", url);
-            }}
-          />
-          <div className="my-3">
+        <div className="flex flex-1 overflow-y-auto justify-between flex-col bg-secondary-bg shadow-m rounded-2xl">
+          <div className="p-3">
+            <ProfileImageSection
+              item={property}
+              bucket="avatars"
+              path="properties"
+              table="Properties"
+              noImageText="No Image"
+              aspectRatio="aspect-video"
+              width="w-full"
+              onImageChange={(url) => {
+                // Optional: update your parent state, e.g. via TanStack Query invalidate
+                queryClient.invalidateQueries(["Property", property.name]);
+                console.log("New avatar URL:", url);
+              }}
+            />
+          </div>
+          <div className="flex flex-1 p-3 overflow-y-auto flex-col gap-3">
+            <div className="mb-3">
+              <Controller
+                name="name"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    required
+                    label="Property Name"
+                    placeholder="Enter property name..."
+                    {...field}
+                    icon={IoHome}
+                    error={fieldState.error}
+                  />
+                )}
+              />
+            </div>
+
             <Controller
-              name="name"
+              name="bedrooms"
               control={control}
               render={({ field, fieldState }) => (
-                <TextInput
-                  required
-                  label="Property Name"
-                  placeholder="Enter property name..."
+                <NumericInputGroup
+                  label="Bedrooms"
                   {...field}
-                  icon={IoHome}
+                  icon={FaBed}
                   error={fieldState.error}
                 />
               )}
             />
+
+            <Controller
+              name="sleeps"
+              control={control}
+              render={({ field, fieldState }) => (
+                <NumericInputGroup
+                  label="Sleeps"
+                  {...field}
+                  icon={IoIosMan}
+                  error={fieldState.error}
+                />
+              )}
+            />
+
+            <Controller
+              name="bathrooms"
+              control={control}
+              render={({ field, fieldState }) => (
+                <NumericInputGroup
+                  label="Bathrooms"
+                  {...field}
+                  icon={FaBath}
+                  error={fieldState.error}
+                />
+              )}
+            />
+            <ToggleButton
+              label="Active Status"
+              checked={watch("is_active")}
+              onChange={(val) =>
+                setValue("is_active", val, { shouldDirty: true })
+              }
+              trueLabel="Active"
+              falseLabel="Inactive"
+              icon={BsActivity}
+            />
           </div>
-
-          <Controller
-            name="bedrooms"
-            control={control}
-            render={({ field, fieldState }) => (
-              <NumericInputGroup
-                label="Bedrooms"
-                {...field}
-                icon={FaBed}
-                error={fieldState.error}
-              />
-            )}
-          />
-
-          <Controller
-            name="sleeps"
-            control={control}
-            render={({ field, fieldState }) => (
-              <NumericInputGroup
-                label="Sleeps"
-                {...field}
-                icon={IoIosMan}
-                error={fieldState.error}
-              />
-            )}
-          />
-
-          <Controller
-            name="bathrooms"
-            control={control}
-            render={({ field, fieldState }) => (
-              <NumericInputGroup
-                label="Bathrooms"
-                {...field}
-                icon={FaBath}
-                error={fieldState.error}
-              />
-            )}
-          />
         </div>
       </div>
       <div className="flex-1">

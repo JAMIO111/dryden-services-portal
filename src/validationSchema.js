@@ -423,6 +423,24 @@ export const EmployeeFormSchema = z.object({
     .nullable(),
 });
 
+export const AbsenceFormSchema = z.object({
+  employee_id: z.string().min(1, "Select an employee"),
+  category: z.enum([
+    "Annual Leave",
+    "Sickness",
+    "Maternity",
+    "Paternity",
+    "Unpaid Leave",
+    "Medical Leave",
+    "Bereavement",
+    "Jury Duty",
+    "Other",
+  ]),
+  start_date: z.date(),
+  end_date: z.date(),
+  reason: z.string().max(200).optional(),
+});
+
 export const AdHocJobFormSchema = z
   .object({
     property_id: z

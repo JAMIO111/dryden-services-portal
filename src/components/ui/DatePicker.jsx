@@ -178,8 +178,7 @@ const DatePicker = ({
           ) : (
             <TbClock className="w-5 h-5 text-primary-text" />
           )}
-          <span
-            className={`ml-2 ${!currentDate ? "text-primary-text/50" : ""}`}>
+          <span className={`ml-2 ${!currentDate ? "text-sm text-muted" : ""}`}>
             {currentDate
               ? format(
                   currentDate,

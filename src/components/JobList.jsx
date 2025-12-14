@@ -57,7 +57,7 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
                   index % 2 === 0 ? "bg-tertiary-bg" : "bg-secondary-bg"
                 } ${
                   index !== jobs.length ? "border-b" : ""
-                } border-border-color grid grid-cols-[1.5fr_2.5fr_2fr_2fr_140px] text-xs text-primary-text hover:bg-brand-primary/15`}>
+                } border-border-color grid grid-cols-[1.5fr_2.5fr_2fr_2fr_140px] text-xs text-primary-text items-center hover:bg-brand-primary/15`}>
                 <div className="flex font-medium items-center px-2 py-1">
                   {job.jobId || "N/A"}
                 </div>
