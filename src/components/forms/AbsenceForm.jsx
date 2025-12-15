@@ -77,10 +77,6 @@ const AbsenceForm = ({ absence }) => {
         body: absence
           ? "has updated an employee absence"
           : "has added a new employee absence",
-        metaData: {
-          url: `/Human-Resources/Absences/${saved.id}`,
-          buttonText: "View Absence",
-        },
         category: "Absences",
         type: absence ? "update" : "new",
       });

@@ -499,7 +499,8 @@ const JobSheet = forwardRef(({ job }, ref) => {
         </section>
       )}
 
-      {(job?.sheetType === "changeover" || job?.type === "Clean") && (
+      {((job?.itemType === "job" && job?.sheetType === "changeover") ||
+        job?.type === "Clean") && (
         <section className="rounded-lg overflow-hidden border mb-3">
           <h2 className="p-1 border-b font-semibold bg-gray-200">
             Quality Checks

@@ -2,10 +2,17 @@ import { Mail, Building2 } from "lucide-react";
 import CTAButton from "./CTAButton";
 import { IoAddOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useModal } from "@/contexts/ModalContext";
 import { useAbsences } from "@/hooks/useAbsences";
 import AbsenceForm from "./forms/AbsenceForm.jsx";
+import { IoBriefcaseOutline, IoAirplaneOutline } from "react-icons/io5";
+import { RiUserLine } from "react-icons/ri";
+import { GiTribunalJury } from "react-icons/gi";
+import { PiBaby } from "react-icons/pi";
+import { MdOutlineSick } from "react-icons/md";
+import { TbCoffin } from "react-icons/tb";
+import { TbMedicalCross } from "react-icons/tb";
 
 export default function AbsenceList({ startDate, endDate }) {
   const { openModal } = useModal();
@@ -22,6 +29,18 @@ export default function AbsenceList({ startDate, endDate }) {
     Other: "bg-yellow-400/20 text-yellow-500",
     "Jury Duty": "bg-teal-400/20 text-teal-500",
     "Medical Leave": "bg-red-400/20 text-red-500",
+  };
+
+  const statusIcons = {
+    "Annual Leave": <IoAirplaneOutline />,
+    Maternity: <PiBaby />,
+    Sickness: <MdOutlineSick />,
+    Bereavement: <TbCoffin />,
+    "Unpaid Leave": <IoBriefcaseOutline />,
+    Paternity: <PiBaby />,
+    Other: <IoBriefcaseOutline />,
+    "Jury Duty": <GiTribunalJury />,
+    "Medical Leave": <TbMedicalCross />,
   };
 
   useEffect(() => {
@@ -49,6 +68,17 @@ export default function AbsenceList({ startDate, endDate }) {
             Fill out the form below to add a new absence to the system.
           </p>
           <AbsenceForm />
+        </div>
+      ),
+    });
+  };
+
+  const handleEditAbsence = (absence) => {
+    openModal({
+      title: `Edit Absence - ${absence.employee.first_name} ${absence.employee.surname}`,
+      content: (
+        <div className="min-w-[600px] max-w-[800px] max-h-[80vh] min-h-0 overflow-y-auto px-3 pt-3">
+          <AbsenceForm absence={absence} />
         </div>
       ),
     });
@@ -114,12 +144,23 @@ export default function AbsenceList({ startDate, endDate }) {
           ) : (
             absences?.map((absence) => (
               <div
+                onDoubleClick={() => handleEditAbsence(absence)}
                 key={absence.id}
                 className="bg-primary-bg p-1.5 rounded-2xl shadow-s transition-shadow duration-200 hover:shadow-m">
-                <div className="p-2 bg-primary-bg rounded-t-2xl w-full flex flex-row justify-between items-center">
+                <div className="p-2 bg-primary-bg rounded-t-2xl w-full flex flex-row justify-between items-start">
                   <div className="flex gap-1 flex-col">
                     <h3 className="text-lg font-semibold flex items-center gap-2 text-primary-text">
-                      <Building2 className="w-5 h-5 text-secondary-text" />
+                      {absence?.employee?.avatar ? (
+                        <img
+                          src={absence.employee.avatar}
+                          alt="Employee Avatar"
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-secondary-text/20 flex items-center justify-center">
+                          <RiUserLine className="w-4 h-4 text-secondary-text" />
+                        </div>
+                      )}
                       {`${absence.employee.first_name || ""} ${
                         absence.employee.surname || ""
                       }`}
@@ -145,12 +186,15 @@ export default function AbsenceList({ startDate, endDate }) {
                       })()}
                     </p>
                   </div>
-                  <span
-                    className={`text-sm font-medium px-3 py-1.5 rounded-lg ${
+                  <div
+                    className={`${
                       statusColor[absence.category]
-                    }`}>
-                    {absence.category}
-                  </span>
+                    } flex px-3 py-1.5 rounded-lg items-center gap-2`}>
+                    {statusIcons[absence.category]}
+                    <span className={`text-sm font-medium`}>
+                      {absence.category}
+                    </span>
+                  </div>
                 </div>
                 {absence.reason && (
                   <div className="p-3 bg-tertiary-bg border border-border-color/50 rounded-xl text-sm space-y-2">

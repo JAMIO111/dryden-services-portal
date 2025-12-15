@@ -7,56 +7,40 @@ const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
   const { user: authUser } = useAuth();
-  const [profile, setProfile] = useState(undefined); // undefined = loading
   const [orgUsers, setOrgUsers] = useState([]); // all employees with auth_id
+  const [profile, setProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!authUser) {
       setProfile(null);
-      setOrgUsers([]);
+      setIsLoading(false);
       localStorage.removeItem("user_profile");
       return;
     }
 
-    const cached = localStorage.getItem("user_profile");
-    if (cached) setProfile(JSON.parse(cached));
-
     const fetchData = async () => {
-      try {
-        const { data: profileData, error: profileError } = await supabase
-          .from("Employees")
-          .select(
-            "first_name, surname, job_title, avatar, id, auth_id, notification_preferences"
-          )
-          .eq("auth_id", authUser.id)
-          .maybeSingle();
+      setIsLoading(true);
 
-        if (profileError) {
-          console.error(profileError);
-          setProfile(null);
-        } else if (profileData) {
-          setProfile(profileData);
-          localStorage.setItem("user_profile", JSON.stringify(profileData));
-        }
+      const { data, error } = await supabase
+        .from("Employees")
+        .select(
+          "first_name, surname, job_title, avatar, id, auth_id, notification_preferences"
+        )
+        .eq("auth_id", authUser.id)
+        .maybeSingle();
 
-        const { data: usersData, error: usersError } = await supabase
-          .from("Employees")
-          .select(
-            "first_name, surname, job_title, avatar, id, auth_id, notification_preferences"
-          )
-          .not("auth_id", "is", null);
-
-        if (usersError) {
-          console.error(usersError);
-          setOrgUsers([]);
-        } else {
-          setOrgUsers(usersData || []);
-        }
-      } catch (err) {
-        console.error(err);
+      if (error) {
+        console.error(error);
         setProfile(null);
-        setOrgUsers([]);
+      } else {
+        setProfile(data ?? null);
+        if (data) {
+          localStorage.setItem("user_profile", JSON.stringify(data));
+        }
       }
+
+      setIsLoading(false);
     };
 
     fetchData();
@@ -102,7 +86,14 @@ export const UserProvider = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ profile, setProfile, orgUsers, updateProfile, refreshProfile }}>
+      value={{
+        profile,
+        setProfile,
+        isLoading,
+        orgUsers,
+        updateProfile,
+        refreshProfile,
+      }}>
       {children}
     </UserContext.Provider>
   );

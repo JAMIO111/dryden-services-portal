@@ -28,6 +28,7 @@ export const useJobSheetJobs = (startDate, endDate, split = true) => {
         itemType: "job",
         date: new Date(j.jobDate),
         jobId: j.bookingId,
+        sheetType: "changeover", // Default to changeover for normal jobs
       };
 
       // If job contains changeover/hot_tub → create one item per type

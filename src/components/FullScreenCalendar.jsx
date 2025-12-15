@@ -389,14 +389,25 @@ export default function FullScreenCalendar() {
                       <p className="text-sm font-semibold text-primary-text">
                         Absence
                       </p>
-                      <p className="text-xs text-primary-text">
-                        {absence.category
-                          ?.toLowerCase()
-                          .replace(/\b\w/g, (c) => c.toUpperCase())}
-                      </p>
-                      <p className="text-xs text-secondary-text">
-                        {absence.reason}
-                      </p>
+                      <div className="flex flex-row gap-2 items-center">
+                        {absence.employee.avatar ? (
+                          <img
+                            className="w-6 h-6 rounded-full object-cover"
+                            src={absence.employee.avatar}
+                            alt={`${absence.employee.first_name} ${absence.employee.surname}`}
+                          />
+                        ) : (
+                          <div className="w-5 h-5 p-3 bg-secondary-text/20 text-xs rounded-full flex items-center justify-center">
+                            {absence.employee.first_name
+                              .charAt(0)
+                              .toUpperCase()}
+                            {absence.employee.surname.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <p className="text-sm text-primary-text">
+                          {`${absence.employee.first_name} ${absence.employee.surname}`}
+                        </p>
+                      </div>
                     </div>
                   </span>
                 ))
