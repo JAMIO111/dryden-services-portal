@@ -79,6 +79,7 @@ const PropertyForm = () => {
     trigger,
     register,
     watch,
+    setValue,
     formState: { errors, isSubmitting, isValid, isDirty },
   } = useForm({
     resolver: zodResolver(PropertyFormSchema),
@@ -108,6 +109,8 @@ const PropertyForm = () => {
     name: "Owners",
     keyName: "formId",
   });
+
+  console.log("Form Data", watch());
 
   useEffect(() => {
     if (name === "New-Property") {
@@ -540,7 +543,11 @@ const PropertyForm = () => {
             icon={FaCheck}
             callbackFn={handleSubmit(async (data) => {
               try {
-                const payload = { ...data, id: watch("id") };
+                const payload = {
+                  ...data,
+                  id: watch("id"),
+                  is_active: watch("is_active"),
+                };
 
                 console.log("Payload Data:", payload);
 

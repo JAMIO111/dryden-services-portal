@@ -10,7 +10,7 @@ import { IoBriefcaseOutline, IoAirplaneOutline } from "react-icons/io5";
 import { RiUserLine } from "react-icons/ri";
 import { GiTribunalJury } from "react-icons/gi";
 import { PiBaby } from "react-icons/pi";
-import { MdOutlineSick } from "react-icons/md";
+import { MdOutlineSick, MdMoneyOff } from "react-icons/md";
 import { TbCoffin } from "react-icons/tb";
 import { TbMedicalCross } from "react-icons/tb";
 
@@ -36,7 +36,7 @@ export default function AbsenceList({ startDate, endDate }) {
     Maternity: <PiBaby />,
     Sickness: <MdOutlineSick />,
     Bereavement: <TbCoffin />,
-    "Unpaid Leave": <IoBriefcaseOutline />,
+    "Unpaid Leave": <MdMoneyOff />,
     Paternity: <PiBaby />,
     Other: <IoBriefcaseOutline />,
     "Jury Duty": <GiTribunalJury />,

@@ -1,4 +1,5 @@
 import supabase from "../supabase-client";
+import { useUser } from "@/contexts/UserProvider";
 
 export const fetchNCKPI = async ({ startDate, endDate, ncType }) => {
   const { data, error } = await supabase.rpc("get_nc_kpi_json", {
@@ -75,10 +76,13 @@ export const deleteRow = async (table, id) => {
   if (error) throw new Error(error.message);
 };
 
-export const softDeleteRow = async (table, id) => {
+export const softDeleteRow = async (table, id, user) => {
   const { error } = await supabase
     .from(table)
-    .update({ deleted_at: new Date().toISOString() })
+    .update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: user?.id || null,
+    })
     .eq("id", id);
   if (error) throw new Error(error.message);
 };

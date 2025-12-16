@@ -1,0 +1,87 @@
+"filename", "language", "JavaScript", "JavaScript JSX", "PostCSS", "comment", "blank", "total"
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\MenuStructure.js", "JavaScript", 4, 0, 0, 0, 0, 4
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\api\supabaseApi.js", "JavaScript", 8, 0, 0, 0, 1, 9
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\AbsenceList.jsx", "JavaScript JSX", 0, 201, 0, 3, 10, 214
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ActionsModal.jsx", "JavaScript JSX", 0, 6, 0, 0, 1, 7
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\AdHocJobRow.jsx", "JavaScript JSX", 0, 103, 0, 0, 12, 115
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\AdHocJobsTable.jsx", "JavaScript JSX", 0, 180, 0, 0, 13, 193
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\BookingsTable.jsx", "JavaScript JSX", 0, 1, 0, 0, 0, 1
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Breadcrumb.jsx", "JavaScript JSX", 0, 6, 0, 0, 1, 7
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\CTAButton.jsx", "JavaScript JSX", 0, 11, 0, 0, 0, 11
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ClientManagementOverviewCard.jsx", "JavaScript JSX", 0, -2, 0, 0, 2, 0
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\DailyCalendarItems.jsx", "JavaScript JSX", 0, 99, 0, 0, 3, 102
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Employees.jsx", "JavaScript JSX", 0, 35, 0, 2, 3, 40
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\FullScreenCalendar.jsx", "JavaScript JSX", 0, 91, 0, 0, 5, 96
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Header.jsx", "JavaScript JSX", 0, 10, 0, 0, -2, 8
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\JobList.jsx", "JavaScript JSX", 0, 49, 0, 0, 1, 50
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\JobSheet.jsx", "JavaScript JSX", 0, 146, 0, 0, 4, 150
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\LeadDetails.jsx", "JavaScript JSX", 0, 8, 0, 0, 0, 8
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\LeadsList.jsx", "JavaScript JSX", 0, 5, 0, 0, 0, 5
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Login.jsx", "JavaScript JSX", 0, 1, 0, 0, 0, 1
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ModalImageUploader.jsx", "JavaScript JSX", 0, 1, 0, 0, 0, 1
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\NotificationCard.jsx", "JavaScript JSX", 0, 16, 0, 0, 1, 17
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\NotificationPane.jsx", "JavaScript JSX", 0, -5, 0, 0, 1, -4
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Onboarding.jsx", "JavaScript JSX", 0, 202, 0, 0, 20, 222
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\OwnerDetails.jsx", "JavaScript JSX", 0, 47, 0, 0, 1, 48
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\OwnerList.jsx", "JavaScript JSX", 0, 31, 0, -1, 1, 31
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Owners.jsx", "JavaScript JSX", 0, 6, 0, 0, 1, 7
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\PasswordResetEmail.jsx", "JavaScript JSX", 0, 113, 0, 0, 6, 119
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ProfileImageSection.jsx", "JavaScript JSX", 0, 1, 0, 0, 0, 1
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\PropertyDetails.jsx", "JavaScript JSX", 0, 8, 0, 0, 0, 8
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\PropertyList.jsx", "JavaScript JSX", 0, 4, 0, 0, 0, 4
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\RequireProfile.jsx", "JavaScript JSX", 0, 18, 0, 0, 6, 24
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ResetLinkSent.jsx", "JavaScript JSX", 0, 20, 0, 0, 3, 23
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ResetPassword.jsx", "JavaScript JSX", 0, 173, 0, 0, 12, 185
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Settings\Settings.jsx", "JavaScript JSX", 0, 2, 0, 6, 5, 13
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Settings\SettingsAccount.jsx", "JavaScript JSX", 0, 131, 0, 8, 25, 164
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\Settings\SettingsNotifications.jsx", "JavaScript JSX", 0, 103, 0, 5, 16, 124
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\dashboard\AdHocJobsDashboard.jsx", "JavaScript JSX", 0, 246, 0, 3, 28, 277
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\dashboard\BookingsDashboard.jsx", "JavaScript JSX", 0, -8, 0, 0, -1, -9
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\dashboard\Dashboard.jsx", "JavaScript JSX", 0, -23, 0, 0, -1, -24
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\dashboard\DashboardCard.jsx", "JavaScript JSX", 0, 1, 0, 0, 0, 1
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\dashboard\HRDashboard.jsx", "JavaScript JSX", 0, 3, 0, 6, 3, 12
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\dashboard\JobsDashboard.jsx", "JavaScript JSX", 0, 165, 0, 0, 13, 178
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\dashboard\MaintenanceDashboard.jsx", "JavaScript JSX", 0, 3, 0, 0, 0, 3
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\AbsenceForm.jsx", "JavaScript JSX", 0, 295, 0, 7, 22, 324
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\AdHocJobForm.jsx", "JavaScript JSX", 0, 315, 0, 11, 26, 352
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\BookingForm.jsx", "JavaScript JSX", 0, 10, 0, 0, 1, 11
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\CorrespondenceForm.jsx", "JavaScript JSX", 0, 13, 0, 0, 0, 13
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\EmployeeForm.jsx", "JavaScript JSX", 0, 79, 0, 3, 7, 89
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\LeadForm.jsx", "JavaScript JSX", 0, 21, 0, 0, 0, 21
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\MeetingForm.jsx", "JavaScript JSX", 0, 26, 0, 2, -1, 27
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\OwnerForm.jsx", "JavaScript JSX", 0, 157, 0, 8, 11, 176
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\OwnerPropertyForm.jsx", "JavaScript JSX", 0, 171, 0, 4, 25, 200
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\PropertyForm.jsx", "JavaScript JSX", 0, 59, 0, 2, 3, 64
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\RecurrenceForm.jsx", "JavaScript JSX", 0, 108, 0, 1, 10, 119
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\ReoccuringBookingForm.jsx", "JavaScript JSX", 0, -5, 0, 0, -3, -8
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\forms\SingleJobForm.jsx", "JavaScript JSX", 0, -254, 0, -8, -18, -280
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ui\DatePicker.jsx", "JavaScript JSX", 0, 32, 0, 0, 0, 32
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ui\DateRangePicker.jsx", "JavaScript JSX", 0, 2, 0, 0, 0, 2
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ui\PasswordField.jsx", "JavaScript JSX", 0, 31, 0, 0, 3, 34
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ui\PropertyNavigation.jsx", "JavaScript JSX", 0, 8, 0, 0, 0, 8
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ui\RHFComboBox.jsx", "JavaScript JSX", 0, -2, 0, 0, 0, -2
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ui\TextInput.jsx", "JavaScript JSX", 0, 13, 0, 4, 6, 23
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\components\ui\ToggleButton.jsx", "JavaScript JSX", 0, 1, 0, 0, 0, 1
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\contexts\UserProvider.jsx", "JavaScript JSX", 0, 85, 0, 13, 19, 117
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useAdHocJobs.jsx", "JavaScript JSX", 0, 58, 0, 0, 10, 68
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useAdHocJobsCalendar.jsx", "JavaScript JSX", 0, 41, 0, 6, 11, 58
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useAdHocJobsFilters.jsx", "JavaScript JSX", 0, 39, 0, 2, 8, 49
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useBookingVolume.jsx", "JavaScript JSX", 0, 1, 0, 0, 0, 1
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useBookings.jsx", "JavaScript JSX", 0, 1, 0, 0, 2, 3
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useCalendarItems.jsx", "JavaScript JSX", 0, 34, 0, 2, 0, 36
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useCreateNotification.jsx", "JavaScript JSX", 0, 21, 0, 3, 8, 32
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useDeleteAbsence.jsx", "JavaScript JSX", 0, 14, 0, 1, 4, 19
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useGenerateRecurrences.jsx", "JavaScript JSX", 0, 111, 0, 13, 30, 154
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useInsertMeeting.jsx", "JavaScript JSX", 0, 20, 0, 3, 4, 27
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useJobSheetJobs.jsx", "JavaScript JSX", 0, 70, 0, 10, 16, 96
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useJobs.jsx", "JavaScript JSX", 0, 3, 0, 0, 0, 3
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useUpsertAbsence.jsx", "JavaScript JSX", 0, 44, 0, 2, 5, 51
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useUpsertAdHocJob.jsx", "JavaScript JSX", 0, 181, 0, 16, 29, 226
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useUpsertEmployee.jsx", "JavaScript JSX", 0, 35, 0, 3, 8, 46
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useUpsertOwner.jsx", "JavaScript JSX", 0, 28, 0, 2, 4, 34
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\hooks\useUpsertSingleJob.jsx", "JavaScript JSX", 0, -55, 0, -2, -12, -69
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\index.css", "PostCSS", 0, 0, 9, 0, 1, 10
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\lib\HelperFunctions.js", "JavaScript", 15, 0, 0, 0, 0, 15
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\main.jsx", "JavaScript JSX", 0, 38, 0, 0, 0, 38
+"c:\Users\dryde\OneDrive\Desktop\Visual Studio Projects\Dryden-Services-Portal\src\validationSchema.js", "JavaScript", 40, 0, 0, 0, 1, 41
+"Total", "-", 67, 4057, 9, 140, 434, 4707

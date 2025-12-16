@@ -270,9 +270,9 @@ export default function ClientManagementOverviewCard({
                       }
                       key={i}
                       className="flex flex-col cursor-pointer items-center flex-shrink-0">
-                      {property.image ? (
+                      {property.avatar ? (
                         <img
-                          src={property.image || `No Image`}
+                          src={property.avatar || `No Image`}
                           alt={"No Image"}
                           className="w-20 h-14 hover:shadow-s object-cover rounded-xl border border-border-color"
                         />

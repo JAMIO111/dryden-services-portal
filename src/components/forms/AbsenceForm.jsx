@@ -13,10 +13,13 @@ import RHFComboBox from "../ui/RHFComboBox";
 import DatePicker from "../ui/DatePicker";
 import { AbsenceFormSchema } from "@/validationSchema";
 import { useModal } from "@/contexts/ModalContext";
+import { IoTrashOutline } from "react-icons/io5";
+import { useDeleteAbsence } from "@/hooks/useDeleteAbsence";
+import { useConfirm } from "@/contexts/ConfirmationModalProvider";
 
 const defaultFormData = {
   employee_id: "",
-  type: "",
+  category: null,
   start_date: null,
   end_date: null,
   reason: "",
@@ -24,10 +27,12 @@ const defaultFormData = {
 
 const AbsenceForm = ({ absence }) => {
   const { closeModal } = useModal();
+  const confirm = useConfirm();
   const { data: employees } = useEmployees();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const upsertAbsence = useUpsertAbsence();
+  const deleteAbsence = useDeleteAbsence();
   const { createNotification } = useCreateNotification();
 
   const {
@@ -47,7 +52,7 @@ const AbsenceForm = ({ absence }) => {
     if (absence) {
       reset({
         employee_id: absence.employee_id || null,
-        type: absence.type || null,
+        category: absence.category || null,
         start_date: absence.start_date
           ? new Date(absence.start_date)
           : new Date(),
@@ -64,6 +69,8 @@ const AbsenceForm = ({ absence }) => {
 
       const saved = await upsertAbsence.mutateAsync(payload);
 
+      console.log("Absence payload:", payload);
+
       showToast({
         type: "success",
         title: "Absence Saved",
@@ -79,6 +86,23 @@ const AbsenceForm = ({ absence }) => {
           : "has added a new employee absence",
         category: "Absences",
         type: absence ? "update" : "new",
+        docRef: `${
+          employees.find((emp) => emp.id === payload.employee_id)?.first_name
+        } ${
+          employees.find((emp) => emp.id === payload.employee_id)?.surname
+        } - ${payload.category} - ${new Date(
+          payload.start_date
+        ).toLocaleDateString("en-GB", {
+          weekday: "short",
+          year: "2-digit",
+          month: "short",
+          day: "numeric",
+        })} to ${new Date(payload.end_date).toLocaleDateString("en-GB", {
+          weekday: "short",
+          year: "2-digit",
+          month: "short",
+          day: "numeric",
+        })}`,
       });
 
       reset(defaultFormData);
@@ -90,6 +114,61 @@ const AbsenceForm = ({ absence }) => {
         message:
           error?.message || "An error occurred while saving the absence.",
       });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!absence?.id) return;
+
+    const ok = await confirm({
+      title: "Are you sure you want to delete this absence?",
+      message: "This action can't be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      type: "warning",
+    });
+    if (ok) {
+      try {
+        await deleteAbsence.mutateAsync(absence.id);
+
+        showToast({
+          type: "success",
+          title: "Absence Deleted",
+          message: "The absence record has been removed.",
+        });
+
+        closeModal?.();
+        await createNotification({
+          title: "Absence Deleted",
+          body: "has deleted an employee absence",
+          category: "Absences",
+          type: "delete",
+          docRef: `${
+            employees.find((emp) => emp.id === absence.employee_id)?.first_name
+          } ${
+            employees.find((emp) => emp.id === absence.employee_id)?.surname
+          } - ${absence.category} - ${new Date(
+            absence.start_date
+          ).toLocaleDateString("en-GB", {
+            weekday: "short",
+            year: "2-digit",
+            month: "short",
+            day: "numeric",
+          })} to ${new Date(absence.end_date).toLocaleDateString("en-GB", {
+            weekday: "short",
+            year: "2-digit",
+            month: "short",
+            day: "numeric",
+          })}`,
+        });
+      } catch (error) {
+        showToast({
+          type: "error",
+          title: "Delete Failed",
+          message:
+            error?.message || "An error occurred while deleting the absence.",
+        });
+      }
     }
   };
 
@@ -215,6 +294,15 @@ const AbsenceForm = ({ absence }) => {
 
       {/* Buttons */}
       <div className="flex items-end mt-5 gap-3 pb-5 justify-end">
+        <div className="flex flex-1">
+          <CTAButton
+            type="cancel"
+            text="Delete Absence"
+            disabled={!absence || isSubmitting}
+            callbackFn={handleDelete}
+            icon={IoTrashOutline}
+          />
+        </div>
         <CTAButton
           type="cancel"
           text="Revert Changes"

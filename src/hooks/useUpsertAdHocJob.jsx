@@ -12,13 +12,16 @@ export const useUpsertAdHocJob = () => {
     mutationFn: async ({ adHocJobData, recurrenceDates = [] }) => {
       const { property_id, id, type, start_date, end_date, single_date } =
         adHocJobData;
+
       if (!property_id) throw new Error("Property is required.");
 
       const currentYear = new Date().getFullYear();
       const yearSuffix = String(currentYear).slice(-2);
 
-      // Get last job to generate next sequence
-      const { data: lastAdHocJob, error: refError } = await supabase
+      /* --------------------------------
+         Generate next JOB reference
+      -------------------------------- */
+      const { data: lastJob, error: refError } = await supabase
         .from("AdHocJobs")
         .select("ad_hoc_job_id")
         .like("ad_hoc_job_id", `JOB-${yearSuffix}-%`)
@@ -29,19 +32,21 @@ export const useUpsertAdHocJob = () => {
       if (refError && refError.code !== "PGRST116") throw refError;
 
       let nextNumber = 1;
-      if (lastAdHocJob?.ad_hoc_job_id) {
-        const match = lastAdHocJob.ad_hoc_job_id.match(/JOB-\d{2}-(\d{3})/);
+      if (lastJob?.ad_hoc_job_id) {
+        const match = lastJob.ad_hoc_job_id.match(/JOB-\d{2}-(\d{3})/);
         if (match) nextNumber = parseInt(match[1], 10) + 1;
       }
 
-      // --- Recurring jobs batch insert ---
+      /* --------------------------------
+         RECURRING JOBS
+      -------------------------------- */
       if (recurrenceDates.length > 0) {
         const jobsToInsert = [];
 
-        for (let idx = 0; idx < recurrenceDates.length; idx++) {
-          const date = recurrenceDates[idx];
+        for (let i = 0; i < recurrenceDates.length; i++) {
+          const date = recurrenceDates[i];
           const ad_hoc_job_id = `JOB-${yearSuffix}-${String(
-            nextNumber + idx
+            nextNumber + i
           ).padStart(3, "0")}`;
 
           const jobDates =
@@ -57,27 +62,50 @@ export const useUpsertAdHocJob = () => {
                   end_date: null,
                 };
 
-          // Check for clashes (type + property match)
-          const { data: existingJob } = await supabase
-            .from("AdHocJobs")
-            .select("id")
-            .eq("property_id", property_id)
-            .eq("type", type)
-            .or(
-              type === "Laundry"
-                ? `and(start_date.lte.${jobDates.end_date.toISOString()},end_date.gte.${jobDates.start_date.toISOString()})`
-                : `single_date.eq.${jobDates.single_date.toISOString()}`
-            )
-            .limit(1)
-            .single();
+          /* ---- Laundry conflict rule ----
+             Block ONLY if start OR end matches
+          */
+          if (type === "Laundry") {
+            const { data: clash } = await supabase
+              .from("AdHocJobs")
+              .select("id")
+              .eq("property_id", property_id)
+              .eq("type", "Laundry")
+              .or(
+                `start_date.eq.${jobDates.start_date.toISOString()},end_date.eq.${jobDates.end_date.toISOString()}`
+              )
+              .limit(1)
+              .single();
 
-          if (existingJob) {
-            showToast({
-              type: "error",
-              title: "Job Conflict",
-              message: `A ${type} job already exists for this property on ${date.toLocaleDateString()}. Skipping this recurrence.`,
-            });
-            continue;
+            if (clash) {
+              showToast({
+                type: "error",
+                title: "Job Conflict",
+                message: `A Laundry job already starts or ends on ${date.toLocaleDateString()} for this property. Skipping.`,
+              });
+              continue;
+            }
+          }
+
+          /* ---- Non-laundry conflict ---- */
+          if (type !== "Laundry") {
+            const { data: clash } = await supabase
+              .from("AdHocJobs")
+              .select("id")
+              .eq("property_id", property_id)
+              .eq("type", type)
+              .eq("single_date", jobDates.single_date)
+              .limit(1)
+              .single();
+
+            if (clash) {
+              showToast({
+                type: "error",
+                title: "Job Conflict",
+                message: `A ${type} job already exists on ${date.toLocaleDateString()}. Skipping.`,
+              });
+              continue;
+            }
           }
 
           jobsToInsert.push({
@@ -88,8 +116,9 @@ export const useUpsertAdHocJob = () => {
           });
         }
 
-        if (jobsToInsert.length === 0)
+        if (!jobsToInsert.length) {
           throw new Error("No jobs could be inserted due to conflicts.");
+        }
 
         const { data, error } = await supabase
           .from("AdHocJobs")
@@ -100,12 +129,13 @@ export const useUpsertAdHocJob = () => {
         return data;
       }
 
-      // --- Single job upsert ---
-      const adHocJobId = id
+      /* --------------------------------
+         SINGLE JOB
+      -------------------------------- */
+      const ad_hoc_job_id = id
         ? adHocJobData.ad_hoc_job_id
         : `JOB-${yearSuffix}-${String(nextNumber).padStart(3, "0")}`;
 
-      // Check for clashes for the single job
       const jobDates =
         type === "Laundry"
           ? {
@@ -114,42 +144,60 @@ export const useUpsertAdHocJob = () => {
               single_date: null,
             }
           : {
-              single_date: single_date,
+              single_date,
               start_date: null,
               end_date: null,
             };
 
-      const { data: existingSingle } = await supabase
-        .from("AdHocJobs")
-        .select("id")
-        .eq("property_id", property_id)
-        .eq("type", type)
-        .or(
-          type === "Laundry"
-            ? `and(start_date.lte.${jobDates.end_date.toISOString()},end_date.gte.${jobDates.start_date.toISOString()})`
-            : `single_date.eq.${jobDates.single_date.toISOString()}`
-        )
-        .limit(1)
-        .single();
+      /* ---- Laundry conflict ---- */
+      if (type === "Laundry" && !id) {
+        const { data: clash } = await supabase
+          .from("AdHocJobs")
+          .select("id")
+          .eq("property_id", property_id)
+          .eq("type", "Laundry")
+          .or(
+            `start_date.eq.${jobDates.start_date.toISOString()},end_date.eq.${jobDates.end_date.toISOString()}`
+          )
+          .limit(1)
+          .single();
 
-      if (existingSingle && !id) {
-        showToast({
-          type: "error",
-          title: "Job Conflict",
-          message: `A ${type} job already exists for this property on ${
-            type === "Laundry"
-              ? `${jobDates.start_date.toLocaleDateString()} - ${jobDates.end_date.toLocaleDateString()}`
-              : jobDates.single_date.toLocaleDateString()
-          }.`,
-        });
-        throw new Error("Job conflict detected.");
+        if (clash) {
+          showToast({
+            type: "error",
+            title: "Job Conflict",
+            message: `A Laundry job already starts or ends on ${jobDates.start_date.toLocaleDateString()} for this property.`,
+          });
+          throw new Error("Laundry job boundary conflict.");
+        }
       }
 
-      // Insert or update single job
+      /* ---- Non-laundry conflict ---- */
+      if (type !== "Laundry" && !id) {
+        const { data: clash } = await supabase
+          .from("AdHocJobs")
+          .select("id")
+          .eq("property_id", property_id)
+          .eq("type", type)
+          .eq("single_date", jobDates.single_date)
+          .limit(1)
+          .single();
+
+        if (clash) {
+          showToast({
+            type: "error",
+            title: "Job Conflict",
+            message: `A ${type} job already exists on ${jobDates.single_date.toLocaleDateString()}.`,
+          });
+          throw new Error("Job conflict detected.");
+        }
+      }
+
+      /* ---- Insert / Update ---- */
       const { data, error } = id
         ? await supabase
             .from("AdHocJobs")
-            .update({ ...adHocJobData, ad_hoc_job_id: adHocJobId })
+            .update({ ...adHocJobData, ad_hoc_job_id })
             .eq("id", id)
             .select()
             .single()
@@ -157,7 +205,7 @@ export const useUpsertAdHocJob = () => {
             .from("AdHocJobs")
             .insert({
               ...adHocJobData,
-              ad_hoc_job_id: adHocJobId,
+              ad_hoc_job_id,
               created_by: profile.id,
             })
             .select()
@@ -169,6 +217,7 @@ export const useUpsertAdHocJob = () => {
 
     onSuccess: (data) => {
       const ids = Array.isArray(data) ? data.map((job) => job.id) : [data?.id];
+
       queryClient.invalidateQueries(["AdHocJobs"]);
       ids.forEach((id) => queryClient.invalidateQueries(["AdHocJob", id]));
     },

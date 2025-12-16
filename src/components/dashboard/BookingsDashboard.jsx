@@ -226,6 +226,8 @@ const BookingsDashboard = () => {
               onChange={setSelectedRange}
               value={memoisedRange}
               presets={[
+                "Today",
+                "Tomorrow",
                 "Last Week",
                 "This Week",
                 "Next Week",
@@ -263,6 +265,7 @@ const BookingsDashboard = () => {
       </div>
       {activeModalType === "Actions" && (
         <ActionsModal
+          type="booking"
           item={selectedItem}
           position={modalPos}
           onClose={handleCloseModal}

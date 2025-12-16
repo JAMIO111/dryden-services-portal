@@ -7,12 +7,18 @@ import { softDeleteRow } from "../api/supabaseApi";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../contexts/ToastProvider";
 import { useConfirm } from "../contexts/ConfirmationModalProvider";
-import { forwardRef } from "react";
+import { forwardRef, useRef } from "react";
+import AdHocJobForm from "./forms/AdHocJobForm";
+import { useModal } from "../contexts/ModalContext";
+import { useUser } from "../contexts/UserProvider";
 
-const ActionsModal = forwardRef(({ item, position, onClose }, ref) => {
+const ActionsModal = forwardRef(({ item, position, onClose, type }, ref) => {
   const queryClient = useQueryClient();
+  const { openModal } = useModal();
   const { showToast } = useToast();
   const confirm = useConfirm();
+  const modalRef = useRef(null);
+  const { profile } = useUser();
 
   const handleDelete = async (id) => {
     onClose();
@@ -24,20 +30,25 @@ const ActionsModal = forwardRef(({ item, position, onClose }, ref) => {
       type: "warning",
     });
     if (ok) {
+      const table = type === "adHocJob" ? "AdHocJobs" : "Bookings";
       try {
-        await softDeleteRow("Bookings", item.id);
-        queryClient.invalidateQueries(["Bookings"]);
+        await softDeleteRow(table, item.id, profile);
+        queryClient.invalidateQueries([table]);
         showToast({
           type: "success",
           title: "Deleted",
-          message: "The booking was successfully deleted.",
+          message: `The ${
+            type === "adHocJob" ? "job" : "booking"
+          } was successfully deleted.`,
         });
       } catch (err) {
         console.error("Failed to delete:", err);
         showToast({
           type: "error",
           title: "Deletion Failed",
-          message: "We were unable to delete the record.",
+          message: `We were unable to delete the ${
+            type === "adHocJob" ? "job" : "booking"
+          }.`,
         });
       }
     }
@@ -48,6 +59,20 @@ const ActionsModal = forwardRef(({ item, position, onClose }, ref) => {
   const handleEditBooking = () => {
     console.log(`Editing ${item.booking_id}`);
     navigate(`/Jobs/Bookings/${item.booking_id}`);
+  };
+
+  const handleEditAdHocJob = () => {
+    onClose();
+    openModal({
+      title: `Edit ${item.ad_hoc_job_id} - ${item.type}`,
+      content: (
+        <div
+          className="min-w-[600px] overflow-hidden min-h-0 h-[80vh] p-4"
+          ref={modalRef}>
+          <AdHocJobForm adHocJob={item} />
+        </div>
+      ),
+    });
   };
 
   return createPortal(
@@ -62,11 +87,13 @@ const ActionsModal = forwardRef(({ item, position, onClose }, ref) => {
       }}>
       <div className="w-full h-1/4 flex gap-2 flex-col p-2 justify-center items-center border-b border-border-color">
         <ActionsModalItem
-          label="Edit Booking"
+          label={type === "adHocJob" ? "Edit Job" : "Edit Booking"}
           icon={HiOutlinePencil}
           color="blue"
           item={item}
-          callback={handleEditBooking}
+          callback={
+            type === "adHocJob" ? handleEditAdHocJob : handleEditBooking
+          }
         />
       </div>
       <div className="w-full h-1/4 flex p-2 justify-center items-center">

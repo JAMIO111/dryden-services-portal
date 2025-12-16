@@ -117,6 +117,21 @@ export const datePresets = [
     },
   },
   {
+    label: "Today",
+    range: () => {
+      const today = normalize(new Date());
+      return [today, today];
+    },
+  },
+  {
+    label: "Tomorrow",
+    range: () => {
+      const tomorrow = normalize(new Date());
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return [tomorrow, tomorrow];
+    },
+  },
+  {
     label: "This Week",
     range: () => [getStartOfWeek(new Date(), 1), getEndOfWeek(new Date(), 1)],
   },

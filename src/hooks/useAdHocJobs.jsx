@@ -38,6 +38,9 @@ export const useAdHocJobs = ({
       let query = supabase
         .from("v_ad_hoc_jobs")
         .select("*", { count: "exact" });
+
+      query = query.is("deleted_at", null);
+
       query = query
         .order(sortColumn, { ascending: sortOrder === "asc" })
         .range(from, to)

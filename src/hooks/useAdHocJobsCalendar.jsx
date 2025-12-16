@@ -6,6 +6,7 @@ const fetchAdHocJobsCalendar = async (startDate, endDate) => {
   const { data: jobs, error } = await supabase
     .from("v_ad_hoc_jobs")
     .select("*")
+    .is("deleted_at", null)
     .lte("sort_date_start", endDate.toISOString())
     .gte("sort_date_end", startDate.toISOString())
     .order("sort_date_start", { ascending: true });

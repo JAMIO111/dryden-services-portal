@@ -69,7 +69,7 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
             .map((property) => (
               <li
                 key={property.id}
-                className={`flex border-b pr-5 border-border-color items-center cursor-pointer ${
+                className={`flex border-b p-2 pr-5 border-border-color items-center cursor-pointer ${
                   selectedProperty?.id === property.id
                     ? "bg-brand-primary/10"
                     : "hover:bg-brand-primary/5"
@@ -83,11 +83,11 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
                   <img
                     src={property.avatar}
                     alt={property?.name}
-                    className="aspect-video h-36 border-r border-border-color object-cover mr-4"
+                    className="aspect-video rounded-xl h-36 border-r border-border-color object-cover mr-4"
                   />
                 ) : (
                   <div
-                    className={`aspect-video h-36 flex flex-col items-center justify-center border-r border-border-color mr-4 bg-primary-bg`}>
+                    className={`aspect-video h-36 rounded-xl flex flex-col items-center justify-center border-r border-border-color mr-4 bg-primary-bg`}>
                     <HiOutlineHomeModern className="w-12 h-12 text-secondary-text mb-2" />
                     <span className="text-secondary-text">No Image</span>
                   </div>

@@ -104,6 +104,8 @@ const Dashboard = () => {
                 onChange={setSelectedRange}
                 value={memoisedRange}
                 presets={[
+                  "Today",
+                  "Tomorrow",
                   "Last Week",
                   "This Week",
                   "Next Week",

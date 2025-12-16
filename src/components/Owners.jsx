@@ -16,7 +16,7 @@ const Owners = () => {
   const { debouncedSearchTerm } = useGlobalSearch();
 
   useEffect(() => {
-    setSelectedOwner(null);
+    setSelectedOwner(location?.state?.owner ?? null);
   }, [debouncedSearchTerm, activeStatus]);
 
   if (isLoading) return <Spinner />;

@@ -322,11 +322,13 @@ export default function DateRangePicker({
                     </button>
                   );
                 })}
-                <button
-                  className="mt-2 block w-full text-left text-sm py-1 px-2 bg-primary-text text-primary-bg rounded"
-                  onClick={() => setMode("custom")}>
-                  Custom Range
-                </button>
+                {switchMode && (
+                  <button
+                    className="mt-2 block w-full text-left text-sm py-1 px-2 bg-primary-text text-primary-bg rounded"
+                    onClick={() => setMode("custom")}>
+                    Custom Range
+                  </button>
+                )}
               </div>
             </>
           )}

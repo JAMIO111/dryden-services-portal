@@ -225,6 +225,8 @@ const AdHocJobsDashboard = () => {
               onChange={setSelectedRange}
               value={memoisedRange}
               presets={[
+                "Today",
+                "Tomorrow",
                 "Last Week",
                 "This Week",
                 "Next Week",
@@ -262,9 +264,11 @@ const AdHocJobsDashboard = () => {
       </div>
       {activeModalType === "Actions" && (
         <ActionsModal
+          type="adHocJob"
           item={selectedItem}
           position={modalPos}
           onClose={handleCloseModal}
+          ref={modalRef}
         />
       )}
     </div>
