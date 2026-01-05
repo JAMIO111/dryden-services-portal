@@ -33,19 +33,23 @@ const CardSelect = ({
       return;
     }
 
-    if (val === "hot_tub") {
-      onChange([...current, val]);
-      return;
+    let next = [...current, val];
+
+    if (val === "maintenance") {
+      next = next.filter((v) => v !== "changeover");
     }
 
-    const others = ["changeover", "clean", "laundry"];
-    if (others.includes(val)) {
-      const filtered = current.filter((v) => v === "hot_tub");
-      onChange([...filtered, val]);
-      return;
+    if (val === "changeover") {
+      next = next.filter(
+        (v) =>
+          v === "hot_tub" ||
+          v === "changeover" ||
+          v === "clean" ||
+          v === "laundry"
+      );
     }
 
-    onChange([...current, val]);
+    onChange(next);
   };
 
   return (

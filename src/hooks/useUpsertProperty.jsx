@@ -94,7 +94,7 @@ export const useUpsertProperty = () => {
       }
 
       // --- Owners Handling ---
-      if (ownersForm && ownersForm.length > 0) {
+      if (ownersForm) {
         // Filter out any invalid owners without an owner_id
         const validOwners = ownersForm.filter((o) => o.id);
 

@@ -5,16 +5,21 @@ import { HiOutlinePencil } from "react-icons/hi2";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { useModal } from "@/contexts/ModalContext";
 import EmployeeForm from "./forms/EmployeeForm.jsx";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useActiveEmployees, useInactiveEmployees } from "@/hooks/useEmployees";
 import { BiSolidShow, BiSolidHide } from "react-icons/bi";
 import ToggleButton from "./ui/ToggleButton";
 
 const Employees = () => {
   const { openModal } = useModal();
+  const [activeStatus, setActiveStatus] = useState("Active");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const { data: employees, isLoading, error } = useEmployees();
+  const {
+    data: employees,
+    isLoading,
+    error,
+  } = activeStatus === "Active" ? useActiveEmployees() : useInactiveEmployees(); // fetch inactive employees
+  console.log("Employees:", employees);
   const [showHourlyRate, setShowHourlyRate] = useState(false);
-  const [activeStatus, setActiveStatus] = useState("All");
 
   const getInitials = (firstName, lastName) => {
     const firstInitial = firstName?.charAt(0)?.toUpperCase();
@@ -36,11 +41,7 @@ const Employees = () => {
         ).includes(debouncedSearchTerm.toLowerCase())
       : true;
 
-    // Filter by active status toggle
-    const statusMatch =
-      activeStatus === "All" ? true : employee.is_active === true;
-
-    return termMatch && statusMatch;
+    return termMatch;
   });
 
   const handleAddEmployee = () => {

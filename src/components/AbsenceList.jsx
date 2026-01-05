@@ -93,7 +93,7 @@ export default function AbsenceList({ startDate, endDate }) {
         {/* Header INSIDE the scroll container */}
         <div
           id="absence-list-header"
-          className="sticky top-0 inset-m z-10 rounded-t-3xl backdrop-blur-md bg-secondary-bg/70 
+          className="sticky top-0 inset-m z-10 rounded-t-2xl backdrop-blur-md bg-secondary-bg/70 
                  border-b border-transparent 
                  data-[scrolled=true]:border-border-color/60 
                  data-[scrolled=true]:bg-secondary-bg/50
@@ -142,69 +142,74 @@ export default function AbsenceList({ startDate, endDate }) {
               </p>
             </div>
           ) : (
-            absences?.map((absence) => (
-              <div
-                onDoubleClick={() => handleEditAbsence(absence)}
-                key={absence.id}
-                className="bg-primary-bg p-1.5 rounded-2xl shadow-s transition-shadow duration-200 hover:shadow-m">
-                <div className="p-2 bg-primary-bg rounded-t-2xl w-full flex flex-row justify-between items-start">
-                  <div className="flex gap-1 flex-col">
-                    <h3 className="text-lg font-semibold flex items-center gap-2 text-primary-text">
-                      {absence?.employee?.avatar ? (
-                        <img
-                          src={absence.employee.avatar}
-                          alt="Employee Avatar"
-                          className="w-6 h-6 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-secondary-text/20 flex items-center justify-center">
-                          <RiUserLine className="w-4 h-4 text-secondary-text" />
-                        </div>
-                      )}
-                      {`${absence.employee.first_name || ""} ${
-                        absence.employee.surname || ""
-                      }`}
-                    </h3>
-                    <p className="text-sm text-secondary-text">
-                      {(() => {
-                        const start = new Date(absence.start_date);
-                        const end = new Date(absence.end_date);
-                        const options = {
-                          weekday: "short",
-                          year: "2-digit",
-                          month: "short",
-                          day: "numeric",
-                        };
-                        const startStr = start.toLocaleDateString(
-                          "en-GB",
-                          options
-                        );
-                        const endStr = end.toLocaleDateString("en-GB", options);
-                        return startStr === endStr
-                          ? startStr
-                          : `${startStr} - ${endStr}`;
-                      })()}
-                    </p>
+            absences
+              ?.sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
+              .map((absence) => (
+                <div
+                  onDoubleClick={() => handleEditAbsence(absence)}
+                  key={absence.id}
+                  className="bg-primary-bg p-1.5 rounded-2xl shadow-s transition-shadow duration-200 hover:shadow-m">
+                  <div className="p-2 bg-primary-bg rounded-t-2xl w-full flex flex-row justify-between items-start">
+                    <div className="flex gap-1 flex-col">
+                      <h3 className="text-lg font-semibold flex items-center gap-2 text-primary-text">
+                        {absence?.employee?.avatar ? (
+                          <img
+                            src={absence.employee.avatar}
+                            alt="Employee Avatar"
+                            className="w-6 h-6 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-secondary-text/20 flex items-center justify-center">
+                            <RiUserLine className="w-4 h-4 text-secondary-text" />
+                          </div>
+                        )}
+                        {`${absence.employee.first_name || ""} ${
+                          absence.employee.surname || ""
+                        }`}
+                      </h3>
+                      <p className="text-sm text-secondary-text">
+                        {(() => {
+                          const start = new Date(absence.start_date);
+                          const end = new Date(absence.end_date);
+                          const options = {
+                            weekday: "short",
+                            year: "2-digit",
+                            month: "short",
+                            day: "numeric",
+                          };
+                          const startStr = start.toLocaleDateString(
+                            "en-GB",
+                            options
+                          );
+                          const endStr = end.toLocaleDateString(
+                            "en-GB",
+                            options
+                          );
+                          return startStr === endStr
+                            ? startStr
+                            : `${startStr} - ${endStr}`;
+                        })()}
+                      </p>
+                    </div>
+                    <div
+                      className={`${
+                        statusColor[absence.category]
+                      } flex px-3 py-1.5 rounded-lg items-center gap-2`}>
+                      {statusIcons[absence.category]}
+                      <span className={`text-sm font-medium`}>
+                        {absence.category}
+                      </span>
+                    </div>
                   </div>
-                  <div
-                    className={`${
-                      statusColor[absence.category]
-                    } flex px-3 py-1.5 rounded-lg items-center gap-2`}>
-                    {statusIcons[absence.category]}
-                    <span className={`text-sm font-medium`}>
-                      {absence.category}
-                    </span>
-                  </div>
+                  {absence.reason && (
+                    <div className="p-3 bg-tertiary-bg border border-border-color/50 rounded-xl text-sm space-y-2">
+                      <p className="font-medium text-primary-text">
+                        {absence.reason || "No reason provided"}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                {absence.reason && (
-                  <div className="p-3 bg-tertiary-bg border border-border-color/50 rounded-xl text-sm space-y-2">
-                    <p className="font-medium text-primary-text">
-                      {absence.reason || "No reason provided"}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))
+              ))
           )}
         </div>
       </div>

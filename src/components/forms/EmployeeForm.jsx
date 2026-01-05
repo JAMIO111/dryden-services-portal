@@ -5,6 +5,8 @@ import { IoText } from "react-icons/io5";
 import { useQueryClient } from "@tanstack/react-query";
 import { EmployeeFormSchema } from "../../validationSchema";
 import { useUpsertEmployee } from "@/hooks/useUpsertEmployee";
+import { useTerminateContract } from "@/hooks/useTerminateContract";
+import { useUpdateContract } from "@/hooks/useUpdateContract";
 import ProfileImageSection from "../ProfileImageSection";
 import TextInput from "../ui/TextInput";
 import RHFComboBox from "../ui/RHFComboBox";
@@ -21,6 +23,7 @@ import {
   IoBriefcaseOutline,
   IoLocationOutline,
 } from "react-icons/io5";
+import { GrDocumentUpdate } from "react-icons/gr";
 import ToggleButton from "../ui/ToggleButton";
 import { HiOutlinePhone } from "react-icons/hi2";
 import { TfiEmail } from "react-icons/tfi";
@@ -52,6 +55,8 @@ const EmployeeForm = ({ employee }) => {
   const { createNotification } = useCreateNotification();
   const queryClient = useQueryClient();
   const upsertEmployee = useUpsertEmployee();
+  const updateContract = useUpdateContract();
+  const terminateContract = useTerminateContract();
   const { showToast } = useToast();
   const { closeModal } = useModal();
 
@@ -78,11 +83,20 @@ const EmployeeForm = ({ employee }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const onSubmit = async (data) => {
+  const handleSaveEmployee = async (data) => {
     try {
       const payload = {
-        ...data,
+        first_name: data.first_name,
+        middle_name: data.middle_name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
         dob: data.dob ? formatDateForDateColumn(new Date(data.dob)) : null,
+        gender: data.gender,
+        ni_number: data.ni_number,
+        is_driver: data.is_driver,
+        is_cscs: data.is_cscs,
       };
 
       // add ID when editing
@@ -120,6 +134,44 @@ const EmployeeForm = ({ employee }) => {
     }
   };
 
+  const handleUpdateContract = async () => {
+    if (!employee?.employee_period_id) return;
+
+    await updateContract.mutateAsync({
+      employeeId: employee.id,
+      currentPeriodId: employee.employee_period_id,
+      updates: {
+        job_title: watch("job_title"),
+        contract_type: watch("contract_type"),
+        hourly_rate: watch("hourly_rate"),
+      },
+    });
+
+    showToast({
+      type: "success",
+      title: "Contract Updated",
+      message: "A new contract has been created with updated details.",
+    });
+
+    closeModal();
+  };
+
+  const handleTerminateEmployment = async () => {
+    if (!employee?.employee_period_id) return;
+
+    await terminateContract.mutateAsync({
+      employeePeriodId: employee.employee_period_id,
+    });
+
+    showToast({
+      type: "success",
+      title: "Employment Ended",
+      message: "The employee's contract has been terminated.",
+    });
+
+    closeModal();
+  };
+
   useEffect(() => {
     if (employee) {
       reset({
@@ -139,176 +191,236 @@ const EmployeeForm = ({ employee }) => {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-6 h-[80vh] min-w-[50vw] overflow-y-auto p-6">
-      {/* Profile section */}
-      <div className="flex justify-center">
-        <ProfileImageSection
-          item={employee}
-          bucket="avatars"
-          path="employees"
-          table="Employees"
-          width="w-52"
-          height="h-52"
-          noImageText={initials || "NA"}
-          onImageChange={() => {
-            queryClient.invalidateQueries(["Employee", employee.id]);
-          }}
-        />
-        <div className="ml-6 flex flex-1 flex-col justify-center gap-1">
-          {/* First Name */}
-          <Controller
-            name="first_name"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                required
-                label="First Name"
-                placeholder="e.g. John"
-                {...field}
-                icon={IoText}
-                error={fieldState.error}
+      className="flex h-[80vh] min-w-[80vw] flex-row"
+      onSubmit={handleSubmit(handleSaveEmployee)}>
+      <div className="flex flex-col">
+        <div className="flex flex-2 flex-col gap-4 overflow-y-auto p-6">
+          {/* Profile section */}
+          <div className="flex justify-center">
+            <ProfileImageSection
+              item={employee}
+              bucket="avatars"
+              path="employees"
+              table="Employees"
+              width="w-52"
+              height="h-52"
+              noImageText={initials || "NA"}
+              onImageChange={() => {
+                queryClient.invalidateQueries(["Employee", employee.id]);
+              }}
+            />
+            <div className="ml-6 flex flex-1 flex-col justify-center gap-1">
+              {/* First Name */}
+              <Controller
+                name="first_name"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    required
+                    label="First Name"
+                    placeholder="e.g. John"
+                    {...field}
+                    icon={IoText}
+                    error={fieldState.error}
+                  />
+                )}
               />
-            )}
+
+              {/* Middle Name */}
+              <Controller
+                name="middle_name"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    label="Middle Name"
+                    placeholder="e.g. William"
+                    {...field}
+                    icon={IoText}
+                    error={fieldState.error}
+                  />
+                )}
+              />
+
+              {/* Surname */}
+              <Controller
+                name="surname"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    required
+                    label="Surname"
+                    placeholder="e.g. Doe"
+                    {...field}
+                    icon={IoText}
+                    error={fieldState.error}
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Grid layout for fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+            <div className="col-span-2">
+              {/* Date of Birth */}
+              <Controller
+                name="dob"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    required
+                    label="Date of Birth"
+                    currentDate={field.value}
+                    onChange={field.onChange}
+                    defaultPageDate={new Date("1990-01-01")}
+                    placeholder="Select date of birth..."
+                    {...field}
+                    error={fieldState.error}
+                  />
+                )}
+              />
+            </div>
+            {/* Gender */}
+            <Controller
+              name="gender"
+              control={control}
+              render={({ field, fieldState }) => (
+                <RHFComboBox
+                  required
+                  label="Gender"
+                  icon={IoMaleFemaleOutline}
+                  placeholder="Select gender..."
+                  {...field}
+                  error={fieldState.error}
+                  options={[
+                    { id: "male", value: "male", name: "Male" },
+                    { id: "female", value: "female", name: "Female" },
+                  ]}
+                />
+              )}
+            />
+            {/* NI Number */}
+            <Controller
+              name="ni_number"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextInput
+                  icon={PiPassword}
+                  label="NI Number"
+                  placeholder="Enter NI number..."
+                  {...field}
+                  error={fieldState.error}
+                />
+              )}
+            />
+
+            {/* Email */}
+            <Controller
+              name="email"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextInput
+                  label="Email"
+                  icon={TfiEmail}
+                  placeholder="e.g. john.doe@example.com"
+                  {...field}
+                  error={fieldState.error}
+                />
+              )}
+            />
+            {/* Phone Number */}
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextInput
+                  label="Phone Number"
+                  icon={HiOutlinePhone}
+                  placeholder="e.g. 07456321569"
+                  {...field}
+                  error={fieldState.error}
+                />
+              )}
+            />
+            <div className="col-span-2">
+              {/* Address */}
+              <Controller
+                name="address"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <RHFTextAreaInput
+                    required
+                    label="Address"
+                    placeholder="e.g. 23 Baker Street, London, UK, NW1 6XE"
+                    rows={2}
+                    icon={IoLocationOutline}
+                    {...field}
+                    error={fieldState.error}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Driver */}
+            <Controller
+              name="is_driver"
+              control={control}
+              render={({ field, fieldState }) => (
+                <ToggleButton
+                  label="Driver License Holder"
+                  trueLabel="Yes"
+                  falseLabel="No"
+                  icon={TbSteeringWheel}
+                  checked={field.value}
+                  onChange={field.onChange}
+                  error={fieldState.error}
+                />
+              )}
+            />
+            {/* Driver License Number */}
+            <Controller
+              name="is_cscs"
+              control={control}
+              render={({ field, fieldState }) => (
+                <ToggleButton
+                  label="CSCS Card Holder"
+                  trueLabel="Yes"
+                  falseLabel="No"
+                  icon={FaRegIdCard}
+                  checked={field.value}
+                  onChange={field.onChange}
+                  error={fieldState.error}
+                />
+              )}
+            />
+          </div>
+        </div>
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-3 px-6 py-3">
+          <CTAButton
+            type="cancel"
+            text="Revert"
+            icon={RxReset}
+            callbackFn={() => reset()}
+            disabled={!isDirty || isSubmitting}
           />
 
-          {/* Middle Name */}
-          <Controller
-            name="middle_name"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                label="Middle Name"
-                placeholder="e.g. William"
-                {...field}
-                icon={IoText}
-                error={fieldState.error}
-              />
-            )}
-          />
-
-          {/* Surname */}
-          <Controller
-            name="surname"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                required
-                label="Surname"
-                placeholder="e.g. Doe"
-                {...field}
-                icon={IoText}
-                error={fieldState.error}
-              />
-            )}
+          <CTAButton
+            type="success"
+            text="Save"
+            disabled={!isDirty || !isValid || isSubmitting}
+            icon={GiSaveArrow}
+            callbackFn={handleSubmit(handleSaveEmployee)}
           />
         </div>
       </div>
-
-      {/* Grid layout for fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
-        <div className="col-span-2">
-          {/* Date of Birth */}
+      <div className="flex flex-col flex-1">
+        <div className="flex flex-1 flex-col p-6 gap-4 overflow-y-auto">
+          <h2 className="text-2xl font-semibold text-primary-text mb-1">
+            {employee ? "Edit Employee" : "Add New Employee"}
+          </h2>
           <Controller
-            name="dob"
-            control={control}
-            render={({ field, fieldState }) => (
-              <DatePicker
-                required
-                label="Date of Birth"
-                currentDate={field.value}
-                onChange={field.onChange}
-                defaultPageDate={new Date("1990-01-01")}
-                placeholder="Select date of birth..."
-                {...field}
-                error={fieldState.error}
-              />
-            )}
-          />
-        </div>
-        {/* Gender */}
-        <Controller
-          name="gender"
-          control={control}
-          render={({ field, fieldState }) => (
-            <RHFComboBox
-              required
-              label="Gender"
-              icon={IoMaleFemaleOutline}
-              placeholder="Select gender..."
-              {...field}
-              error={fieldState.error}
-              options={[
-                { id: "male", value: "male", name: "Male" },
-                { id: "female", value: "female", name: "Female" },
-              ]}
-            />
-          )}
-        />
-        {/* Job Title */}
-        <Controller
-          name="job_title"
-          control={control}
-          render={({ field, fieldState }) => (
-            <TextInput
-              required
-              label="Job Title"
-              placeholder="e.g. Head Housekeeper"
-              {...field}
-              icon={IoBriefcaseOutline}
-              error={fieldState.error}
-            />
-          )}
-        />
-        {/* Email */}
-        <Controller
-          name="email"
-          control={control}
-          render={({ field, fieldState }) => (
-            <TextInput
-              label="Email"
-              icon={TfiEmail}
-              placeholder="e.g. john.doe@example.com"
-              {...field}
-              error={fieldState.error}
-            />
-          )}
-        />
-        {/* Phone Number */}
-        <Controller
-          name="phone"
-          control={control}
-          render={({ field, fieldState }) => (
-            <TextInput
-              label="Phone Number"
-              icon={HiOutlinePhone}
-              placeholder="e.g. 07456321569"
-              {...field}
-              error={fieldState.error}
-            />
-          )}
-        />
-        <div className="col-span-2">
-          {/* Address */}
-          <Controller
-            name="address"
-            control={control}
-            render={({ field, fieldState }) => (
-              <RHFTextAreaInput
-                required
-                label="Address"
-                placeholder="e.g. 23 Baker Street, London, UK, NW1 6XE"
-                rows={2}
-                icon={IoLocationOutline}
-                {...field}
-                error={fieldState.error}
-              />
-            )}
-          />
-        </div>
-        <div className="col-span-2">
-          <Controller
-            name="start_date"
+            name="created_at"
             control={control}
             render={({ field, fieldState }) => (
               <DatePicker
@@ -322,10 +434,34 @@ const EmployeeForm = ({ employee }) => {
               />
             )}
           />
-        </div>
-
-        <div className="col-span-1">
-          {/* Hourly Rate */}
+          {/* Job Title */}
+          <Controller
+            name="job_title"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextInput
+                required
+                label="Job Title"
+                placeholder="e.g. Head Housekeeper"
+                {...field}
+                icon={IoBriefcaseOutline}
+                error={fieldState.error}
+              />
+            )}
+          />
+          <Controller
+            name="contract_type"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextInput
+                label="Contract Type"
+                placeholder="e.g. Full-Time, Part-Time"
+                icon={IoText}
+                {...field}
+                error={fieldState.error}
+              />
+            )}
+          />
           <Controller
             name="hourly_rate"
             control={control}
@@ -342,99 +478,22 @@ const EmployeeForm = ({ employee }) => {
             )}
           />
         </div>
-
-        <Controller
-          name="contract_type"
-          control={control}
-          render={({ field, fieldState }) => (
-            <TextInput
-              label="Contract Type"
-              placeholder="e.g. Full-Time, Part-Time"
-              icon={IoText}
-              {...field}
-              error={fieldState.error}
+        <div className="flex justify-end gap-3 py-3 px-6">
+          {employee?.employee_period_id && (
+            <CTAButton
+              type="cancel"
+              text="End Employment"
+              icon={RxReset}
+              callbackFn={handleTerminateEmployment}
             />
           )}
-        />
-
-        {/* NI Number */}
-        <Controller
-          name="ni_number"
-          control={control}
-          render={({ field, fieldState }) => (
-            <TextInput
-              icon={PiPassword}
-              label="NI Number"
-              placeholder="Enter NI number..."
-              {...field}
-              error={fieldState.error}
-            />
-          )}
-        />
-        {/* Driver */}
-        <Controller
-          name="is_driver"
-          control={control}
-          render={({ field, fieldState }) => (
-            <ToggleButton
-              label="Driver License Holder"
-              trueLabel="Yes"
-              falseLabel="No"
-              icon={TbSteeringWheel}
-              checked={field.value}
-              onChange={field.onChange}
-              error={fieldState.error}
-            />
-          )}
-        />
-        {/* Driver License Number */}
-        <Controller
-          name="is_cscs"
-          control={control}
-          render={({ field, fieldState }) => (
-            <ToggleButton
-              label="CSCS Card Holder"
-              trueLabel="Yes"
-              falseLabel="No"
-              icon={FaRegIdCard}
-              checked={field.value}
-              onChange={field.onChange}
-              error={fieldState.error}
-            />
-          )}
-        />
-        <Controller
-          name="is_active"
-          control={control}
-          render={({ field, fieldState }) => (
-            <ToggleButton
-              label="Active Employee"
-              trueLabel="Active"
-              falseLabel="Inactive"
-              checked={field.value}
-              onChange={field.onChange}
-              error={fieldState.error}
-            />
-          )}
-        />
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-3 mt-4">
-        <CTAButton
-          type="cancel"
-          text="Revert"
-          icon={RxReset}
-          callbackFn={() => reset()}
-        />
-
-        <CTAButton
-          type="success"
-          text="Save"
-          disabled={!isDirty || !isValid || isSubmitting}
-          icon={GiSaveArrow}
-          callbackFn={handleSubmit(onSubmit)}
-        />
+          <CTAButton
+            type="success"
+            text="Update Contract"
+            icon={GrDocumentUpdate}
+            callbackFn={handleUpdateContract}
+          />
+        </div>
       </div>
     </form>
   );

@@ -7,6 +7,8 @@ import { useAuth } from "@/contexts/AuthProvider";
 import supabase from "@/supabase-client";
 import PasswordField from "../ui/PasswordField";
 import { useToast } from "@/contexts/ToastProvider";
+import { LuUser } from "react-icons/lu";
+import { IoBriefcaseOutline } from "react-icons/io5";
 
 const SettingsAccount = () => {
   const { user: authUser } = useAuth();
@@ -167,7 +169,9 @@ const SettingsAccount = () => {
           <div className="flex flex-col text-primary-text gap-3">
             <div className="px-4 py-2 flex flex-col gap-3">
               <div className="flex items-center justify-between flex-row gap-3">
-                <p className="flex-1/3">First Name</p>
+                <p className="flex gap-2 items-center flex-1/3">
+                  <LuUser /> First Name
+                </p>
                 <TextInput
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
@@ -176,7 +180,9 @@ const SettingsAccount = () => {
               </div>
 
               <div className="flex items-center justify-between flex-row gap-3">
-                <p className="flex-1/3">Surname</p>
+                <p className="flex-1/3 flex items-center gap-2">
+                  <LuUser /> Surname
+                </p>
                 <TextInput
                   value={surname}
                   onChange={(e) => setSurname(e.target.value)}
@@ -185,7 +191,9 @@ const SettingsAccount = () => {
               </div>
 
               <div className="flex items-center justify-between flex-row gap-3">
-                <p className="flex-1/3">Job Title</p>
+                <p className="flex-1/3 flex items-center gap-2">
+                  <IoBriefcaseOutline /> Job Title
+                </p>
                 <TextInput
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}

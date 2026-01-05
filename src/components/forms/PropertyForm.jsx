@@ -36,6 +36,7 @@ import ProfileImageSection from "../ProfileImageSection";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
 import RHFTextAreaInput from "../ui/RHFTextArea";
+import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { FaRegNoteSticky } from "react-icons/fa6";
 
 const defaultFormData = {
@@ -201,8 +202,8 @@ const PropertyForm = () => {
               }}
             />
           </div>
-          <div className="flex flex-1 p-3 overflow-y-auto flex-col gap-3">
-            <div className="mb-3">
+          <div className="flex flex-1 p-3 overflow-y-auto flex-col">
+            <div className="mb-2">
               <Controller
                 name="name"
                 control={control}
@@ -373,6 +374,11 @@ const PropertyForm = () => {
                     icon: TbIroning3,
                   },
                   { id: "clean", name: "Clean", icon: GiMagicBroom },
+                  {
+                    id: "maintenance",
+                    name: "Maintenance",
+                    icon: HiOutlineWrenchScrewdriver,
+                  },
                 ]}
                 multiSelect={true}
                 label="Service Type"

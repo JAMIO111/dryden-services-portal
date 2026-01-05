@@ -6,12 +6,12 @@ import DateRangePicker from "../ui/DateRangePicker";
 import { getGreeting } from "@/lib/HelperFunctions";
 import { useState, useMemo } from "react";
 import DashboardCard from "./DashboardCard";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useActiveEmployees } from "@/hooks/useEmployees";
 import AbsenceList from "../AbsenceList";
 
 const HRDashboard = () => {
   const { profile } = useUser();
-  const { data: employees, isLoading } = useEmployees();
+  const { data: employees, isLoading } = useActiveEmployees();
   const today = useMemo(() => new Date(), []);
   const end = useMemo(() => {
     const s = new Date(today);
@@ -67,11 +67,11 @@ const HRDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col overflow-hidden p-3 gap-3">
-        <div className="flex flex-row gap-3 shrink-0">
+      <div className="flex flex-1 flex-col overflow-hidden gap-3">
+        <div className="flex flex-row p-3 pb-0 gap-3 shrink-0">
           <DashboardCard
             title="Total Employees"
-            value={employees?.filter((emp) => emp.is_active).length}
+            value={employees?.length}
             icon={PiUsersThree}
             link="/Human-Resources/Employees"
             isLoading={isLoading}
@@ -81,7 +81,7 @@ const HRDashboard = () => {
         </div>
 
         {/* Absence List + Placeholder */}
-        <div className="flex flex-1 flex-row gap-3 overflow-hidden">
+        <div className="flex flex-1 flex-row gap-3 p-3 pt-0 overflow-hidden">
           {/* Absence List */}
           <div className="flex-[2] flex flex-col overflow-hidden rounded-2xl shadow-s bg-secondary-bg">
             <AbsenceList

@@ -401,6 +401,8 @@ const OwnerForm = () => {
                       _owner: payload,
                     }
                   );
+                  queryClient.invalidateQueries(["Leads"]);
+                  queryClient.invalidateQueries(["Owners"]);
 
                   if (error) throw error;
 

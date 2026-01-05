@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import CTAButton from "../CTAButton";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
 import { useUpsertAbsence } from "@/hooks/useUpsertAbsence";
-import { useEmployees } from "@/hooks/useEmployees";
+import { useActiveEmployees } from "@/hooks/useEmployees";
 import RHFComboBox from "../ui/RHFComboBox";
 import DatePicker from "../ui/DatePicker";
 import { AbsenceFormSchema } from "@/validationSchema";
@@ -28,7 +28,7 @@ const defaultFormData = {
 const AbsenceForm = ({ absence }) => {
   const { closeModal } = useModal();
   const confirm = useConfirm();
-  const { data: employees } = useEmployees();
+  const { data: employees } = useActiveEmployees();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const upsertAbsence = useUpsertAbsence();
