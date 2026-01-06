@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IoText } from "react-icons/io5";
@@ -30,6 +30,7 @@ import { TfiEmail } from "react-icons/tfi";
 import { useToast } from "../../contexts/ToastProvider";
 import { useModal } from "@/contexts/ModalContext";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useEmployeeWithContracts } from "@/hooks/useEmployeeWithContracts";
 
 const defaultFormData = {
   id: null,
@@ -49,23 +50,39 @@ const defaultFormData = {
   is_active: true,
   hourly_rate: "",
   contract_type: "",
+  created_at: new Date(),
 };
 
 const EmployeeForm = ({ employee }) => {
+  const [view, setView] = useState("history");
   const { createNotification } = useCreateNotification();
   const queryClient = useQueryClient();
   const upsertEmployee = useUpsertEmployee();
   const updateContract = useUpdateContract();
   const terminateContract = useTerminateContract();
+  const {
+    data: employeeWithContracts,
+    isLoading,
+    error,
+  } = useEmployeeWithContracts(employee?.id);
+  console.log("Employee with Contracts:", employeeWithContracts);
   const { showToast } = useToast();
   const { closeModal } = useModal();
+
+  const orderedContracts = (employeeWithContracts?.EmployeePeriod ?? [])
+    .slice()
+    .sort((a, b) => {
+      if (a.terminated_at === null && b.terminated_at !== null) return -1;
+      if (a.terminated_at !== null && b.terminated_at === null) return 1;
+      return new Date(b.terminated_at) - new Date(a.terminated_at);
+    });
 
   const {
     control,
     handleSubmit,
     reset,
     watch,
-    formState: { errors, isSubmitting, isDirty, isValid },
+    formState: { errors, isSubmitting, isDirty, isValid, dirtyFields },
   } = useForm({
     resolver: zodResolver(EmployeeFormSchema),
     mode: "onChange",
@@ -75,6 +92,26 @@ const EmployeeForm = ({ employee }) => {
   const initials = `${employee?.first_name?.[0] ?? ""}${
     employee?.surname?.[0] ?? ""
   }`.toUpperCase();
+
+  const CONTRACT_FIELDS = ["job_title", "contract_type", "hourly_rate"];
+
+  const contractDirty =
+    watch("job_title") !== employee?.job_title ||
+    watch("contract_type") !== employee?.contract_type ||
+    watch("hourly_rate") !==
+      (employee?.hourly_rate == null
+        ? ""
+        : Number(employee.hourly_rate).toFixed(2));
+
+  const contractFieldsDirty = CONTRACT_FIELDS.some(
+    (field) => dirtyFields[field]
+  );
+
+  const nonContractFieldsDirty = Object.keys(dirtyFields).some(
+    (field) => !CONTRACT_FIELDS.includes(field)
+  );
+
+  const disableSave = contractFieldsDirty && !nonContractFieldsDirty;
 
   const formatDateForDateColumn = (date) => {
     const year = date.getFullYear();
@@ -408,7 +445,7 @@ const EmployeeForm = ({ employee }) => {
           <CTAButton
             type="success"
             text="Save"
-            disabled={!isDirty || !isValid || isSubmitting}
+            disabled={!isDirty || disableSave || !isValid || isSubmitting}
             icon={GiSaveArrow}
             callbackFn={handleSubmit(handleSaveEmployee)}
           />
@@ -416,83 +453,182 @@ const EmployeeForm = ({ employee }) => {
       </div>
       <div className="flex flex-col flex-1">
         <div className="flex flex-1 flex-col p-6 gap-4 overflow-y-auto">
-          <h2 className="text-2xl font-semibold text-primary-text mb-1">
-            {employee ? "Edit Employee" : "Add New Employee"}
-          </h2>
-          <Controller
-            name="created_at"
-            control={control}
-            render={({ field, fieldState }) => (
-              <DatePicker
-                required
-                label="Start of Employment"
-                currentDate={field.value}
-                onChange={field.onChange}
-                placeholder="Select start date..."
-                {...field}
-                error={fieldState.error}
+          {view === "edit" ? (
+            <div className="history flex flex-col gap-4">
+              <h2 className="text-xl font-semibold text-primary-text mb-1">
+                Edit Contract Details
+              </h2>
+              <Controller
+                name="created_at"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    required
+                    label="Start of Contract"
+                    currentDate={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select start date..."
+                    {...field}
+                    error={fieldState.error}
+                  />
+                )}
               />
-            )}
-          />
-          {/* Job Title */}
-          <Controller
-            name="job_title"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                required
-                label="Job Title"
-                placeholder="e.g. Head Housekeeper"
-                {...field}
-                icon={IoBriefcaseOutline}
-                error={fieldState.error}
+              {/* Job Title */}
+              <Controller
+                name="job_title"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    required
+                    label="Job Title"
+                    placeholder="e.g. Head Housekeeper"
+                    {...field}
+                    icon={IoBriefcaseOutline}
+                    error={fieldState.error}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="contract_type"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                label="Contract Type"
-                placeholder="e.g. Full-Time, Part-Time"
-                icon={IoText}
-                {...field}
-                error={fieldState.error}
+              <Controller
+                name="contract_type"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    label="Contract Type"
+                    placeholder="e.g. Full-Time, Part-Time"
+                    icon={IoText}
+                    {...field}
+                    error={fieldState.error}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="hourly_rate"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                dataType="number"
-                prefix="£"
-                label="Hourly Rate"
-                placeholder="e.g. 15.00"
-                {...field}
-                error={fieldState.error}
-                icon={IoBriefcaseOutline}
+              <Controller
+                name="hourly_rate"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    dataType="number"
+                    prefix="£"
+                    label="Hourly Rate"
+                    placeholder="e.g. 15.00"
+                    {...field}
+                    error={fieldState.error}
+                    icon={IoBriefcaseOutline}
+                  />
+                )}
               />
-            )}
-          />
+            </div>
+          ) : (
+            <div className="history">
+              <h2 className="text-xl font-semibold text-primary-text mb-3">
+                Employment History
+              </h2>
+              {isLoading ? (
+                <p className="flex bg-tertiary-bg rounded-lg justify-center items-center py-10 text-secondary-text">
+                  Loading...
+                </p>
+              ) : error ? (
+                <p className="text-red-500 flex bg-tertiary-bg rounded-lg justify-center items-center py-10">
+                  Error loading history.
+                </p>
+              ) : orderedContracts?.length ? (
+                <ul className="flex flex-col gap-3">
+                  {orderedContracts.map((contract) => (
+                    <li
+                      key={contract.id}
+                      className="p-4 bg-tertiary-bg rounded-lg shadow-s space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-secondary-text">Job Title</span>
+                        <span className="text-primary-text font-medium">
+                          {contract.job_title}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="text-secondary-text">
+                          Contract Type
+                        </span>
+                        <span className="text-primary-text">
+                          {contract.contract_type || "N/A"}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="text-secondary-text">Hourly Rate</span>
+                        <span className="text-primary-text">
+                          {contract.hourly_rate != null
+                            ? `£${Number(contract.hourly_rate).toFixed(2)}`
+                            : "N/A"}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="text-secondary-text">Start Date</span>
+                        <span className="text-primary-text">
+                          {new Date(contract.created_at).toLocaleDateString(
+                            "en-GB",
+                            {
+                              weekday: "short",
+                              year: "2-digit",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="text-secondary-text">End Date</span>
+                        <span className="text-primary-text">
+                          {contract.terminated_at
+                            ? new Date(
+                                contract.terminated_at
+                              ).toLocaleDateString("en-GB", {
+                                weekday: "short",
+                                year: "2-digit",
+                                month: "short",
+                                day: "numeric",
+                              })
+                            : "Present"}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="flex bg-tertiary-bg rounded-lg justify-center items-center py-10 text-secondary-text">
+                  No employment history available.
+                </p>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex justify-end gap-3 py-3 px-6">
-          {employee?.employee_period_id && (
+          <CTAButton
+            width="w-1/2"
+            type="main"
+            text={view === "edit" ? "View History" : "Edit Contract"}
+            icon={GrDocumentUpdate}
+            callbackFn={() => setView(view === "edit" ? "history" : "edit")}
+          />
+          {employee?.employee_period_id && view === "history" && (
             <CTAButton
+              width="w-1/2"
               type="cancel"
               text="End Employment"
               icon={RxReset}
               callbackFn={handleTerminateEmployment}
             />
           )}
-          <CTAButton
-            type="success"
-            text="Update Contract"
-            icon={GrDocumentUpdate}
-            callbackFn={handleUpdateContract}
-          />
+          {view === "edit" && (
+            <CTAButton
+              width="w-1/2"
+              type="success"
+              text="Update Contract"
+              icon={GrDocumentUpdate}
+              disabled={isSubmitting || !contractDirty}
+              callbackFn={handleUpdateContract}
+            />
+          )}
         </div>
       </div>
     </form>

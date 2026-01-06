@@ -194,7 +194,7 @@ const Employees = () => {
                 </div>
 
                 <div className="flex justify-center w-25">
-                  {getStatusPill(employee.is_active)}
+                  {getStatusPill(employee.employee_period_id)}
                 </div>
               </div>
             ))
