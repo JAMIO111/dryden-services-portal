@@ -169,6 +169,19 @@ const OwnerDetails = ({ owner }) => {
                     {owner?.first_name}
                   </p>
                 </div>
+                {owner?.middle_name && (
+                  <div className="px-5 flex flex-row justify-between items-center gap-5">
+                    <div className="flex flex-row items-center gap-2">
+                      <IoText className="text-primary-text w-4 h-4 shrink-0" />
+                      <h3 className="font-semibold text-primary-text">
+                        Middle Name
+                      </h3>
+                    </div>
+                    <p className="text-sm text-primary-text">
+                      {owner?.middle_name}
+                    </p>
+                  </div>
+                )}
                 <div className="px-5 flex flex-row justify-between items-center gap-5">
                   <div className="flex flex-row items-center gap-2">
                     <IoText className="text-primary-text w-4 h-4 shrink-0" />

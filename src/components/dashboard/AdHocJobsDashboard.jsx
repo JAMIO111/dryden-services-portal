@@ -48,6 +48,15 @@ const AdHocJobsDashboard = () => {
     };
   });
 
+  useEffect(() => {
+    if (location.state?.dateRange) {
+      setSelectedRange({
+        startDate: new Date(location.state.dateRange.startDate),
+        endDate: new Date(location.state.dateRange.endDate),
+      });
+    }
+  }, [location.state]);
+
   const memoisedRange = useMemo(
     () => selectedRange,
     [selectedRange.startDate, selectedRange.endDate]
@@ -196,7 +205,11 @@ const AdHocJobsDashboard = () => {
         <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
           <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
             <CTAButton
-              callbackFn={() => navigate("/Jobs/Bookings")}
+              callbackFn={() =>
+                navigate("/Jobs/Bookings", {
+                  state: { dateRange: memoisedRange },
+                })
+              }
               type="secondary"
               text="Go to Bookings"
               icon={BiSolidArrowToRight}

@@ -8,23 +8,29 @@ export const useUpdateContract = () => {
     mutationFn: async ({ employeeId, currentPeriodId, updates = {} }) => {
       const now = new Date().toISOString();
 
-      // 1️⃣ terminate current contract
-      const { error: terminateError } = await supabase
-        .from("EmployeePeriod")
-        .update({ terminated_at: now })
-        .eq("id", currentPeriodId)
-        .is("terminated_at", null);
+      // 1️⃣ terminate current contract if it exists
+      if (currentPeriodId) {
+        const { error: terminateError } = await supabase
+          .from("EmployeePeriod")
+          .update({ terminated_at: now })
+          .eq("id", currentPeriodId)
+          .is("terminated_at", null);
 
-      if (terminateError) throw terminateError;
+        if (terminateError) throw terminateError;
+      }
 
-      // 2️⃣ fetch old contract details
-      const { data: previous, error: fetchError } = await supabase
-        .from("EmployeePeriod")
-        .select("job_title, contract_type, hourly_rate")
-        .eq("id", currentPeriodId)
-        .single();
+      // 2️⃣ fetch old contract details if exists
+      let previous = {};
+      if (currentPeriodId) {
+        const { data, error: fetchError } = await supabase
+          .from("EmployeePeriod")
+          .select("job_title, contract_type, hourly_rate")
+          .eq("id", currentPeriodId)
+          .single();
 
-      if (fetchError) throw fetchError;
+        if (fetchError) throw fetchError;
+        previous = data;
+      }
 
       // 3️⃣ create new contract
       const { error: insertError } = await supabase
@@ -34,6 +40,7 @@ export const useUpdateContract = () => {
           job_title: updates.job_title ?? previous.job_title,
           contract_type: updates.contract_type ?? previous.contract_type,
           hourly_rate: updates.hourly_rate ?? previous.hourly_rate,
+          created_at: updates.created_at ?? now,
         });
 
       if (insertError) throw insertError;

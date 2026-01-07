@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IoText } from "react-icons/io5";
@@ -44,7 +44,6 @@ const defaultFormData = {
   phone: "",
   address: "",
   ni_number: "",
-  start_date: null,
   is_driver: false,
   is_cscs: false,
   is_active: true,
@@ -69,13 +68,19 @@ const EmployeeForm = ({ employee }) => {
   const { showToast } = useToast();
   const { closeModal } = useModal();
 
-  const orderedContracts = (employeeWithContracts?.EmployeePeriod ?? [])
-    .slice()
-    .sort((a, b) => {
-      if (a.terminated_at === null && b.terminated_at !== null) return -1;
-      if (a.terminated_at !== null && b.terminated_at === null) return 1;
-      return new Date(b.terminated_at) - new Date(a.terminated_at);
-    });
+  const orderedContracts = useMemo(() => {
+    return (employeeWithContracts?.EmployeePeriod ?? [])
+      .slice()
+      .sort((a, b) => {
+        if (a.terminated_at === null && b.terminated_at !== null) return -1;
+        if (a.terminated_at !== null && b.terminated_at === null) return 1;
+        return new Date(b.terminated_at) - new Date(a.terminated_at);
+      });
+  }, [employeeWithContracts]);
+
+  const isActive = orderedContracts.some(
+    (contract) => contract.terminated_at === null
+  );
 
   const {
     control,
@@ -96,12 +101,12 @@ const EmployeeForm = ({ employee }) => {
   const CONTRACT_FIELDS = ["job_title", "contract_type", "hourly_rate"];
 
   const contractDirty =
-    watch("job_title") !== employee?.job_title ||
-    watch("contract_type") !== employee?.contract_type ||
+    watch("job_title") !== orderedContracts[0]?.job_title ||
+    watch("contract_type") !== orderedContracts[0]?.contract_type ||
     watch("hourly_rate") !==
-      (employee?.hourly_rate == null
+      (orderedContracts[0]?.hourly_rate == null
         ? ""
-        : Number(employee.hourly_rate).toFixed(2));
+        : Number(orderedContracts[0]?.hourly_rate).toFixed(2));
 
   const contractFieldsDirty = CONTRACT_FIELDS.some(
     (field) => dirtyFields[field]
@@ -172,32 +177,60 @@ const EmployeeForm = ({ employee }) => {
   };
 
   const handleUpdateContract = async () => {
-    if (!employee?.employee_period_id) return;
+    const newStart = watch("created_at"); // the start date from the form
 
+    if (!newStart) {
+      showToast({
+        type: "error",
+        title: "Start Date Required",
+        message: "Please select a start date for the contract.",
+      });
+      return;
+    }
+
+    // Check for overlapping contracts
+    const invalidStart = orderedContracts.some((contract) => {
+      const start = new Date(contract.created_at);
+      const end = contract.terminated_at
+        ? new Date(contract.terminated_at)
+        : new Date();
+
+      return newStart >= start && newStart <= end; // overlaps existing
+    });
+
+    if (invalidStart) {
+      showToast({
+        type: "error",
+        title: "Invalid Start Date",
+        message: "This start date overlaps with an existing contract.",
+      });
+      return;
+    }
+
+    // No overlaps, proceed with mutation
     await updateContract.mutateAsync({
       employeeId: employee.id,
-      currentPeriodId: employee.employee_period_id,
+      currentPeriodId: orderedContracts[0]?.id, // could be undefined for new employee
       updates: {
         job_title: watch("job_title"),
         contract_type: watch("contract_type"),
         hourly_rate: watch("hourly_rate"),
+        created_at: newStart,
       },
     });
 
     showToast({
       type: "success",
       title: "Contract Updated",
-      message: "A new contract has been created with updated details.",
+      message: `A new contract has been created for ${employee.first_name} ${employee.surname}.`,
     });
 
-    closeModal();
+    setView("history");
   };
 
   const handleTerminateEmployment = async () => {
-    if (!employee?.employee_period_id) return;
-
     await terminateContract.mutateAsync({
-      employeePeriodId: employee.employee_period_id,
+      employeePeriodId: orderedContracts[0].id,
     });
 
     showToast({
@@ -214,17 +247,16 @@ const EmployeeForm = ({ employee }) => {
       reset({
         ...defaultFormData,
         ...employee,
-        hourly_rate:
-          employee.hourly_rate == null
-            ? ""
-            : Number(employee.hourly_rate).toFixed(2),
+        hourly_rate: orderedContracts[0]?.hourly_rate
+          ? Number(orderedContracts[0]?.hourly_rate).toFixed(2)
+          : "",
+        contract_type: orderedContracts[0]?.contract_type || "",
+        job_title: orderedContracts[0]?.job_title || "",
         dob: employee.dob ? new Date(employee.dob) : defaultFormData.dob,
-        start_date: employee.start_date
-          ? new Date(employee.start_date)
-          : defaultFormData.start_date,
+        created_at: new Date(),
       });
     }
-  }, [employee, reset]);
+  }, [employee, reset, orderedContracts]);
 
   return (
     <form
@@ -436,7 +468,7 @@ const EmployeeForm = ({ employee }) => {
         <div className="flex justify-end gap-3 px-6 py-3">
           <CTAButton
             type="cancel"
-            text="Revert"
+            text="Revert Changes"
             icon={RxReset}
             callbackFn={() => reset()}
             disabled={!isDirty || isSubmitting}
@@ -444,7 +476,7 @@ const EmployeeForm = ({ employee }) => {
 
           <CTAButton
             type="success"
-            text="Save"
+            text="Save Details"
             disabled={!isDirty || disableSave || !isValid || isSubmitting}
             icon={GiSaveArrow}
             callbackFn={handleSubmit(handleSaveEmployee)}
@@ -606,11 +638,17 @@ const EmployeeForm = ({ employee }) => {
           <CTAButton
             width="w-1/2"
             type="main"
-            text={view === "edit" ? "View History" : "Edit Contract"}
+            text={
+              view === "edit"
+                ? "View History"
+                : isActive
+                ? "Edit Contract"
+                : "Initiate Contract"
+            }
             icon={GrDocumentUpdate}
             callbackFn={() => setView(view === "edit" ? "history" : "edit")}
           />
-          {employee?.employee_period_id && view === "history" && (
+          {isActive && view === "history" && (
             <CTAButton
               width="w-1/2"
               type="cancel"
@@ -623,7 +661,7 @@ const EmployeeForm = ({ employee }) => {
             <CTAButton
               width="w-1/2"
               type="success"
-              text="Update Contract"
+              text={isActive ? "Update Contract" : "Save Contract"}
               icon={GrDocumentUpdate}
               disabled={isSubmitting || !contractDirty}
               callbackFn={handleUpdateContract}

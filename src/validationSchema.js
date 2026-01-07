@@ -406,17 +406,27 @@ export const EmployeeFormSchema = z.object({
     .string({ required_error: "Job title is required" })
     .min(1, { message: "Job title is required" })
     .nullable(),
+  hourly_rate: z
+    .union([z.string(), z.number()])
+    .transform((val) =>
+      typeof val === "string" && val.trim() !== "" ? parseFloat(val) : null
+    )
+    .nullable(),
+  start_date: z.date({ required_error: "Start date is required" }),
   ni_number: z
     .string()
     .max(15, { message: "NI Number must not exceed 15 characters" }),
   is_driver: z.boolean(),
   is_cscs: z.boolean(),
   contract_type: z
-    .string()
+    .string({ required_error: "Contract type is required" })
     .max(50, { message: "Contract type must not exceed 50 characters" })
     .nullable(),
   hourly_rate: z
-    .union([z.string(), z.number()])
+    .union([
+      z.string(),
+      z.number({ required_error: "Hourly rate is required" }),
+    ])
     .transform((val) =>
       typeof val === "string" && val.trim() !== "" ? parseFloat(val) : null
     )
