@@ -5,14 +5,19 @@ export const useUpdateContract = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ employeeId, currentPeriodId, updates = {} }) => {
+    mutationFn: async ({
+      employeeId,
+      currentPeriodId,
+      updates = {},
+      terminate_previous_at,
+    }) => {
       const now = new Date().toISOString();
 
       // 1️⃣ terminate current contract if it exists
-      if (currentPeriodId) {
+      if (currentPeriodId && terminate_previous_at) {
         const { error: terminateError } = await supabase
           .from("EmployeePeriod")
-          .update({ terminated_at: now })
+          .update({ terminated_at: terminate_previous_at })
           .eq("id", currentPeriodId)
           .is("terminated_at", null);
 

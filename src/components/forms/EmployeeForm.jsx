@@ -37,7 +37,7 @@ const defaultFormData = {
   first_name: "",
   surname: "",
   middle_name: "",
-  gender: "",
+  gender: null,
   job_title: "",
   dob: null,
   email: "",
@@ -67,6 +67,20 @@ const EmployeeForm = ({ employee }) => {
   console.log("Employee with Contracts:", employeeWithContracts);
   const { showToast } = useToast();
   const { closeModal } = useModal();
+
+  const normalise = (d) => {
+    const date = new Date(d);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const subtractOneDay = (d) => {
+    const date = new Date(d);
+    date.setDate(date.getDate() - 1);
+    return date;
+  };
+
+  const newEmployee = employeeWithContracts == undefined;
 
   const orderedContracts = useMemo(() => {
     return (employeeWithContracts?.EmployeePeriod ?? [])
@@ -177,9 +191,9 @@ const EmployeeForm = ({ employee }) => {
   };
 
   const handleUpdateContract = async () => {
-    const newStart = watch("created_at"); // the start date from the form
+    const newStartRaw = watch("created_at");
 
-    if (!newStart) {
+    if (!newStartRaw) {
       showToast({
         type: "error",
         title: "Start Date Required",
@@ -188,29 +202,107 @@ const EmployeeForm = ({ employee }) => {
       return;
     }
 
-    // Check for overlapping contracts
-    const invalidStart = orderedContracts.some((contract) => {
-      const start = new Date(contract.created_at);
-      const end = contract.terminated_at
-        ? new Date(contract.terminated_at)
-        : new Date();
+    const newStart = normalise(newStartRaw);
 
-      return newStart >= start && newStart <= end; // overlaps existing
-    });
+    const activeContract = orderedContracts.find(
+      (c) => c.terminated_at === null
+    );
 
-    if (invalidStart) {
+    const closedContracts = orderedContracts
+      .filter((c) => c.terminated_at !== null)
+      .map((c) => ({
+        ...c,
+        start: normalise(c.created_at),
+        end: normalise(c.terminated_at),
+      }));
+
+    /* --------------------------------------------------
+     CASE 1: Editing an OPEN contract
+  -------------------------------------------------- */
+    if (activeContract) {
+      const activeStart = normalise(activeContract.created_at);
+
+      // ❌ New start cannot be before the active contract start
+      if (newStart < activeStart) {
+        showToast({
+          type: "error",
+          title: "Invalid Start Date",
+          message:
+            "The new contract cannot start before the current contract began.",
+        });
+        return;
+      }
+
+      // ❌ Cannot overlap any earlier closed contract
+      const overlapsClosed = closedContracts.some(
+        (c) => newStart > c.start && newStart < c.end
+      );
+
+      if (overlapsClosed) {
+        showToast({
+          type: "error",
+          title: "Invalid Start Date",
+          message: "This start date overlaps a previous contract period.",
+        });
+        return;
+      }
+
+      // ✅ Close current contract the day before new one starts
+      const terminationDate = subtractOneDay(newStart);
+
+      await updateContract.mutateAsync({
+        employeeId: employee.id,
+        currentPeriodId: activeContract.id,
+        terminate_previous_at: terminationDate, // 👈 backend must apply this
+        updates: {
+          job_title: watch("job_title"),
+          contract_type: watch("contract_type"),
+          hourly_rate: watch("hourly_rate"),
+          created_at: newStart,
+        },
+      });
+
+      showToast({
+        type: "success",
+        title: "Contract Updated",
+        message: `A new contract has been created and the previous one closed.`,
+      });
+
+      setView("history");
+      return;
+    }
+
+    /* --------------------------------------------------
+     CASE 2: Initiating contract (no open contract)
+  -------------------------------------------------- */
+    const lastClosedContract = closedContracts[closedContracts.length - 1]; // most recent closed contract
+    const now = new Date();
+
+    if (newStart > now) {
       showToast({
         type: "error",
         title: "Invalid Start Date",
-        message: "This start date overlaps with an existing contract.",
+        message: "Start date cannot be in the future.",
       });
       return;
     }
 
-    // No overlaps, proceed with mutation
+    if (lastClosedContract && newStart <= new Date(lastClosedContract.end)) {
+      showToast({
+        type: "error",
+        title: "Invalid Start Date",
+        message: `Start date must be after the last contract ended (${format(
+          new Date(lastClosedContract.end),
+          "PPP"
+        )}).`,
+      });
+      return;
+    }
+
+    // ✅ Safe to create first / new contract
     await updateContract.mutateAsync({
       employeeId: employee.id,
-      currentPeriodId: orderedContracts[0]?.id, // could be undefined for new employee
+      currentPeriodId: null,
       updates: {
         job_title: watch("job_title"),
         contract_type: watch("contract_type"),
@@ -221,8 +313,8 @@ const EmployeeForm = ({ employee }) => {
 
     showToast({
       type: "success",
-      title: "Contract Updated",
-      message: `A new contract has been created for ${employee.first_name} ${employee.surname}.`,
+      title: "Contract Created",
+      message: `The contract has been successfully created.`,
     });
 
     setView("history");
@@ -258,11 +350,19 @@ const EmployeeForm = ({ employee }) => {
     }
   }, [employee, reset, orderedContracts]);
 
+  console.log("Errors:", errors);
+  console.log("Dirty Fields:", dirtyFields);
+  console.log("Valid Fields:", isValid);
+  console.log("Is Dirty:", isDirty);
+  console.log("Contract Dirty:", contractDirty);
+  console.log("Disable Save:", disableSave);
+  console.log("Is Valid:", isValid);
+
   return (
     <form
       className="flex h-[80vh] min-w-[80vw] flex-row"
       onSubmit={handleSubmit(handleSaveEmployee)}>
-      <div className="flex flex-col">
+      <div className="flex flex-1 flex-col">
         <div className="flex flex-2 flex-col gap-4 overflow-y-auto p-6">
           {/* Profile section */}
           <div className="flex justify-center">
@@ -483,192 +583,198 @@ const EmployeeForm = ({ employee }) => {
           />
         </div>
       </div>
-      <div className="flex flex-col flex-1">
-        <div className="flex flex-1 flex-col p-6 gap-4 overflow-y-auto">
-          {view === "edit" ? (
-            <div className="history flex flex-col gap-4">
-              <h2 className="text-xl font-semibold text-primary-text mb-1">
-                Edit Contract Details
-              </h2>
-              <Controller
-                name="created_at"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <DatePicker
-                    required
-                    label="Start of Contract"
-                    currentDate={field.value}
-                    onChange={field.onChange}
-                    placeholder="Select start date..."
-                    {...field}
-                    error={fieldState.error}
-                  />
-                )}
-              />
-              {/* Job Title */}
-              <Controller
-                name="job_title"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextInput
-                    required
-                    label="Job Title"
-                    placeholder="e.g. Head Housekeeper"
-                    {...field}
-                    icon={IoBriefcaseOutline}
-                    error={fieldState.error}
-                  />
-                )}
-              />
-              <Controller
-                name="contract_type"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextInput
-                    label="Contract Type"
-                    placeholder="e.g. Full-Time, Part-Time"
-                    icon={IoText}
-                    {...field}
-                    error={fieldState.error}
-                  />
-                )}
-              />
-              <Controller
-                name="hourly_rate"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextInput
-                    dataType="number"
-                    prefix="£"
-                    label="Hourly Rate"
-                    placeholder="e.g. 15.00"
-                    {...field}
-                    error={fieldState.error}
-                    icon={IoBriefcaseOutline}
-                  />
-                )}
-              />
-            </div>
-          ) : (
-            <div className="history">
-              <h2 className="text-xl font-semibold text-primary-text mb-3">
-                Employment History
-              </h2>
-              {isLoading ? (
-                <p className="flex bg-tertiary-bg rounded-lg justify-center items-center py-10 text-secondary-text">
-                  Loading...
-                </p>
-              ) : error ? (
-                <p className="text-red-500 flex bg-tertiary-bg rounded-lg justify-center items-center py-10">
-                  Error loading history.
-                </p>
-              ) : orderedContracts?.length ? (
-                <ul className="flex flex-col gap-3">
-                  {orderedContracts.map((contract) => (
-                    <li
-                      key={contract.id}
-                      className="p-4 bg-tertiary-bg rounded-lg shadow-s space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-secondary-text">Job Title</span>
-                        <span className="text-primary-text font-medium">
-                          {contract.job_title}
-                        </span>
-                      </div>
+      {!newEmployee && (
+        <div className="flex flex-col flex-1">
+          <div className="flex flex-1 flex-col p-6 gap-4 overflow-y-auto">
+            {view === "edit" ? (
+              <div className="history flex flex-col gap-4">
+                <h2 className="text-xl font-semibold text-primary-text mb-1">
+                  Edit Contract Details
+                </h2>
+                <Controller
+                  name="created_at"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <DatePicker
+                      required
+                      label="Start of Contract"
+                      currentDate={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select start date..."
+                      {...field}
+                      error={fieldState.error}
+                    />
+                  )}
+                />
+                {/* Job Title */}
+                <Controller
+                  name="job_title"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <TextInput
+                      required
+                      label="Job Title"
+                      placeholder="e.g. Head Housekeeper"
+                      {...field}
+                      icon={IoBriefcaseOutline}
+                      error={fieldState.error}
+                    />
+                  )}
+                />
+                <Controller
+                  name="contract_type"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <TextInput
+                      label="Contract Type"
+                      placeholder="e.g. Full-Time, Part-Time"
+                      icon={IoText}
+                      {...field}
+                      error={fieldState.error}
+                    />
+                  )}
+                />
+                <Controller
+                  name="hourly_rate"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <TextInput
+                      dataType="number"
+                      prefix="£"
+                      label="Hourly Rate"
+                      placeholder="e.g. 15.00"
+                      {...field}
+                      error={fieldState.error}
+                      icon={IoBriefcaseOutline}
+                    />
+                  )}
+                />
+              </div>
+            ) : (
+              <div className="history">
+                <h2 className="text-xl font-semibold text-primary-text mb-3">
+                  Employment History
+                </h2>
+                {isLoading ? (
+                  <p className="flex bg-tertiary-bg rounded-lg justify-center items-center py-10 text-secondary-text">
+                    Loading...
+                  </p>
+                ) : error ? (
+                  <p className="text-red-500 flex bg-tertiary-bg rounded-lg justify-center items-center py-10">
+                    Error loading history.
+                  </p>
+                ) : orderedContracts?.length ? (
+                  <ul className="flex flex-col gap-3">
+                    {orderedContracts.map((contract) => (
+                      <li
+                        key={contract.id}
+                        className="p-4 bg-tertiary-bg rounded-lg shadow-s space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-secondary-text">Job Title</span>
+                          <span className="text-primary-text font-medium">
+                            {contract.job_title}
+                          </span>
+                        </div>
 
-                      <div className="flex justify-between">
-                        <span className="text-secondary-text">
-                          Contract Type
-                        </span>
-                        <span className="text-primary-text">
-                          {contract.contract_type || "N/A"}
-                        </span>
-                      </div>
+                        <div className="flex justify-between">
+                          <span className="text-secondary-text">
+                            Contract Type
+                          </span>
+                          <span className="text-primary-text">
+                            {contract.contract_type || "N/A"}
+                          </span>
+                        </div>
 
-                      <div className="flex justify-between">
-                        <span className="text-secondary-text">Hourly Rate</span>
-                        <span className="text-primary-text">
-                          {contract.hourly_rate != null
-                            ? `£${Number(contract.hourly_rate).toFixed(2)}`
-                            : "N/A"}
-                        </span>
-                      </div>
+                        <div className="flex justify-between">
+                          <span className="text-secondary-text">
+                            Hourly Rate
+                          </span>
+                          <span className="text-primary-text">
+                            {contract.hourly_rate != null
+                              ? `£${Number(contract.hourly_rate).toFixed(2)}`
+                              : "N/A"}
+                          </span>
+                        </div>
 
-                      <div className="flex justify-between">
-                        <span className="text-secondary-text">Start Date</span>
-                        <span className="text-primary-text">
-                          {new Date(contract.created_at).toLocaleDateString(
-                            "en-GB",
-                            {
-                              weekday: "short",
-                              year: "2-digit",
-                              month: "short",
-                              day: "numeric",
-                            }
-                          )}
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between">
-                        <span className="text-secondary-text">End Date</span>
-                        <span className="text-primary-text">
-                          {contract.terminated_at
-                            ? new Date(
-                                contract.terminated_at
-                              ).toLocaleDateString("en-GB", {
+                        <div className="flex justify-between">
+                          <span className="text-secondary-text">
+                            Start Date
+                          </span>
+                          <span className="text-primary-text">
+                            {new Date(contract.created_at).toLocaleDateString(
+                              "en-GB",
+                              {
                                 weekday: "short",
                                 year: "2-digit",
                                 month: "short",
                                 day: "numeric",
-                              })
-                            : "Present"}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="flex bg-tertiary-bg rounded-lg justify-center items-center py-10 text-secondary-text">
-                  No employment history available.
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="flex justify-end gap-3 py-3 px-6">
-          <CTAButton
-            width="w-1/2"
-            type="main"
-            text={
-              view === "edit"
-                ? "View History"
-                : isActive
-                ? "Edit Contract"
-                : "Initiate Contract"
-            }
-            icon={GrDocumentUpdate}
-            callbackFn={() => setView(view === "edit" ? "history" : "edit")}
-          />
-          {isActive && view === "history" && (
+                              }
+                            )}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span className="text-secondary-text">End Date</span>
+                          <span className="text-primary-text">
+                            {contract.terminated_at
+                              ? new Date(
+                                  contract.terminated_at
+                                ).toLocaleDateString("en-GB", {
+                                  weekday: "short",
+                                  year: "2-digit",
+                                  month: "short",
+                                  day: "numeric",
+                                })
+                              : "Present"}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="flex bg-tertiary-bg rounded-lg justify-center items-center py-10 text-secondary-text">
+                    No employment history available.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-3 py-3 px-6">
             <CTAButton
               width="w-1/2"
-              type="cancel"
-              text="End Employment"
-              icon={RxReset}
-              callbackFn={handleTerminateEmployment}
-            />
-          )}
-          {view === "edit" && (
-            <CTAButton
-              width="w-1/2"
-              type="success"
-              text={isActive ? "Update Contract" : "Save Contract"}
+              type="main"
+              text={
+                view === "edit"
+                  ? "View History"
+                  : isActive
+                  ? "Edit Contract"
+                  : "Initiate Contract"
+              }
               icon={GrDocumentUpdate}
-              disabled={isSubmitting || !contractDirty}
-              callbackFn={handleUpdateContract}
+              callbackFn={() => setView(view === "edit" ? "history" : "edit")}
             />
-          )}
+            {isActive && view === "history" && (
+              <CTAButton
+                width="w-1/2"
+                type="cancel"
+                text="End Employment"
+                icon={RxReset}
+                callbackFn={handleTerminateEmployment}
+              />
+            )}
+            {view === "edit" && (
+              <CTAButton
+                width="w-1/2"
+                type="success"
+                text={isActive ? "Update Contract" : "Save Contract"}
+                icon={GrDocumentUpdate}
+                disabled={isSubmitting || !contractDirty}
+                callbackFn={handleUpdateContract}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </form>
   );
 };

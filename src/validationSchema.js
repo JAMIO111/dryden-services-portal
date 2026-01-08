@@ -380,7 +380,9 @@ export const EmployeeFormSchema = z.object({
   surname: z
     .string({ required_error: "Surname is required" })
     .min(1, { message: "Surname is required" }),
-  address: z.string({ required_error: "Address is required" }),
+  address: z.string({ required_error: "Address is required" }).min(1, {
+    message: "Address is required",
+  }),
   email: z
     .string()
     .email("Invalid email format")
@@ -402,35 +404,11 @@ export const EmployeeFormSchema = z.object({
     .or(z.literal("")),
   dob: z.date({ required_error: "Date of birth is required" }),
   gender: z.string({ required_error: "Gender is required" }),
-  job_title: z
-    .string({ required_error: "Job title is required" })
-    .min(1, { message: "Job title is required" })
-    .nullable(),
-  hourly_rate: z
-    .union([z.string(), z.number()])
-    .transform((val) =>
-      typeof val === "string" && val.trim() !== "" ? parseFloat(val) : null
-    )
-    .nullable(),
-  start_date: z.date({ required_error: "Start date is required" }),
   ni_number: z
     .string()
     .max(15, { message: "NI Number must not exceed 15 characters" }),
   is_driver: z.boolean(),
   is_cscs: z.boolean(),
-  contract_type: z
-    .string({ required_error: "Contract type is required" })
-    .max(50, { message: "Contract type must not exceed 50 characters" })
-    .nullable(),
-  hourly_rate: z
-    .union([
-      z.string(),
-      z.number({ required_error: "Hourly rate is required" }),
-    ])
-    .transform((val) =>
-      typeof val === "string" && val.trim() !== "" ? parseFloat(val) : null
-    )
-    .nullable(),
 });
 
 export const AbsenceFormSchema = z.object({
