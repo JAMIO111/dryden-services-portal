@@ -35,20 +35,6 @@ const CardSelect = ({
 
     let next = [...current, val];
 
-    if (val === "maintenance") {
-      next = next.filter((v) => v !== "changeover");
-    }
-
-    if (val === "changeover") {
-      next = next.filter(
-        (v) =>
-          v === "hot_tub" ||
-          v === "changeover" ||
-          v === "clean" ||
-          v === "laundry"
-      );
-    }
-
     onChange(next);
   };
 

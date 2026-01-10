@@ -1,27 +1,24 @@
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PropertyFormSchema } from "../../validationSchema";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { IoIosMan, IoIosUndo } from "react-icons/io";
-import { FaBed, FaBath, FaCheck, FaTreeCity } from "react-icons/fa6";
-import { IoTrashOutline, IoLocation, IoHome } from "react-icons/io5";
-import {
-  BsMailbox2Flag,
-  BsFillBuildingsFill,
-  BsPencil,
-  BsActivity,
-} from "react-icons/bs";
+import { FaBed, FaBath, FaCheck } from "react-icons/fa6";
+import { IoTrashOutline, IoLocation } from "react-icons/io5";
+import { BsPencil, BsActivity } from "react-icons/bs";
 import { PiNumberThreeFill } from "react-icons/pi";
 import { GiMagicBroom } from "react-icons/gi";
 import { SlLock } from "react-icons/sl";
 import NumericInputGroup from "../NumericInputGroup";
-import TextInput from "../ui/TextInput";
+import TimePicker from "../ui/TimePicker";
 import { usePropertyByName } from "@/hooks/usePropertyByName";
 import CTAButton from "../CTAButton";
+import TextInput from "../ui/TextInput";
 import { useModal } from "@/contexts/ModalContext";
 import KeyCodeForm from "./KeyCodeForm";
 import PropertyOwnerForm from "./PropertyOwnerForm";
+import PropertyAddressForm from "./PropertyAddressForm";
 import { useUpsertProperty } from "@/hooks/useUpsertProperty";
 import CardSelect from "@components/CardSelect";
 import { usePackages } from "@/hooks/useManagementPackages";
@@ -38,6 +35,8 @@ import { useCreateNotification } from "@/hooks/useCreateNotification";
 import RHFTextAreaInput from "../ui/RHFTextArea";
 import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { FaRegNoteSticky } from "react-icons/fa6";
+import { LuUser } from "react-icons/lu";
+import { BiBuildingHouse } from "react-icons/bi";
 
 const defaultFormData = {
   id: undefined,
@@ -88,6 +87,16 @@ const PropertyForm = () => {
     defaultValues: { ...defaultFormData, ...(property || {}) },
     delayError: 250,
   });
+
+  const hasAddressError = Boolean(
+    errors?.name ||
+      errors?.line_1 ||
+      errors?.line_2 ||
+      errors?.town ||
+      errors?.county ||
+      errors?.postcode ||
+      errors?.what_3_words
+  );
 
   const {
     fields: keyCodeFields,
@@ -174,6 +183,21 @@ const PropertyForm = () => {
     });
   };
 
+  const openEditAddressModal = () => {
+    openModal({
+      title: "Edit Address",
+      content: (
+        <div className="p-3">
+          <PropertyAddressForm control={control} />
+
+          <div className="flex justify-end gap-2 mt-4">
+            <CTAButton type="cancel" text="Close" callbackFn={closeModal} />
+          </div>
+        </div>
+      ),
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center flex-1 w-full">
@@ -202,62 +226,55 @@ const PropertyForm = () => {
               }}
             />
           </div>
+
           <div className="flex flex-1 p-3 overflow-y-auto flex-col">
-            <div className="mb-2">
-              <Controller
-                name="name"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextInput
-                    required
-                    label="Property Name"
-                    placeholder="Enter property name..."
-                    {...field}
-                    icon={IoHome}
-                    error={fieldState.error}
-                  />
-                )}
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-primary-text tracking-tight">
+                Property Details
+              </h2>
+
+              <CTAButton
+                type="main"
+                text="Edit Details"
+                callbackFn={openEditAddressModal}
               />
             </div>
 
-            <Controller
-              name="bedrooms"
-              control={control}
-              render={({ field, fieldState }) => (
-                <NumericInputGroup
-                  label="Bedrooms"
-                  {...field}
-                  icon={FaBed}
-                  error={fieldState.error}
-                />
-              )}
-            />
+            {/* Card */}
+            <div
+              className={`rounded-xl bg-tertiary-bg p-4 mb-3 shadow-s ${
+                hasAddressError ? "border border-error-color" : ""
+              }`}>
+              <h3 className="text-base font-semibold pl-7 text-primary-text mb-3">
+                {watch("name") || "No Name Provided"}
+              </h3>
 
-            <Controller
-              name="sleeps"
-              control={control}
-              render={({ field, fieldState }) => (
-                <NumericInputGroup
-                  label="Sleeps"
-                  {...field}
-                  icon={IoIosMan}
-                  error={fieldState.error}
-                />
-              )}
-            />
+              <div className="flex items-start mb-3 gap-3 text-sm text-secondary-text">
+                <IoLocation className="mt-0.5 h-4 w-4 text-secondary-text shrink-0" />
 
-            <Controller
-              name="bathrooms"
-              control={control}
-              render={({ field, fieldState }) => (
-                <NumericInputGroup
-                  label="Bathrooms"
-                  {...field}
-                  icon={FaBath}
-                  error={fieldState.error}
-                />
-              )}
-            />
+                <div className="flex flex-col leading-snug">
+                  {watch("line_1") && <span>{watch("line_1")}</span>}
+
+                  {watch("line_2") && <span>{watch("line_2")}</span>}
+
+                  {(watch("town") || watch("county") || watch("postcode")) && (
+                    <span>
+                      {[watch("town"), watch("county"), watch("postcode")]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 text-sm text-secondary-text">
+                <PiNumberThreeFill className="mt-0.5 h-4 w-4 text-secondary-text shrink-0" />
+                <span className="text-sm text-secondary-text">
+                  {watch("what_3_words") || "W3W not set"}
+                </span>
+              </div>
+            </div>
             <ToggleButton
               label="Active Status"
               checked={watch("is_active")}
@@ -272,68 +289,96 @@ const PropertyForm = () => {
         </div>
       </div>
       <div className="flex-1">
-        <div className="flex h-full justify-between flex-1 p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
-          {[
-            {
-              name: "line_1",
-              label: "Line 1",
-              icon: IoLocation,
-              textTransform: "capitalize",
-              required: true,
-            },
-            {
-              name: "line_2",
-              label: "Line 2",
-              icon: IoLocation,
-              textTransform: "capitalize",
-              required: false,
-            },
-            {
-              name: "town",
-              label: "Town",
-              icon: BsFillBuildingsFill,
-              textTransform: "capitalize",
-              required: true,
-            },
-            {
-              name: "county",
-              label: "County",
-              icon: FaTreeCity,
-              textTransform: "capitalize",
-              required: true,
-            },
-            {
-              name: "postcode",
-              label: "Postcode",
-              icon: BsMailbox2Flag,
-              textTransform: "uppercase",
-              required: true,
-            },
-            {
-              name: "what_3_words",
-              label: "What 3 Words",
-              icon: PiNumberThreeFill,
-              textTransform: "lowercase",
-              required: true,
-            },
-          ].map((input) => (
-            <Controller
-              key={input.name}
-              name={input.name}
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextInput
-                  required={input.required}
-                  label={input.label}
-                  placeholder={`Enter ${input.label.toLowerCase()}...`}
-                  {...field}
-                  icon={input.icon}
-                  error={fieldState.error}
-                  textTransform={input.textTransform}
-                />
-              )}
-            />
-          ))}
+        <div className="flex h-full justify-start flex-1 p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
+          <Controller
+            name="bedrooms"
+            control={control}
+            render={({ field, fieldState }) => (
+              <NumericInputGroup
+                label="Bedrooms"
+                {...field}
+                icon={FaBed}
+                error={fieldState.error}
+              />
+            )}
+          />
+
+          <Controller
+            name="sleeps"
+            control={control}
+            render={({ field, fieldState }) => (
+              <NumericInputGroup
+                label="Sleeps"
+                {...field}
+                icon={IoIosMan}
+                error={fieldState.error}
+              />
+            )}
+          />
+
+          <Controller
+            name="bathrooms"
+            control={control}
+            render={({ field, fieldState }) => (
+              <NumericInputGroup
+                label="Bathrooms"
+                {...field}
+                icon={FaBath}
+                error={fieldState.error}
+              />
+            )}
+          />
+
+          <Controller
+            name="property_ref"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextInput
+                label="Property Reference"
+                placeholder="Enter property reference..."
+                {...field}
+                icon={BiBuildingHouse}
+                error={fieldState.error}
+              />
+            )}
+          />
+          <Controller
+            name="owner_ref"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextInput
+                label="Owner Reference"
+                placeholder="Enter owner reference..."
+                {...field}
+                icon={LuUser}
+                error={fieldState.error}
+              />
+            )}
+          />
+          <Controller
+            name="check_in"
+            control={control}
+            render={({ field }) => (
+              <TimePicker
+                label="Check In Time"
+                value={field.value}
+                onChange={field.onChange}
+                interval={15}
+              />
+            )}
+          />
+          <Controller
+            name="check_out"
+            control={control}
+            render={({ field }) => (
+              <TimePicker
+                label="Check Out Time"
+                value={field.value}
+                onChange={field.onChange}
+                interval={15}
+              />
+            )}
+          />
         </div>
       </div>
       <div className="flex flex-col flex-1 gap-3">
@@ -362,11 +407,6 @@ const PropertyForm = () => {
             render={({ field, fieldState }) => (
               <CardSelect
                 options={[
-                  {
-                    id: "changeover",
-                    name: "Changeover",
-                    icon: MdPublishedWithChanges,
-                  },
                   { id: "hot_tub", name: "Hot Tub", icon: MdHotTub },
                   {
                     id: "laundry",
@@ -378,6 +418,11 @@ const PropertyForm = () => {
                     id: "maintenance",
                     name: "Maintenance",
                     icon: HiOutlineWrenchScrewdriver,
+                  },
+                  {
+                    id: "changeover",
+                    name: "Changeover",
+                    icon: MdPublishedWithChanges,
                   },
                 ]}
                 multiSelect={true}
