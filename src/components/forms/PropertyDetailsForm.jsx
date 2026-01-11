@@ -1,6 +1,7 @@
 import { Controller } from "react-hook-form";
 import { FaBed, FaBath } from "react-icons/fa6";
 import { IoIosMan } from "react-icons/io";
+import { BsBuildingGear } from "react-icons/bs";
 import { BiBuildingHouse } from "react-icons/bi";
 import { LuUser } from "react-icons/lu";
 import DatePicker from "../ui/DatePicker";
@@ -106,6 +107,19 @@ const PropertyDetailsForm = ({ control }) => {
                 currentDate={value}
                 onChange={onChange}
                 displayMode="time"
+              />
+            )}
+          />
+          <Controller
+            name="letting_agent"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextInput
+                label="Letting Agent"
+                placeholder="Enter letting agent..."
+                icon={BsBuildingGear}
+                {...field}
+                error={fieldState.error}
               />
             )}
           />
