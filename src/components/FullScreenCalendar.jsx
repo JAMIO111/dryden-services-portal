@@ -5,6 +5,7 @@ import DailyCalendarItems from "@components/DailyCalendarItems";
 import SlidingSelectorGeneric from "./ui/SlidingSelectorGeneric";
 import { useCalendarItems } from "@/hooks/useCalendarItems";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { GoPlus } from "react-icons/go";
 
 // --- UTC helpers to avoid DST issues ---
 function getSundayUTC(date) {
@@ -98,6 +99,13 @@ export default function FullScreenCalendar() {
     const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
     return weekNo;
   }
+
+  const handleNewItem = () => {
+    openModal({
+      title: "Insert New Calendar Item",
+      content: <NewCalendarItemForm date={selectedDate} />,
+    });
+  };
 
   // --- Navigation
   const goNext = () => {
@@ -439,6 +447,15 @@ export default function FullScreenCalendar() {
                   normalizedDate
                 )}, ${normalizedDate.getUTCFullYear()}`}
           </h1>
+          <div className="flex gap-2 items-center shadow-s bg-secondary-bg p-1 rounded-xl">
+            <CTAButton
+              icon={GoPlus}
+              width="w-28"
+              type="main"
+              text="Insert Item"
+              callbackFn={handleNewItem}
+            />
+          </div>
           <div className="flex w-60 items-center gap-4">
             <SlidingSelectorGeneric
               options={["Weekly", "Monthly"]}

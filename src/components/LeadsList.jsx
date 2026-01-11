@@ -4,15 +4,22 @@ import { LuArrowUpRight } from "react-icons/lu";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { IoAddOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLeads } from "@/hooks/useLeads";
 import { useModal } from "@/contexts/ModalContext";
 import LeadForm from "./forms/LeadForm.jsx";
+import ToggleButton from "./ui/ToggleButton";
 
 export default function LeadList() {
   const { openModal } = useModal();
   const navigate = useNavigate();
+  const [statusFilter, setStatusFilter] = useState("Open");
   const { data: leads, isLoading } = useLeads();
+  const filteredLeads =
+    statusFilter === "All"
+      ? leads
+      : leads?.filter((lead) => lead.status !== "Converted");
+
   const statusColor = {
     New: "bg-pink-400/20 text-pink-500",
     "Hot Lead": "bg-red-400/20 text-red-500",
@@ -74,13 +81,26 @@ export default function LeadList() {
               {leads?.length} Open leads to manage
             </p>
           </div>
-          <CTAButton
-            icon={IoAddOutline}
-            width="w-auto"
-            type="main"
-            text="Add New Lead"
-            callbackFn={handleAddLead}
-          />
+          <div className="flex flex-1 justify-end gap-3">
+            <div className="w-34">
+              <ToggleButton
+                checked={statusFilter === "All"}
+                onChange={() =>
+                  setStatusFilter(statusFilter === "All" ? "Open" : "All")
+                }
+                trueLabel="All"
+                falseLabel="Open"
+                verticalPadding={"py-1.5"}
+              />
+            </div>
+            <CTAButton
+              icon={IoAddOutline}
+              width="w-auto"
+              type="main"
+              text="Add New Lead"
+              callbackFn={handleAddLead}
+            />
+          </div>
         </div>
 
         {/* Scrollable cards */}
@@ -91,7 +111,7 @@ export default function LeadList() {
                 Loading leads...
               </p>
             </div>
-          ) : leads?.length === 0 ? (
+          ) : filteredLeads?.length === 0 ? (
             <div className="flex bg-tertiary-bg rounded-2xl shadow-s flex-col justify-center items-center h-40 text-secondary-text">
               <Building2 className="w-8 h-8 opacity-60 mb-3" />
               <p>No leads found</p>
@@ -100,7 +120,7 @@ export default function LeadList() {
               </p>
             </div>
           ) : (
-            leads.map((lead) => (
+            filteredLeads.map((lead) => (
               <div
                 key={lead.id}
                 className="bg-primary-bg p-1.5 rounded-2xl shadow-s transition-shadow duration-200 hover:shadow-m">

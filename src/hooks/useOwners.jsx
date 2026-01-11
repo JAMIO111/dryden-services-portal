@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
 
 const fetchOwners = async () => {
-  const { data, error } = await supabase.from("Owners").select("*");
+  const { data, error } = await supabase
+    .from("Owners")
+    .select("*, Leads(id, title)");
   if (error) throw new Error(error.message);
   return data;
 };

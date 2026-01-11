@@ -16,6 +16,7 @@ import { IoKeySharp } from "react-icons/io5";
 import { HiOutlineHomeModern } from "react-icons/hi2";
 import { TbExternalLink } from "react-icons/tb";
 import { FaHouseChimneyUser } from "react-icons/fa6";
+import { Building2 } from "lucide-react";
 
 const OwnerDetails = ({ owner }) => {
   const { openModal } = useModal();
@@ -27,6 +28,7 @@ const OwnerDetails = ({ owner }) => {
   const [selectedProperty, setSelectedProperty] = useState(null);
 
   console.log("selected property:", selectedProperty);
+  console.log("Owner:", owner);
 
   // Set default property when data loads
   useEffect(() => {
@@ -158,96 +160,122 @@ const OwnerDetails = ({ owner }) => {
 
               {/* Full Info */}
               <div className="border flex-1 py-3 gap-3 flex flex-col border-border-color rounded-2xl bg-tertiary-bg overflow-hidden">
-                <div className="px-5 flex flex-row justify-between items-center gap-5">
-                  <div className="flex flex-row items-center gap-2">
-                    <IoText className="text-primary-text w-4 h-4 shrink-0" />
-                    <h3 className="font-semibold text-primary-text">
-                      First Name
-                    </h3>
-                  </div>
-                  <p className="text-sm text-primary-text">
-                    {owner?.first_name}
-                  </p>
-                </div>
-                {owner?.middle_name && (
+                <div className="flex flex-col gap-3 flex-1">
                   <div className="px-5 flex flex-row justify-between items-center gap-5">
                     <div className="flex flex-row items-center gap-2">
                       <IoText className="text-primary-text w-4 h-4 shrink-0" />
                       <h3 className="font-semibold text-primary-text">
-                        Middle Name
+                        First Name
                       </h3>
                     </div>
                     <p className="text-sm text-primary-text">
-                      {owner?.middle_name}
+                      {owner?.first_name}
                     </p>
                   </div>
-                )}
-                <div className="px-5 flex flex-row justify-between items-center gap-5">
-                  <div className="flex flex-row items-center gap-2">
-                    <IoText className="text-primary-text w-4 h-4 shrink-0" />
-                    <h3 className="font-semibold text-primary-text">Surname</h3>
+                  {owner?.middle_name && (
+                    <div className="px-5 flex flex-row justify-between items-center gap-5">
+                      <div className="flex flex-row items-center gap-2">
+                        <IoText className="text-primary-text w-4 h-4 shrink-0" />
+                        <h3 className="font-semibold text-primary-text">
+                          Middle Name
+                        </h3>
+                      </div>
+                      <p className="text-sm text-primary-text">
+                        {owner?.middle_name}
+                      </p>
+                    </div>
+                  )}
+                  <div className="px-5 flex flex-row justify-between items-center gap-5">
+                    <div className="flex flex-row items-center gap-2">
+                      <IoText className="text-primary-text w-4 h-4 shrink-0" />
+                      <h3 className="font-semibold text-primary-text">
+                        Surname
+                      </h3>
+                    </div>
+                    <p className="text-sm text-primary-text">
+                      {owner?.surname}
+                    </p>
                   </div>
-                  <p className="text-sm text-primary-text">{owner?.surname}</p>
-                </div>
-                <div className="px-5 flex flex-row justify-between items-center gap-5">
-                  <div className="flex flex-row items-center gap-2">
-                    <HiOutlinePhone className="text-primary-text w-4 h-4 shrink-0" />
-                    <h3 className="font-semibold text-primary-text">
-                      Primary Phone
-                    </h3>
-                  </div>
-                  <p className="text-sm text-primary-text">
-                    {owner?.primary_phone || "No Phone No."}
-                  </p>
-                </div>
-                {owner?.secondary_phone && (
                   <div className="px-5 flex flex-row justify-between items-center gap-5">
                     <div className="flex flex-row items-center gap-2">
                       <HiOutlinePhone className="text-primary-text w-4 h-4 shrink-0" />
                       <h3 className="font-semibold text-primary-text">
-                        Secondary Phone
+                        Primary Phone
                       </h3>
                     </div>
                     <p className="text-sm text-primary-text">
-                      {owner?.secondary_phone}
+                      {owner?.primary_phone || "No Phone No."}
                     </p>
                   </div>
-                )}
-                <div className="px-5 flex flex-row justify-between items-center gap-5">
-                  <div className="flex flex-row items-center gap-2">
-                    <TfiEmail className="text-primary-text w-4 h-4 shrink-0" />
-                    <h3 className="font-semibold text-primary-text">
-                      Primary Email
-                    </h3>
-                  </div>
-                  <p className="text-sm text-primary-text">
-                    {owner?.primary_email || "No Email"}
-                  </p>
-                </div>
-                {owner?.secondary_email && (
+                  {owner?.secondary_phone && (
+                    <div className="px-5 flex flex-row justify-between items-center gap-5">
+                      <div className="flex flex-row items-center gap-2">
+                        <HiOutlinePhone className="text-primary-text w-4 h-4 shrink-0" />
+                        <h3 className="font-semibold text-primary-text">
+                          Secondary Phone
+                        </h3>
+                      </div>
+                      <p className="text-sm text-primary-text">
+                        {owner?.secondary_phone}
+                      </p>
+                    </div>
+                  )}
                   <div className="px-5 flex flex-row justify-between items-center gap-5">
                     <div className="flex flex-row items-center gap-2">
                       <TfiEmail className="text-primary-text w-4 h-4 shrink-0" />
                       <h3 className="font-semibold text-primary-text">
-                        Secondary Email
+                        Primary Email
                       </h3>
                     </div>
                     <p className="text-sm text-primary-text">
-                      {owner?.secondary_email}
+                      {owner?.primary_email || "No Email"}
                     </p>
                   </div>
-                )}
-                <div className="px-5 flex flex-row justify-between items-center gap-5">
-                  <div className="flex flex-row items-center gap-2">
-                    <IoLocationOutline className="text-primary-text w-4 h-4 shrink-0" />
-                    <h3 className="font-semibold text-primary-text">
-                      Location
-                    </h3>
+                  {owner?.secondary_email && (
+                    <div className="px-5 flex flex-row justify-between items-center gap-5">
+                      <div className="flex flex-row items-center gap-2">
+                        <TfiEmail className="text-primary-text w-4 h-4 shrink-0" />
+                        <h3 className="font-semibold text-primary-text">
+                          Secondary Email
+                        </h3>
+                      </div>
+                      <p className="text-sm text-primary-text">
+                        {owner?.secondary_email}
+                      </p>
+                    </div>
+                  )}
+                  <div className="px-5 flex flex-row justify-between items-center gap-5">
+                    <div className="flex flex-row items-center gap-2">
+                      <IoLocationOutline className="text-primary-text w-4 h-4 shrink-0" />
+                      <h3 className="font-semibold text-primary-text">
+                        Location
+                      </h3>
+                    </div>
+                    <p className="text-sm text-primary-text">
+                      {owner?.location || "No Location"}
+                    </p>
                   </div>
-                  <p className="text-sm text-primary-text">
-                    {owner?.location || "No Location"}
-                  </p>
                 </div>
+                {owner.lead_id && (
+                  <div className="px-5 flex flex-row justify-between items-center gap-5">
+                    <div className="flex flex-row items-center gap-2">
+                      <Building2 className="text-primary-text w-4 h-4 shrink-0" />
+                      <h3 className="font-semibold text-primary-text">
+                        Owner converted from Lead
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `/Client-Management/Leads/${owner.Leads.title}`
+                        )
+                      }
+                      className="text-sm cursor-pointer active:scale-97 shadow-s bg-text-input-color hover:shadow-m rounded-lg p-2 text-primary-text">
+                      <TbExternalLink className="inline-block mr-2 w-4 h-4" />
+                      View Lead Details
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

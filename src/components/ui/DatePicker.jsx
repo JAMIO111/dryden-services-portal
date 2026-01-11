@@ -50,8 +50,24 @@ const DatePicker = ({
   const [currentYear, setCurrentYear] = useState(new Date());
   const [mode, setMode] = useState(""); // "date" | "time"
   const [open, setOpen] = useState(false);
-
   const ref = useRef(null);
+
+  const normalizeDate = (value) => {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value)) return value;
+
+    if (typeof value === "string" && value.includes(":")) {
+      const [h, m, s = 0] = value.split(":").map(Number);
+      const d = new Date();
+      d.setHours(h, m, s, 0);
+      return d;
+    }
+
+    const parsed = new Date(value);
+    return isNaN(parsed) ? null : parsed;
+  };
+
+  const safeDate = normalizeDate(currentDate);
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -64,9 +80,9 @@ const DatePicker = ({
 
   const handleSelectDate = (date) => {
     const updated = new Date(date);
-    if (currentDate) {
-      updated.setHours(new Date(currentDate).getHours());
-      updated.setMinutes(new Date(currentDate).getMinutes());
+    if (safeDate) {
+      updated.setHours(new Date(safeDate).getHours());
+      updated.setMinutes(new Date(safeDate).getMinutes());
     }
     onChange(updated);
     setCurrentMonth(date);
@@ -75,7 +91,7 @@ const DatePicker = ({
   };
 
   const handleTimeChange = (type, value) => {
-    const newDate = new Date(currentDate || new Date());
+    const newDate = new Date(safeDate || new Date());
     if (type === "hours") newDate.setHours(value);
     if (type === "minutes") newDate.setMinutes(value);
     onChange(newDate);
@@ -121,8 +137,8 @@ const DatePicker = ({
   const minutes = Array.from({ length: 12 }, (_, i) => i * 5);
 
   useEffect(() => {
-    if (open && currentDate) {
-      const d = new Date(currentDate);
+    if (open && safeDate) {
+      const d = new Date(safeDate);
       setCurrentMonth(d);
       setCurrentYear(d);
     } else if (open && defaultPageDate) {
@@ -130,7 +146,7 @@ const DatePicker = ({
       setCurrentMonth(d);
       setCurrentYear(d);
     }
-  }, [open, currentDate, defaultPageDate]);
+  }, [open, safeDate, defaultPageDate]);
 
   return (
     <div
@@ -178,10 +194,10 @@ const DatePicker = ({
           ) : (
             <TbClock className="w-5 h-5 text-primary-text" />
           )}
-          <span className={`ml-2 ${!currentDate ? "text-sm text-muted" : ""}`}>
-            {currentDate
+          <span className={`ml-2 ${!safeDate ? "text-sm text-muted" : ""}`}>
+            {safeDate
               ? format(
-                  currentDate,
+                  safeDate,
                   displayMode === "date"
                     ? "EEE, PPP"
                     : displayMode === "time"
@@ -239,8 +255,7 @@ const DatePicker = ({
                 <div className="grid grid-cols-7 text-center gap-1 text-primary-text">
                   {calendarDays.map((day, i) => {
                     if (!day) return <div key={i} />;
-                    const isSelected =
-                      currentDate && isSameDay(day, currentDate);
+                    const isSelected = safeDate && isSameDay(day, safeDate);
                     const isCurrentDay = isToday(day);
                     const classes = [
                       "h-7 w-7 rounded-lg cursor-pointer text-primary-text hover:bg-brand-primary/30 flex items-center justify-center",
@@ -296,7 +311,7 @@ const DatePicker = ({
                         i
                       );
                       const isSelectedMonth =
-                        currentDate && isSameMonth(monthDate, currentDate);
+                        safeDate && isSameMonth(monthDate, safeDate);
                       const isTodayMonth =
                         isSameMonth(monthDate, today) &&
                         isSameYear(monthDate, today);
@@ -331,7 +346,7 @@ const DatePicker = ({
               <label className="text-primary-text">Select Time</label>
               <div className="flex gap-3">
                 <select
-                  value={(new Date(currentDate) || today).getHours()}
+                  value={(new Date(safeDate) || today).getHours()}
                   onChange={(e) =>
                     handleTimeChange("hours", parseInt(e.target.value))
                   }
@@ -344,7 +359,7 @@ const DatePicker = ({
                 </select>
                 <p className="text-lg text-primary-text font-semibold">:</p>
                 <select
-                  value={(new Date(currentDate) || today).getMinutes()}
+                  value={(new Date(safeDate) || today).getMinutes()}
                   onChange={(e) =>
                     handleTimeChange("minutes", parseInt(e.target.value))
                   }

@@ -21,6 +21,7 @@ const LeadDetails = () => {
     "Hot Lead": "bg-red-400/20 text-red-500",
     "Follow-up": "bg-yellow-400/20 text-yellow-500",
     "Cold Lead": "bg-blue-400/20 text-blue-500",
+    Converted: "bg-green-400/20 text-green-500",
   };
 
   const engagementItems = [
@@ -123,42 +124,44 @@ const LeadDetails = () => {
       </div>
 
       {/* RIGHT PANEL - Add New Engagement */}
-      <div className="bg-secondary-bg flex flex-col flex-4 overflow-hidden rounded-3xl border border-border-color h-full">
-        {/* Fixed Header */}
-        <div className="p-4 border-b border-border-color sticky top-0 bg-secondary-bg z-10">
-          <h2 className="text-lg text-primary-text font-semibold mb-2">
-            {selectedTab === "Lead Details"
-              ? "Edit Lead Details"
-              : selectedTab === "Meeting"
-              ? "Add New Meeting"
-              : "Add New Correspondence"}
-          </h2>
-          <SlidingSelector
-            options={["Lead Details", "Meeting", "Correspondence"]}
-            value={selectedTab}
-            onChange={setSelectedTab}
-          />
-        </div>
+      {lead?.status !== "Converted" && (
+        <div className="bg-secondary-bg flex flex-col flex-4 overflow-hidden rounded-3xl border border-border-color h-full">
+          {/* Fixed Header */}
+          <div className="p-4 border-b border-border-color sticky top-0 bg-secondary-bg z-10">
+            <h2 className="text-lg text-primary-text font-semibold mb-2">
+              {selectedTab === "Lead Details"
+                ? "Edit Lead Details"
+                : selectedTab === "Meeting"
+                ? "Add New Meeting"
+                : "Add New Correspondence"}
+            </h2>
+            <SlidingSelector
+              options={["Lead Details", "Meeting", "Correspondence"]}
+              value={selectedTab}
+              onChange={setSelectedTab}
+            />
+          </div>
 
-        {/* Scrollable Form Section */}
-        {lead?.id ? (
-          <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:hidden">
-            {selectedTab === "Correspondence" && (
-              <CorrespondenceForm leadId={lead?.id} leadTitle={lead?.title} />
-            )}
-            {selectedTab === "Meeting" && (
-              <MeetingForm leadId={lead?.id} leadTitle={lead?.title} />
-            )}
-            {selectedTab === "Lead Details" && (
-              <LeadForm lead={lead} navigate={navigate} />
-            )}
-          </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-secondary-text">
-            Loading details...
-          </div>
-        )}
-      </div>
+          {/* Scrollable Form Section */}
+          {lead?.id ? (
+            <div className="flex-1 overflow-y-auto p-4 [&::-webkit-scrollbar]:hidden">
+              {selectedTab === "Correspondence" && (
+                <CorrespondenceForm leadId={lead?.id} leadTitle={lead?.title} />
+              )}
+              {selectedTab === "Meeting" && (
+                <MeetingForm leadId={lead?.id} leadTitle={lead?.title} />
+              )}
+              {selectedTab === "Lead Details" && (
+                <LeadForm lead={lead} navigate={navigate} />
+              )}
+            </div>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-secondary-text">
+              Loading details...
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

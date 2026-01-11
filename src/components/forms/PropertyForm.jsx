@@ -1,42 +1,43 @@
+import { useEffect } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PropertyFormSchema } from "../../validationSchema";
-import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { IoIosMan, IoIosUndo } from "react-icons/io";
-import { FaBed, FaBath, FaCheck } from "react-icons/fa6";
+import { useQueryClient } from "@tanstack/react-query";
+
+/* Icons */
+import { IoIosUndo } from "react-icons/io";
 import { IoTrashOutline, IoLocation } from "react-icons/io5";
-import { BsPencil, BsActivity } from "react-icons/bs";
+import { BsActivity, BsPencil, BsBuildingGear } from "react-icons/bs";
+import { TbClock, TbIroning3 } from "react-icons/tb";
+import { FaCheck } from "react-icons/fa6";
+import { HiOutlineMail } from "react-icons/hi";
+import { HiOutlinePhone, HiOutlineWrenchScrewdriver } from "react-icons/hi2";
+import { MdHotTub, MdPublishedWithChanges } from "react-icons/md";
+import { BiBuildingHouse } from "react-icons/bi";
+import { LuUser } from "react-icons/lu";
 import { PiNumberThreeFill } from "react-icons/pi";
 import { GiMagicBroom } from "react-icons/gi";
 import { SlLock } from "react-icons/sl";
-import NumericInputGroup from "../NumericInputGroup";
-import TimePicker from "../ui/TimePicker";
+
+/* App / hooks */
+import { PropertyFormSchema } from "../../validationSchema";
 import { usePropertyByName } from "@/hooks/usePropertyByName";
-import CTAButton from "../CTAButton";
-import TextInput from "../ui/TextInput";
+import { useUpsertProperty } from "@/hooks/useUpsertProperty";
+import { usePackages } from "@/hooks/useManagementPackages";
+import { useCreateNotification } from "@/hooks/useCreateNotification";
 import { useModal } from "@/contexts/ModalContext";
+import { useToast } from "@/contexts/ToastProvider";
+
+/* Components */
+import CTAButton from "../CTAButton";
+import Spinner from "@components/LoadingSpinner";
+import ToggleButton from "../ui/ToggleButton";
+import CardSelect from "@components/CardSelect";
+import ProfileImageSection from "../ProfileImageSection";
 import KeyCodeForm from "./KeyCodeForm";
 import PropertyOwnerForm from "./PropertyOwnerForm";
 import PropertyAddressForm from "./PropertyAddressForm";
-import { useUpsertProperty } from "@/hooks/useUpsertProperty";
-import CardSelect from "@components/CardSelect";
-import { usePackages } from "@/hooks/useManagementPackages";
-import { HiOutlinePhone } from "react-icons/hi2";
-import { HiOutlineMail } from "react-icons/hi";
-import { MdHotTub, MdPublishedWithChanges } from "react-icons/md";
-import { TbIroning3 } from "react-icons/tb";
-import Spinner from "@components/LoadingSpinner";
-import { useToast } from "../../contexts/ToastProvider";
-import ToggleButton from "../ui/ToggleButton";
-import ProfileImageSection from "../ProfileImageSection";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCreateNotification } from "@/hooks/useCreateNotification";
-import RHFTextAreaInput from "../ui/RHFTextArea";
-import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
-import { FaRegNoteSticky } from "react-icons/fa6";
-import { LuUser } from "react-icons/lu";
-import { BiBuildingHouse } from "react-icons/bi";
+import PropertyDetailsForm from "./PropertyDetailsForm";
 
 const defaultFormData = {
   id: undefined,
@@ -87,6 +88,22 @@ const PropertyForm = () => {
     defaultValues: { ...defaultFormData, ...(property || {}) },
     delayError: 250,
   });
+
+  const formatTo12Hour = (time) => {
+    if (!time) return "Not set";
+
+    const [h, m] = time.split(":").map(Number);
+    const date = new Date();
+    date.setHours(h, m, 0, 0);
+
+    return date
+      .toLocaleTimeString("en-GB", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
+      .replace(/am|pm/, (match) => match.toUpperCase());
+  };
 
   const hasAddressError = Boolean(
     errors?.name ||
@@ -198,6 +215,21 @@ const PropertyForm = () => {
     });
   };
 
+  const openEditDetailsModal = () => {
+    openModal({
+      title: "Edit Property Details",
+      content: (
+        <div className="p-3 max-h-[80vh] min-w-[60vw] overflow-y-auto">
+          <PropertyDetailsForm control={control} />
+
+          <div className="flex justify-end gap-2 mt-4">
+            <CTAButton type="cancel" text="Close" callbackFn={closeModal} />
+          </div>
+        </div>
+      ),
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center flex-1 w-full">
@@ -207,7 +239,7 @@ const PropertyForm = () => {
   }
 
   return (
-    <div className="flex bg-primary-bg h-full flex-row p-3 gap-3">
+    <div className="grid bg-primary-bg h-full p-3 gap-3 grid-cols-4">
       <div className="flex flex-1 gap-3 flex-col">
         <div className="flex flex-1 overflow-y-auto justify-between flex-col bg-secondary-bg shadow-m rounded-2xl">
           <div className="p-3">
@@ -231,12 +263,12 @@ const PropertyForm = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-primary-text tracking-tight">
-                Property Details
+                Property Address
               </h2>
 
               <CTAButton
                 type="main"
-                text="Edit Details"
+                text="Edit Address"
                 callbackFn={openEditAddressModal}
               />
             </div>
@@ -288,100 +320,78 @@ const PropertyForm = () => {
           </div>
         </div>
       </div>
-      <div className="flex-1">
-        <div className="flex h-full justify-start flex-1 p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
-          <Controller
-            name="bedrooms"
-            control={control}
-            render={({ field, fieldState }) => (
-              <NumericInputGroup
-                label="Bedrooms"
-                {...field}
-                icon={FaBed}
-                error={fieldState.error}
-              />
-            )}
-          />
+      <div className="h-full flex flex-1 flex-col gap-3">
+        <div className="flex justify-start flex-1 p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-primary-text tracking-tight">
+              Additional Details
+            </h2>
 
-          <Controller
-            name="sleeps"
-            control={control}
-            render={({ field, fieldState }) => (
-              <NumericInputGroup
-                label="Sleeps"
-                {...field}
-                icon={IoIosMan}
-                error={fieldState.error}
-              />
-            )}
-          />
+            <CTAButton
+              type="main"
+              text="Edit Details"
+              callbackFn={openEditDetailsModal}
+            />
+          </div>
+          <div className="flex flex-1 p-1 gap-5 overflow-y-auto flex-col">
+            <div className="flex overflow-y-auto flex-col gap-3">
+              <div className="flex justify-between items-center text-sm">
+                <div className="flex items-center">
+                  <TbClock className="mr-2 h-5 w-5 text-secondary-text shrink-0" />
+                  <span className="w-32 text-secondary-text">
+                    Check-in time
+                  </span>
+                </div>
+                <span className="font-medium">
+                  {formatTo12Hour(watch("check_in")) || "Not set"}
+                </span>
+              </div>
 
-          <Controller
-            name="bathrooms"
-            control={control}
-            render={({ field, fieldState }) => (
-              <NumericInputGroup
-                label="Bathrooms"
-                {...field}
-                icon={FaBath}
-                error={fieldState.error}
-              />
-            )}
-          />
-
-          <Controller
-            name="property_ref"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                label="Property Reference"
-                placeholder="Enter property reference..."
-                {...field}
-                icon={BiBuildingHouse}
-                error={fieldState.error}
-              />
-            )}
-          />
-          <Controller
-            name="owner_ref"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextInput
-                label="Owner Reference"
-                placeholder="Enter owner reference..."
-                {...field}
-                icon={LuUser}
-                error={fieldState.error}
-              />
-            )}
-          />
-          <Controller
-            name="check_in"
-            control={control}
-            render={({ field }) => (
-              <TimePicker
-                label="Check In Time"
-                value={field.value}
-                onChange={field.onChange}
-                interval={15}
-              />
-            )}
-          />
-          <Controller
-            name="check_out"
-            control={control}
-            render={({ field }) => (
-              <TimePicker
-                label="Check Out Time"
-                value={field.value}
-                onChange={field.onChange}
-                interval={15}
-              />
-            )}
-          />
+              <div className="flex justify-between items-center text-sm">
+                <div className="flex items-center">
+                  <TbClock className="mr-2 h-5 w-5 text-secondary-text shrink-0" />
+                  <span className="w-32 text-secondary-text">
+                    Check-out time
+                  </span>
+                </div>
+                <span className="font-medium">
+                  {formatTo12Hour(watch("check_out")) || "Not set"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <div className="flex items-center">
+                  <BiBuildingHouse className="mr-2 h-5 w-5 text-secondary-text shrink-0" />
+                  <span className="w-fit text-secondary-text">
+                    Property Ref.
+                  </span>
+                </div>
+                <span className="font-medium flex-1 text-right">
+                  {watch("property_ref") || "Not set"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <div className="flex items-center">
+                  <LuUser className="mr-2 h-5 w-5 text-secondary-text shrink-0" />
+                  <span className="w-fit text-secondary-text">Owner Ref.</span>
+                </div>
+                <span className="font-medium flex-1 text-right">
+                  {watch("owner_ref") || "Not set"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <div className="flex items-center">
+                  <BsBuildingGear className="mr-2 h-5 w-5 text-secondary-text shrink-0" />
+                  <span className="w-fit text-secondary-text">
+                    Letting Agent
+                  </span>
+                </div>
+                <span className="font-medium flex-1 text-right">
+                  {watch("letting_agent") || "Not set"}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col flex-1 gap-3">
         <div className="flex justify-between p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
           <Controller
             name="package"
@@ -400,6 +410,8 @@ const PropertyForm = () => {
             )}
           />
         </div>
+      </div>
+      <div className="flex flex-col flex-1 gap-3">
         <div className="flex flex-1 justify-start gap-3 p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
           <Controller
             name="service_type"
@@ -449,10 +461,16 @@ const PropertyForm = () => {
               />
             )}
           />
+          <div className="relative flex-1 bg-amber-100 text-sm p-3 rounded-lg shadow-sm overflow-hidden">
+            {/* Fold */}
+            <div className="absolute top-0 left-0 w-6 h-6 bg-amber-200 rotate-45 -translate-x-1/2 -translate-y-1/2 shadow-sm" />
+
+            {watch("notes") || "No additional notes entered yet."}
+          </div>
         </div>
       </div>
       <div className="flex flex-col h-full gap-3">
-        <div className="flex justify-between p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
+        <div className="flex justify-start flex-1 p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
           <div className="flex items-center justify-between pr-2 mb-3">
             <h2 className="text-xl ml-1 font-semibold text-primary-text">
               Key Codes
@@ -464,7 +482,9 @@ const PropertyForm = () => {
             />
           </div>
           {keyCodeFields?.length === 0 ? (
-            <p className="text-sm text-primary-text">No key codes added yet.</p>
+            <p className="text-sm text-primary-text text-center bg-tertiary-bg rounded-lg shadow-s p-3">
+              No key codes added yet.
+            </p>
           ) : (
             <ul className="flex flex-col gap-1 max-h-28 overflow-y-auto">
               {keyCodeFields.map((field, index) => (
@@ -556,22 +576,7 @@ const PropertyForm = () => {
             )}
           </div>
         </div>
-        <div className="bg-secondary-bg shadow-m rounded-2xl p-3">
-          <Controller
-            name="notes"
-            control={control}
-            render={({ field, fieldState }) => (
-              <RHFTextAreaInput
-                rows={3}
-                icon={FaRegNoteSticky}
-                label="Notes"
-                value={field.value}
-                onChange={field.onChange}
-                error={fieldState.error}
-              />
-            )}
-          />
-        </div>
+
         <div className="flex flex-row gap-3 bg-secondary-bg shadow-m rounded-2xl p-3">
           <CTAButton
             disabled={!isDirty}
