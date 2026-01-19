@@ -447,15 +447,17 @@ export default function FullScreenCalendar() {
                   normalizedDate
                 )}, ${normalizedDate.getUTCFullYear()}`}
           </h1>
-          <div className="flex gap-2 items-center shadow-s bg-secondary-bg p-1 rounded-xl">
-            <CTAButton
-              icon={GoPlus}
-              width="w-28"
-              type="main"
-              text="Insert Item"
-              callbackFn={handleNewItem}
-            />
-          </div>
+          {false && (
+            <div className="flex gap-2 items-center shadow-s bg-secondary-bg p-1 rounded-xl">
+              <CTAButton
+                icon={GoPlus}
+                width="w-28"
+                type="main"
+                text="Insert Item"
+                callbackFn={handleNewItem}
+              />
+            </div>
+          )}
           <div className="flex w-60 items-center gap-4">
             <SlidingSelectorGeneric
               options={["Weekly", "Monthly"]}

@@ -138,6 +138,12 @@ export const PropertyFormSchema = z.object({
     .or(z.literal("")),
   owner_ref: z.string().optional().nullable().or(z.literal("")),
   property_ref: z.string().optional().nullable().or(z.literal("")),
+  letting_agent: z
+    .string()
+    .max(50, { message: "Letting agent must not exceed 50 characters" })
+    .optional()
+    .nullable()
+    .or(z.literal("")),
 });
 
 export const OwnerFormSchema = z.object({

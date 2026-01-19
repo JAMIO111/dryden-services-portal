@@ -54,6 +54,7 @@ const defaultFormData = {
   package: null,
   service_type: null,
   hired_laundry: false,
+  letting_agent: undefined,
   notes: "",
   KeyCodes: [],
   Owners: [],
@@ -219,7 +220,7 @@ const PropertyForm = () => {
     openModal({
       title: "Edit Property Details",
       content: (
-        <div className="p-3 max-h-[80vh] min-w-[60vw] overflow-y-auto">
+        <div className="p-3 max-h-[90vh] min-w-[60vw] overflow-y-auto">
           <PropertyDetailsForm control={control} />
 
           <div className="flex justify-end gap-2 mt-4">

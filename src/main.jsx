@@ -192,7 +192,7 @@ const router = createBrowserRouter([
                   },
                   {
                     path: "Data-Management",
-                    element: <SettingsDataManagement />,
+                    element: <div>Data Management</div>,
                   },
                   {
                     path: "Notifications",

@@ -768,7 +768,15 @@ const EmployeeForm = ({ employee }) => {
                 type="success"
                 text={isActive ? "Update Contract" : "Save Contract"}
                 icon={GrDocumentUpdate}
-                disabled={isSubmitting || !contractDirty}
+                disabled={
+                  isActive
+                    ? isSubmitting || !contractDirty
+                    : isSubmitting ||
+                      !watch("job_title") ||
+                      !watch("created_at") ||
+                      !watch("hourly_rate") ||
+                      !watch("contract_type")
+                }
                 callbackFn={handleUpdateContract}
               />
             )}
