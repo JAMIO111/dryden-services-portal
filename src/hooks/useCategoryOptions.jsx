@@ -48,3 +48,11 @@ export const useEmployeesOptions = () => {
     staleTime: 1000 * 60 * 30, // 30 minutes
   });
 };
+
+export const useStatusOptions = () => {
+  return useQuery({
+    queryKey: ["Status"],
+    queryFn: () => fetchAll("Statuses"),
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
+};
