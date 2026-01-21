@@ -343,7 +343,7 @@ const PropertyForm = () => {
                     Check-in time
                   </span>
                 </div>
-                <span className="font-medium">
+                <span className="font-medium text-primary-text">
                   {formatTo12Hour(watch("check_in")) || "Not set"}
                 </span>
               </div>
@@ -355,7 +355,7 @@ const PropertyForm = () => {
                     Check-out time
                   </span>
                 </div>
-                <span className="font-medium">
+                <span className="font-medium text-primary-text">
                   {formatTo12Hour(watch("check_out")) || "Not set"}
                 </span>
               </div>
@@ -366,7 +366,7 @@ const PropertyForm = () => {
                     Property Ref.
                   </span>
                 </div>
-                <span className="font-medium flex-1 text-right">
+                <span className="font-medium text-primary-text flex-1 text-right">
                   {watch("property_ref") || "Not set"}
                 </span>
               </div>
@@ -375,7 +375,7 @@ const PropertyForm = () => {
                   <LuUser className="mr-2 h-5 w-5 text-secondary-text shrink-0" />
                   <span className="w-fit text-secondary-text">Owner Ref.</span>
                 </div>
-                <span className="font-medium flex-1 text-right">
+                <span className="font-medium flex-1 text-primary-text text-right">
                   {watch("owner_ref") || "Not set"}
                 </span>
               </div>
@@ -386,7 +386,7 @@ const PropertyForm = () => {
                     Letting Agent
                   </span>
                 </div>
-                <span className="font-medium flex-1 text-right">
+                <span className="font-medium flex-1 text-primary-text text-right">
                   {watch("letting_agent") || "Not set"}
                 </span>
               </div>
