@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useGlobalSearch } from "../contexts/SearchProvider";
 import CTAButton from "./CTAButton";
 import { HiOutlinePencil } from "react-icons/hi2";
+import { AiOutlineUser } from "react-icons/ai";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { useModal } from "@/contexts/ModalContext";
 import EmployeeForm from "./forms/EmployeeForm.jsx";
@@ -136,8 +137,16 @@ const Employees = () => {
               Loading Employees...
             </div>
           ) : filteredData?.length === 0 ? (
-            <div className="p-4 text-center text-primary-text">
-              No employees found.
+            <div className="flex justify-center items-center flex-col gap-5 mt-5">
+              <div className="p-4 text-center text-primary-text">
+                No active employees found.
+              </div>
+              <CTAButton
+                type="main"
+                text="Click to View All Employees"
+                icon={AiOutlineUser}
+                callbackFn={() => setActiveStatus("All")}
+              />
             </div>
           ) : (
             filteredData.map((employee, index) => (

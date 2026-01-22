@@ -3,6 +3,7 @@ import CTAButton from "./CTAButton";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { AiOutlineUser } from "react-icons/ai";
 
 const NotificationCard = ({ notification, closePane, userId }) => {
   const isEmptyObject = (v) =>
@@ -21,12 +22,22 @@ const NotificationCard = ({ notification, closePane, userId }) => {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.25 }}
       className="flex bg-secondary-bg shadow-md gap-3 items-start p-3 border border-border-color rounded-xl">
-      <div className="flex justify-center items-center border border-border-color rounded-full h-10 aspect-square">
-        <img
-          src={notification.avatar}
-          alt={notification?.title}
-          className="w-10 h-10 rounded-lg object-cover"
-        />
+      <div className="flex justify-center items-center border border-border-color rounded-lg h-10 aspect-square">
+        {notification.avatar ? (
+          <img
+            src={notification.avatar}
+            alt={notification?.title}
+            className="w-10 h-10 rounded-lg object-cover"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+            <p className="text-secondary-text">{`${notification.created_by
+              ?.split(" ")[0]
+              .charAt(0)}${notification.created_by
+              ?.split(" ")[1]
+              .charAt(0)}`}</p>
+          </div>
+        )}
       </div>
       <div className="flex flex-col justify-start items-start w-full">
         <div className="flex w-full justify-between items-center mb-1">

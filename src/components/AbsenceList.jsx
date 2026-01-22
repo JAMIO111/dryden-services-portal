@@ -14,10 +14,14 @@ import { MdOutlineSick, MdMoneyOff } from "react-icons/md";
 import { TbCoffin } from "react-icons/tb";
 import { TbMedicalCross } from "react-icons/tb";
 
-export default function AbsenceList({ startDate, endDate }) {
+export default function AbsenceList({
+  startDate,
+  endDate,
+  absences,
+  isLoading,
+}) {
   const { openModal } = useModal();
   const navigate = useNavigate();
-  const { data: absences, isLoading } = useAbsences(startDate, endDate);
   console.log("Absences data:", absences);
   const statusColor = {
     "Annual Leave": "bg-orange-400/20 text-orange-500",

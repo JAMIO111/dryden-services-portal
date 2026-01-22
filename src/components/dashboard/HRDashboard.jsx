@@ -8,6 +8,7 @@ import { useState, useMemo } from "react";
 import DashboardCard from "./DashboardCard";
 import { useActiveEmployees } from "@/hooks/useEmployees";
 import AbsenceList from "../AbsenceList";
+import { useAbsences } from "@/hooks/useAbsences";
 
 const HRDashboard = () => {
   const { profile } = useUser();
@@ -29,6 +30,11 @@ const HRDashboard = () => {
       endDate: selectedRange.endDate,
     };
   }, [selectedRange]);
+
+  const { data: absences, isAbsencesLoading } = useAbsences(
+    selectedRange.startDate,
+    selectedRange.endDate
+  );
 
   return (
     // HRDashboard
@@ -70,14 +76,30 @@ const HRDashboard = () => {
       <div className="flex flex-1 flex-col overflow-hidden gap-3">
         <div className="flex flex-row p-3 pb-0 gap-3 shrink-0">
           <DashboardCard
-            title="Total Employees"
+            title="Active Employees"
             value={employees?.length}
             icon={PiUsersThree}
             link="/Human-Resources/Employees"
             isLoading={isLoading}
           />
-          <DashboardCard title="Holidays" icon={FaUmbrellaBeach} />
-          <DashboardCard title="Sick Leave" icon={MdOutlineSick} />
+          <DashboardCard
+            title="Holidays"
+            icon={FaUmbrellaBeach}
+            value={
+              absences?.filter((absence) => absence.category === "Annual Leave")
+                .length
+            }
+            isLoading={isAbsencesLoading}
+          />
+          <DashboardCard
+            title="Sick Leave"
+            icon={MdOutlineSick}
+            value={
+              absences?.filter((absence) => absence.category === "Sickness")
+                .length
+            }
+            isLoading={isAbsencesLoading}
+          />
         </div>
 
         {/* Absence List + Placeholder */}
@@ -85,6 +107,8 @@ const HRDashboard = () => {
           {/* Absence List */}
           <div className="flex-[2] flex flex-col overflow-hidden rounded-2xl shadow-s bg-secondary-bg">
             <AbsenceList
+              absences={absences}
+              isLoading={isAbsencesLoading}
               startDate={selectedRange.startDate}
               endDate={selectedRange.endDate}
             />

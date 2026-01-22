@@ -9,7 +9,7 @@ const DashboardCard = ({
   title = "Title",
   icon: Icon,
   currencyItem = false,
-  value = "123",
+  value = "-",
   trend,
   isSelected = false,
   onClick,
