@@ -74,8 +74,8 @@ const Onboarding = () => {
       job_title: jobTitle.trim(),
       auth_id: user.id,
       email: user.email,
-      start_date: new Date().toISOString(),
       phone: "",
+      created_at: new Date().toISOString(),
       gender: gender,
       address: address.trim(),
       avatar: null,
@@ -83,7 +83,6 @@ const Onboarding = () => {
       is_cscs: false,
       ni_number: "",
       utr_number: "",
-      contract_type: "",
       notification_preferences: {
         Leads: "both",
         Owners: "both",
@@ -95,7 +94,6 @@ const Onboarding = () => {
         "Ad-Hoc Jobs": "both",
         Correspondence: "both",
       },
-      is_active: true,
     };
 
     const { data, error } = await supabase

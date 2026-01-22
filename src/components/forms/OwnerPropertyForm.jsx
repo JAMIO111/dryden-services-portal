@@ -97,9 +97,10 @@ const OwnerPropertyForm = ({ owner, defaultProperties = [], onSave }) => {
       onSave(currentProperties);
       return;
     }
+    const { Leads, ...ownerData } = owner;
     upsertOwner.mutate(
       {
-        ownerData: owner,
+        ownerData,
         propertiesForm: currentProperties,
       },
       {
