@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import ModalImageUploader from "./ModalImageUploader";
 import { IoAdd } from "react-icons/io5";
 import { MdOutlineEdit } from "react-icons/md";
+import { MdBlock } from "react-icons/md";
 
 const ProfileImageSection = ({
   item,
@@ -13,6 +14,7 @@ const ProfileImageSection = ({
   width,
   height,
   aspectRatio = "aspect-square",
+  disabled = false,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
@@ -32,12 +34,14 @@ const ProfileImageSection = ({
       <div
         className={`${width} ${height} ${aspectRatio} group relative flex gap-3 flex-col items-center`}>
         <div
-          onClick={() => setIsModalOpen(true)}
-          className="absolute opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300 bottom-2 right-2 rounded-full bg-primary-bg/80">
+          onClick={() => !disabled && setIsModalOpen(true)}
+          className={`absolute opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300 bottom-2 right-2 rounded-full bg-primary-bg/80 ${disabled ? "pointer-events-none opacity-50" : ""}`}>
           {imageUrl ? (
             <MdOutlineEdit className="h-6 w-6 text-primary-text m-2" />
+          ) : disabled ? (
+            <MdBlock className="h-6 w-6 text-orange-300 m-2" />
           ) : (
-            <IoAdd className="h-7 w-7 text-primary-text m-1 transition-transform duration-500 hover:rotate-[180deg]" />
+            <IoAdd className="h-6 w-6 text-primary-text m-2" />
           )}
         </div>
         {imageUrl ? (
@@ -48,7 +52,12 @@ const ProfileImageSection = ({
           />
         ) : (
           <div className="w-full h-full rounded-2xl bg-tertiary-bg shadow-s flex items-center justify-center text-gray-400">
-            <span className="text-lg text-center">{noImageText}</span>
+            <span
+              className={`${disabled ? "text-orange-300 px-10 text-sm" : "text-md text-secondary-text"} text-center`}>
+              {disabled
+                ? "Save the property before adding an image"
+                : noImageText}
+            </span>
           </div>
         )}
       </div>

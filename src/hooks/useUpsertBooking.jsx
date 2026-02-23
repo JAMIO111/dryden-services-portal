@@ -48,7 +48,7 @@ export const useUpsertBooking = () => {
         const error = new Error(
           `Booking conflict with reference ${
             overlappingBooking.booking_ref || overlappingBooking.id
-          }. Existing booking runs from ${formattedStart} to ${formattedEnd}.`
+          }. Existing booking runs from ${formattedStart} to ${formattedEnd}.`,
         );
         error.code = "OVERLAP";
         error.details = overlappingBooking;
@@ -73,11 +73,11 @@ export const useUpsertBooking = () => {
 
         let nextNumber = 1;
         if (lastBooking?.booking_id) {
-          const match = lastBooking.booking_id.match(/BKG-\d{2}-(\d{3})/);
+          const match = lastBooking.booking_id.match(/BKG-\d{2}-(\d{4})/);
           if (match) nextNumber = parseInt(match[1], 10) + 1;
         }
 
-        const nextNumberStr = String(nextNumber).padStart(3, "0");
+        const nextNumberStr = String(nextNumber).padStart(4, "0");
         booking_id = `BKG-${yearSuffix}-${nextNumberStr}`;
       }
 

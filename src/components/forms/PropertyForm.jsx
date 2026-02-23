@@ -18,6 +18,7 @@ import { LuUser } from "react-icons/lu";
 import { PiNumberThreeFill } from "react-icons/pi";
 import { GiMagicBroom } from "react-icons/gi";
 import { SlLock } from "react-icons/sl";
+import { LuHistory } from "react-icons/lu";
 
 /* App / hooks */
 import { PropertyFormSchema } from "../../validationSchema";
@@ -58,6 +59,10 @@ const defaultFormData = {
   notes: "",
   KeyCodes: [],
   Owners: [],
+  check_in: "10:00",
+  check_out: "15:00",
+  property_ref: undefined,
+  owner_ref: undefined,
 };
 
 const PropertyForm = () => {
@@ -68,7 +73,7 @@ const PropertyForm = () => {
   const { showToast } = useToast();
   const { createNotification } = useCreateNotification();
   const { data: property, isLoading } = usePropertyByName(
-    name !== "New-Property" ? name : null
+    name !== "New-Property" ? name : null,
   );
   const { data: packages } = usePackages();
 
@@ -108,12 +113,12 @@ const PropertyForm = () => {
 
   const hasAddressError = Boolean(
     errors?.name ||
-      errors?.line_1 ||
-      errors?.line_2 ||
-      errors?.town ||
-      errors?.county ||
-      errors?.postcode ||
-      errors?.what_3_words
+    errors?.line_1 ||
+    errors?.line_2 ||
+    errors?.town ||
+    errors?.county ||
+    errors?.postcode ||
+    errors?.what_3_words,
   );
 
   const {
@@ -138,8 +143,6 @@ const PropertyForm = () => {
     keyName: "formId",
   });
 
-  console.log("Form Data", watch());
-
   useEffect(() => {
     if (name === "New-Property") {
       reset(defaultFormData);
@@ -147,8 +150,6 @@ const PropertyForm = () => {
       reset({ ...defaultFormData, ...property });
     }
   }, [name, property, reset]);
-
-  console.log("Form Values:", watch());
 
   const openManageOwnersModal = () => {
     openModal({
@@ -245,6 +246,7 @@ const PropertyForm = () => {
         <div className="flex flex-1 overflow-y-auto justify-between flex-col bg-secondary-bg shadow-m rounded-2xl">
           <div className="p-3">
             <ProfileImageSection
+              disabled={!property?.id} // Disable if property doesn't have an ID yet
               item={property}
               bucket="avatars"
               path="properties"
@@ -390,6 +392,19 @@ const PropertyForm = () => {
                   {watch("letting_agent") || "Not set"}
                 </span>
               </div>
+              {watch("legacy_id") && (
+                <div className="flex justify-between items-center text-sm">
+                  <div className="flex items-center">
+                    <LuHistory className="mr-2 h-5 w-5 text-secondary-text shrink-0" />
+                    <span className="w-fit text-secondary-text">
+                      Legacy Property ID
+                    </span>
+                  </div>
+                  <span className="font-medium flex-1 text-primary-text text-right">
+                    {watch("legacy_id")}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -651,7 +666,7 @@ const PropertyForm = () => {
                   type: "error",
                   title: "Save Failed",
                   message: error?.message?.includes(
-                    'duplicate key value violates unique constraint "Properties_name_key"'
+                    'duplicate key value violates unique constraint "Properties_name_key"',
                   )
                     ? "A property with this name already exists. Please choose a different name."
                     : error?.message ||

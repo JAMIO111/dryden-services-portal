@@ -2,8 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
 
 export function useJobs(startDate, endDate) {
-  console.log("useJobs called with:", startDate, endDate);
-
   return useQuery({
     queryKey: ["jobs", startDate, endDate],
     queryFn: async () => {
@@ -34,7 +32,7 @@ export function useJobs(startDate, endDate) {
             hired_laundry,
             notes
           )
-        `
+        `,
         )
         .is("deleted_at", null)
         .gte("departure_date", startDate.toISOString())
@@ -44,21 +42,10 @@ export function useJobs(startDate, endDate) {
       if (error) throw error;
       if (!bookings?.length) return [];
 
-      // 2. Fetch all bookings once for lookup efficiency
-      const { data: allBookings, error: allErr } = await supabase
-        .from("Bookings")
-        .select(
-          "id, property_id, booking_id, arrival_date, departure_date, is_return_guest, is_owner_booking, adults, children, infants, pets, cots, highchairs, stairgates, notes"
-        )
-        .is("deleted_at", null)
-        .order("arrival_date", { ascending: true });
-
-      if (allErr) throw allErr;
-
-      // 3. Extract unique property IDs
+      // 2. Extract unique property IDs
       const propertyIds = [...new Set(bookings.map((b) => b.property_id))];
 
-      // 4. Fetch all key codes for these properties
+      // 3. Fetch all key codes for these properties
       const { data: keyCodes, error: keyErr } = await supabase
         .from("KeyCodes")
         .select("property_id, code, name")
@@ -67,20 +54,29 @@ export function useJobs(startDate, endDate) {
 
       if (keyErr) throw keyErr;
 
-      // 5. Build jobs array with next booking + property details + key codes
-      const jobs = bookings.map((booking) => {
-        const nextBooking = allBookings.find(
-          (b) =>
-            b.property_id === booking.property_id &&
-            new Date(b.arrival_date) >= new Date(booking.departure_date)
-        );
+      // 4. Fetch the next booking per property after each departure
+      const nextBookingsMap = {};
+      await Promise.all(
+        bookings.map(async (booking) => {
+          const { data: nextData, error: nextErr } = await supabase
+            .from("Bookings")
+            .select("*")
+            .eq("property_id", booking.property_id)
+            .gte("arrival_date", booking.departure_date)
+            .is("deleted_at", null)
+            .order("arrival_date", { ascending: true })
+            .limit(1);
 
+          if (nextErr) throw nextErr;
+          nextBookingsMap[booking.id] = nextData?.[0] ?? null;
+        }),
+      );
+
+      // 5. Build jobs array
+      const jobs = bookings.map((booking) => {
         const propertyKeyCodes = keyCodes
           ?.filter((k) => k.property_id === booking.property_id)
-          ?.map((k) => ({
-            code: k.code,
-            name: k.name,
-          }));
+          ?.map((k) => ({ code: k.code, name: k.name }));
 
         return {
           jobId: booking.id,
@@ -89,14 +85,14 @@ export function useJobs(startDate, endDate) {
           propertyDetails: booking.Properties ?? null,
           jobDate: booking.departure_date,
           departureBooking: booking,
-          nextArrival: nextBooking ? nextBooking.arrival_date : null,
+          nextArrival: nextBookingsMap[booking.id]?.arrival_date ?? null,
           keyCodes: propertyKeyCodes ?? [],
-          bookingDetails: nextBooking || null,
+          bookingDetails: nextBookingsMap[booking.id] ?? null,
         };
       });
 
-      console.log("Fetched jobs:", jobs);
       return jobs;
     },
+    staleTime: 1000 * 60 * 5, // optional: cache 5 minutes
   });
 }

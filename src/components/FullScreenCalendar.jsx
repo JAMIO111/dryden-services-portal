@@ -10,7 +10,7 @@ import { GoPlus } from "react-icons/go";
 // --- UTC helpers to avoid DST issues ---
 function getSundayUTC(date) {
   const d = new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
   );
   const day = d.getUTCDay();
   d.setUTCDate(d.getUTCDate() - day);
@@ -75,7 +75,7 @@ export default function FullScreenCalendar() {
 
   const { data: calendarItems, isLoading } = useCalendarItems(
     calendarStartDate,
-    calendarEndDate
+    calendarEndDate,
   );
 
   console.log("Calendar Items:", calendarItems);
@@ -91,7 +91,7 @@ export default function FullScreenCalendar() {
 
   function getWeekNumber(date) {
     const d = new Date(
-      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
     );
     const dayNum = d.getUTCDay() || 7; // Make Sunday = 7
     d.setUTCDate(d.getUTCDate() + 4 - dayNum); // Thursday in current week
@@ -181,19 +181,19 @@ export default function FullScreenCalendar() {
     const itemsForDay = calendarItems?.[dateKey] || [];
     const jobsForDay = itemsForDay.filter((item) => item.itemType === "job");
     const meetingsForDay = itemsForDay.filter(
-      (item) => item.itemType === "meeting"
+      (item) => item.itemType === "meeting",
     );
     const absencesForDay = itemsForDay.filter(
-      (item) => item.itemType === "absence"
+      (item) => item.itemType === "absence",
     );
     const laundryForDay = itemsForDay.filter(
-      (item) => item.itemType === "adHocJob" && item.type === "Laundry"
+      (item) => item.itemType === "adHocJob" && item.type === "Laundry",
     );
     const hotTubForDay = itemsForDay.filter(
-      (item) => item.itemType === "adHocJob" && item.type === "Hot Tub"
+      (item) => item.itemType === "adHocJob" && item.type === "Hot Tub",
     );
     const cleanForDay = itemsForDay.filter(
-      (item) => item.itemType === "adHocJob" && item.type === "Clean"
+      (item) => item.itemType === "adHocJob" && item.type === "Clean",
     );
 
     const openDailyItemsModal = (date) => {
@@ -294,9 +294,9 @@ export default function FullScreenCalendar() {
                       job.splitType === "Start" && job.transport === "Client"
                         ? "Dropoff"
                         : job.splitType === "End" &&
-                          job.transport === "Dryden Services"
-                        ? "Dropoff"
-                        : "Pickup"
+                            job.transport === "Dryden Services"
+                          ? "Dropoff"
+                          : "Pickup"
                     }`}
                   </p>
                 </div>
@@ -309,16 +309,26 @@ export default function FullScreenCalendar() {
               ? jobsForDay.map((job, index) => (
                   <span
                     key={index}
-                    className="bg-pink-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
-                    <div className="bg-pink-500 rounded-full w-0.75 h-full"></div>
+                    className="hover:scale-97 bg-purple-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                    <div className="flex flex-col">
+                      <div className="bg-red-500 rounded-t-full w-0.75 h-full"></div>
+                      <div
+                        className={`${job.nextArrival === job.jobDate ? "bg-green-500" : "bg-red-500"} rounded-b-full w-0.75 h-full`}></div>
+                    </div>
                     <div className="flex flex-col py-1 gap-1">
-                      <p className="font-semibold text-sm">Changeover</p>
-                      <p className="text-xs">{job.propertyDetails.name}</p>
+                      <p className="font-semibold text-xs">Changeover</p>
+                      <p className="text-sm">{job.propertyDetails.name}</p>
                       <p className="text-xs text-secondary-text">
                         {`Next Arrival: ${
                           job.nextArrival
                             ? new Date(job.nextArrival).toLocaleDateString(
-                                "en-GB"
+                                "en-GB",
+                                {
+                                  weekday: "short",
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "2-digit",
+                                },
                               )
                             : "N/A"
                         }`}
@@ -370,10 +380,10 @@ export default function FullScreenCalendar() {
                       <p className="text-xs text-secondary-text">
                         {`${new Date(meeting.start_date).toLocaleTimeString(
                           "en-GB",
-                          { hour: "2-digit", minute: "2-digit" }
+                          { hour: "2-digit", minute: "2-digit" },
                         )} - ${new Date(meeting.end_date).toLocaleTimeString(
                           "en-GB",
-                          { hour: "2-digit", minute: "2-digit" }
+                          { hour: "2-digit", minute: "2-digit" },
                         )}`}
                       </p>
                     </div>
@@ -444,7 +454,7 @@ export default function FullScreenCalendar() {
                   year: "numeric",
                 })
               : `Week ${getWeekNumber(
-                  normalizedDate
+                  normalizedDate,
                 )}, ${normalizedDate.getUTCFullYear()}`}
           </h1>
           {false && (

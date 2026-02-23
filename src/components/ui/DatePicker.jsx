@@ -52,6 +52,11 @@ const DatePicker = ({
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
+  const toTimeString = (date) => {
+    if (!(date instanceof Date) || isNaN(date)) return null;
+    return date.toTimeString().slice(0, 8); // "HH:mm:ss"
+  };
+
   const normalizeDate = (value) => {
     if (!value) return null;
     if (value instanceof Date && !isNaN(value)) return value;
@@ -94,7 +99,7 @@ const DatePicker = ({
     const newDate = new Date(safeDate || new Date());
     if (type === "hours") newDate.setHours(value);
     if (type === "minutes") newDate.setMinutes(value);
-    onChange(newDate);
+    onChange(toTimeString(newDate));
   };
 
   const getCalendarDays = (date) => {
@@ -108,7 +113,7 @@ const DatePicker = ({
   const handleMonthClick = (monthIndex) => {
     const updated = setMonth(
       setYear(new Date(), currentYear.getFullYear()),
-      monthIndex
+      monthIndex,
     );
     setCurrentMonth(updated);
     setCurrentYear(updated);
@@ -146,7 +151,7 @@ const DatePicker = ({
       setCurrentMonth(d);
       setCurrentYear(d);
     }
-  }, [open, safeDate, defaultPageDate]);
+  }, [open, currentDate, defaultPageDate]);
 
   return (
     <div
@@ -171,8 +176,8 @@ const DatePicker = ({
       error
         ? "border-error-color hover:border-error-color/70"
         : open
-        ? "border-brand-primary hover:border-brand-primary"
-        : "border-transparent"
+          ? "border-brand-primary hover:border-brand-primary"
+          : "border-transparent"
     }
 
     ${open && error ? "ring-3 ring-error-color/30" : ""}
@@ -201,8 +206,8 @@ const DatePicker = ({
                   displayMode === "date"
                     ? "EEE, PPP"
                     : displayMode === "time"
-                    ? "p"
-                    : "PPP p"
+                      ? "p"
+                      : "PPP p",
                 )
               : placeholder || "Select a date"}
           </span>
@@ -308,7 +313,7 @@ const DatePicker = ({
                     {monthsOfYear.map((month, i) => {
                       const monthDate = setMonth(
                         setYear(new Date(), currentYear.getFullYear()),
-                        i
+                        i,
                       );
                       const isSelectedMonth =
                         safeDate && isSameMonth(monthDate, safeDate);
@@ -323,6 +328,7 @@ const DatePicker = ({
 
                       return (
                         <button
+                          type="button"
                           key={month}
                           onClick={() => handleMonthClick(i)}
                           className={classes}>
@@ -346,11 +352,14 @@ const DatePicker = ({
               <label className="text-primary-text">Select Time</label>
               <div className="flex gap-3">
                 <select
-                  value={(new Date(safeDate) || today).getHours()}
+                  value={safeDate ? safeDate.getHours() : ""}
                   onChange={(e) =>
                     handleTimeChange("hours", parseInt(e.target.value))
                   }
                   className="border border-border-color text-primary-text text-lg font-semibold bg-tertiary-bg rounded-lg px-2 py-1">
+                  <option value="" disabled>
+                    --
+                  </option>
                   {hours.map((h) => (
                     <option key={h} value={h}>
                       {h.toString().padStart(2, "0")}
@@ -359,11 +368,14 @@ const DatePicker = ({
                 </select>
                 <p className="text-lg text-primary-text font-semibold">:</p>
                 <select
-                  value={(new Date(safeDate) || today).getMinutes()}
+                  value={safeDate ? safeDate.getMinutes() : ""}
                   onChange={(e) =>
                     handleTimeChange("minutes", parseInt(e.target.value))
                   }
                   className="border border-border-color text-primary-text text-lg font-semibold bg-tertiary-bg rounded-lg px-2 py-1">
+                  <option value="" disabled>
+                    --
+                  </option>
                   {minutes.map((m) => (
                     <option key={m} value={m}>
                       {m.toString().padStart(2, "0")}

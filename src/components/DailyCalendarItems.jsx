@@ -4,6 +4,7 @@ import { MdHotTub, MdPublishedWithChanges } from "react-icons/md";
 import { BsTruck } from "react-icons/bs";
 import { GiMagicBroom } from "react-icons/gi";
 import { TbIroning3 } from "react-icons/tb";
+import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 
 const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
   console.log("DailyCalendarItems items:", items);
@@ -14,10 +15,8 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
       acc[item.itemType].push(item);
       return acc;
     },
-    { job: [], meeting: [], absence: [] }
+    { job: [], meeting: [], absence: [] },
   );
-
-  console.log("Grouped Items:", groupedItems);
 
   if (items?.length === 0) {
     return (
@@ -33,6 +32,8 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
       </div>
     );
   }
+
+  console.log("Rendering DailyCalendarItems with groupedItems:", groupedItems);
 
   return (
     <div className="flex flex-col min-w-[50vw] min-h-[70vh] max-h-[80vh] overflow-y-auto p-4">
@@ -81,7 +82,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
-                    }
+                    },
                   )}`}
                 </p>
 
@@ -161,14 +162,14 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                                   month: "short",
                                   day: "numeric",
                                   year: "numeric",
-                                }
+                                },
                               )} - ${new Date(job.end_date).toLocaleString(
                                 "en-GB",
                                 {
                                   month: "short",
                                   day: "numeric",
                                   year: "numeric",
-                                }
+                                },
                               )}`
                             : new Date(job.single_date).toLocaleString(
                                 "en-GB",
@@ -176,7 +177,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                                   month: "short",
                                   day: "numeric",
                                   year: "numeric",
-                                }
+                                },
                               )
                         } - ${job?.ad_hoc_job_id || ""}`}
                       </p>
@@ -201,9 +202,9 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                         job.splitType === "Start" && job.transport === "Client"
                           ? "Dropoff"
                           : job.splitType === "End" &&
-                            job.transport === "Dryden Services"
-                          ? "Dropoff"
-                          : "Pickup"
+                              job.transport === "Dryden Services"
+                            ? "Dropoff"
+                            : "Pickup"
                       }`}
                     </p>
                   </div>
@@ -224,8 +225,9 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
               <div
                 key={job.jobId}
                 className="bg-tertiary-bg p-3 rounded-lg shadow-s flex flex-row gap-5">
-                <div className="bg-primary-bg rounded-lg shadow-s h-18 w-18 flex items-center justify-center">
-                  <MdPublishedWithChanges className="w-12 h-12 text-pink-500 m-2" />
+                <div className="relative bg-primary-bg rounded-lg shadow-s h-18 w-18 flex items-center justify-center">
+                  <FaArrowLeftLong className="w-6 h-6 text-red-500 mb-4 mx-4 absolute left-0" />
+                  <FaArrowRightLong className="w-6 h-6 text-green-600 mt-4 mx-4 absolute right-0" />
                 </div>
                 <div className="flex flex-col gap-1">
                   <p className="font-semibold text-sm text-primary-text">
@@ -239,7 +241,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                           month: "short",
                           day: "numeric",
                           year: "numeric",
-                        }
+                        },
                       )} ${job.propertyDetails.check_out || ""} - ${
                         job?.bookingId || ""
                       }`}
@@ -259,7 +261,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                     <p className="text-xs text-secondary-text">
                       {job.nextArrival
                         ? `Next Arrival: ${new Date(
-                            job.nextArrival
+                            job.nextArrival,
                           ).toLocaleString("en-GB", {
                             month: "short",
                             day: "numeric",
@@ -276,7 +278,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                       <button
                         onClick={() => {
                           navigate(
-                            `/Jobs/Bookings/${job.bookingDetails.booking_id}`
+                            `/Jobs/Bookings/${job.bookingDetails.booking_id}`,
                           );
                           closeModal();
                         }}
