@@ -70,9 +70,9 @@ export const PropertyFormSchema = z.object({
       val
         .split(" ")
         .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
         )
-        .join(" ")
+        .join(" "),
     ),
   bedrooms: z.number(),
   sleeps: z.number(),
@@ -105,7 +105,7 @@ export const PropertyFormSchema = z.object({
       val
         .replace(/\s+/g, "")
         .replace(/(.{3})$/, " $1")
-        .toUpperCase()
+        .toUpperCase(),
     ),
   what_3_words: z
     .string()
@@ -124,7 +124,7 @@ export const PropertyFormSchema = z.object({
             message: "Location must not be more than 20 characters long",
           }),
         is_private: z.boolean(),
-      })
+      }),
     )
     .optional(),
   package: z.number(),
@@ -144,6 +144,8 @@ export const PropertyFormSchema = z.object({
     .optional()
     .nullable()
     .or(z.literal("")),
+  check_in: z.string().optional().nullable().or(z.literal("")),
+  check_out: z.string().optional().nullable().or(z.literal("")),
 });
 
 export const OwnerFormSchema = z.object({
@@ -238,37 +240,37 @@ export const BookingFormSchema = z.object({
     (val) => (typeof val === "string" ? parseInt(val, 10) : val),
     z
       .number({ message: "Please enter a valid number of children" })
-      .min(0, { message: "Children cannot be negative" })
+      .min(0, { message: "Children cannot be negative" }),
   ),
   infants: z.preprocess(
     (val) => (typeof val === "string" ? parseInt(val, 10) : val),
     z
       .number({ message: "Please enter a valid number of infants" })
-      .min(0, { message: "Infants cannot be negative" })
+      .min(0, { message: "Infants cannot be negative" }),
   ),
   pets: z.preprocess(
     (val) => (typeof val === "string" ? parseInt(val, 10) : val),
     z
       .number({ message: "Please enter a valid number of pets" })
-      .min(0, { message: "Pets cannot be negative" })
+      .min(0, { message: "Pets cannot be negative" }),
   ),
   highchairs: z.preprocess(
     (val) => (typeof val === "string" ? parseInt(val, 10) : val),
     z
       .number({ message: "Please enter a valid number of highchairs" })
-      .min(0, { message: "Highchairs cannot be negative" })
+      .min(0, { message: "Highchairs cannot be negative" }),
   ),
   cots: z.preprocess(
     (val) => (typeof val === "string" ? parseInt(val, 10) : val),
     z
       .number({ message: "Please enter a valid number of cots" })
-      .min(0, { message: "Cots cannot be negative" })
+      .min(0, { message: "Cots cannot be negative" }),
   ),
   stairgates: z.preprocess(
     (val) => (typeof val === "string" ? parseInt(val, 10) : val),
     z
       .number({ message: "Please enter a valid number of stairgates" })
-      .min(0, { message: "Stairgates cannot be negative" })
+      .min(0, { message: "Stairgates cannot be negative" }),
   ),
   is_return_guest: z.boolean().optional(),
 
@@ -439,7 +441,7 @@ export const AbsenceFormSchema = z.object({
     {
       required_error: "Select an absence category",
       invalid_type_error: "Select an absence category",
-    }
+    },
   ),
   start_date: z.date(),
   end_date: z.date(),

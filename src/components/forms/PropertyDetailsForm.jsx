@@ -130,6 +130,7 @@ const PropertyDetailsForm = ({ control }) => {
             control={control}
             render={({ field, fieldState }) => (
               <RHFTextAreaInput
+                notes={true}
                 rows={5}
                 icon={FaRegNoteSticky}
                 label="Notes"

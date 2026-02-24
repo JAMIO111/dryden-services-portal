@@ -10,7 +10,7 @@ const fetchActiveEmployeePeriods = async () => {
       Employees (
         *
       )
-    `
+    `,
     )
     .is("terminated_at", null);
 
@@ -21,7 +21,7 @@ const fetchActiveEmployeePeriods = async () => {
     employee_period_id: row.id,
     created_at: row.created_at,
     terminated_at: row.terminated_at,
-    job_title: row.job_title,
+    contract_job_title: row.job_title,
     contract_type: row.contract_type,
     hourly_rate: row.hourly_rate,
     ...row.Employees, // employee fields at top level

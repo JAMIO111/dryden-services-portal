@@ -16,8 +16,9 @@ const RHFTextAreaInput = forwardRef(
       max = 1000,
       error,
       required = false,
+      notes = false,
     },
-    ref
+    ref,
   ) => {
     return (
       <div className="w-full">
@@ -35,7 +36,7 @@ const RHFTextAreaInput = forwardRef(
         )}
 
         <div
-          className={`flex border flex-row relative transition-all duration-300 items-start shadow-s hover:shadow-m rounded-lg pl-2 py-2 bg-text-input-color
+          className={`flex border flex-row relative transition-all duration-300 items-start shadow-s hover:shadow-m rounded-lg pl-2 py-2 ${notes ? "bg-amber-100" : "bg-text-input-color"}
              focus-within:border-brand-primary focus-within:hover:border-brand-primary min-w-0
             ${
               error
@@ -49,7 +50,9 @@ const RHFTextAreaInput = forwardRef(
             />
           ) : (
             Icon && (
-              <Icon className="w-5 h-5 text-primary-text mr-2 flex-shrink-0 pointer-events-none" />
+              <Icon
+                className={`w-5 h-5 ${notes ? "text-black" : "text-primary-text"} mr-2 flex-shrink-0 pointer-events-none`}
+              />
             )
           )}
 
@@ -63,14 +66,14 @@ const RHFTextAreaInput = forwardRef(
             placeholder={placeholder}
             rows={rows}
             maxLength={max}
-            className="flex-grow w-full bg-transparent outline-none text-primary-text placeholder:text-sm placeholder:text-muted resize-none pr-6"
+            className={`flex-grow w-full bg-transparent outline-none ${notes ? "text-black" : "text-primary-text"} placeholder:text-sm placeholder:text-muted resize-none pr-6`}
           />
 
           {value && (
             <button
               type="button"
               onClick={() => onChange({ target: { value: "" } })}
-              className="absolute top-2 right-2 text-primary-text hover:bg-border-color rounded-sm p-0.5"
+              className={`absolute top-2 right-2 ${notes ? "text-black" : "text-primary-text"} hover:bg-border-color rounded-sm p-0.5`}
               aria-label="Clear">
               <HiMiniXMark className="w-5 h-5" />
             </button>
@@ -78,7 +81,7 @@ const RHFTextAreaInput = forwardRef(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default RHFTextAreaInput;

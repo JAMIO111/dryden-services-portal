@@ -6,19 +6,18 @@ import { useQueryClient } from "@tanstack/react-query";
 
 /* Icons */
 import { IoIosUndo } from "react-icons/io";
-import { IoTrashOutline, IoLocation } from "react-icons/io5";
+import { IoTrashOutline, IoLocation, IoPerson } from "react-icons/io5";
 import { BsActivity, BsPencil, BsBuildingGear } from "react-icons/bs";
 import { TbClock, TbIroning3 } from "react-icons/tb";
-import { FaCheck } from "react-icons/fa6";
 import { HiOutlineMail } from "react-icons/hi";
 import { HiOutlinePhone, HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { MdHotTub, MdPublishedWithChanges } from "react-icons/md";
 import { BiBuildingHouse } from "react-icons/bi";
-import { LuUser } from "react-icons/lu";
+import { LuUser, LuHistory } from "react-icons/lu";
 import { PiNumberThreeFill } from "react-icons/pi";
 import { GiMagicBroom } from "react-icons/gi";
 import { SlLock } from "react-icons/sl";
-import { LuHistory } from "react-icons/lu";
+import { FaBed, FaBath, FaCheck } from "react-icons/fa6";
 
 /* App / hooks */
 import { PropertyFormSchema } from "../../validationSchema";
@@ -39,6 +38,7 @@ import KeyCodeForm from "./KeyCodeForm";
 import PropertyOwnerForm from "./PropertyOwnerForm";
 import PropertyAddressForm from "./PropertyAddressForm";
 import PropertyDetailsForm from "./PropertyDetailsForm";
+import Pill from "@components/Pill";
 
 const defaultFormData = {
   id: undefined,
@@ -405,10 +405,31 @@ const PropertyForm = () => {
                   </span>
                 </div>
               )}
+              <div className="flex flex-wrap flex-row gap-3">
+                {/* Base property pills */}
+                <Pill
+                  icon={
+                    <FaBed className="text-primary-text w-4 h-4 shrink-0" />
+                  }
+                  text={`${watch("bedrooms")}`}
+                />
+                <Pill
+                  icon={
+                    <IoPerson className="text-primary-text w-4 h-4 shrink-0" />
+                  }
+                  text={`${watch("sleeps")}`}
+                />
+                <Pill
+                  icon={
+                    <FaBath className="text-primary-text w-4 h-4 shrink-0" />
+                  }
+                  text={`${watch("bathrooms")}`}
+                />
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex justify-between p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
+        <div className="flex flex-1 justify-between p-3 flex-col bg-secondary-bg shadow-m rounded-2xl">
           <Controller
             name="package"
             control={control}
@@ -477,7 +498,9 @@ const PropertyForm = () => {
               />
             )}
           />
-          <div className="relative flex-1 bg-amber-100 text-sm p-3 rounded-lg shadow-sm overflow-hidden">
+          <div
+            onClick={() => openEditDetailsModal()}
+            className="cursor-pointer relative flex-1 bg-amber-100 text-sm p-3 rounded-lg shadow-sm overflow-hidden">
             {/* Fold */}
             <div className="absolute top-0 left-0 w-6 h-6 bg-amber-200 rotate-45 -translate-x-1/2 -translate-y-1/2 shadow-sm" />
 

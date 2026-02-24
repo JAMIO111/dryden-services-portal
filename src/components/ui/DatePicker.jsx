@@ -96,9 +96,26 @@ const DatePicker = ({
   };
 
   const handleTimeChange = (type, value) => {
-    const newDate = new Date(safeDate || new Date());
-    if (type === "hours") newDate.setHours(value);
-    if (type === "minutes") newDate.setMinutes(value);
+    let newDate;
+
+    if (safeDate) {
+      newDate = new Date(safeDate);
+    } else {
+      // Start from a neutral time instead of "now"
+      newDate = new Date();
+      newDate.setHours(0, 0, 0, 0);
+    }
+
+    if (type === "hours") {
+      newDate.setHours(value);
+      // If there was no existing date, default minutes to 0
+      if (!safeDate) newDate.setMinutes(0);
+    }
+
+    if (type === "minutes") {
+      newDate.setMinutes(value);
+    }
+
     onChange(toTimeString(newDate));
   };
 

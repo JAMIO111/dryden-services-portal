@@ -190,7 +190,9 @@ const Employees = () => {
                     {employee.first_name} {employee.surname}
                   </span>
                 </div>
-                <div className="flex-1">{employee.job_title || "-"}</div>
+                <div className="flex-1">
+                  {employee.contract_job_title || "-"}
+                </div>
                 <div className="flex-1">{employee.email || "-"}</div>
                 <div className="flex-1">{employee.phone || "-"}</div>
                 <div className="w-30">
