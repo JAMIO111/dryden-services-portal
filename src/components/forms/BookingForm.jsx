@@ -56,7 +56,7 @@ const BookingForm = () => {
   const navigate = useNavigate();
   const { bookingId } = useParams();
   const { data: booking } = useBookingById(
-    bookingId !== "New-Booking" ? bookingId : null
+    bookingId !== "New-Booking" ? bookingId : null,
   );
   const { data: properties } = useProperties();
   const { showToast } = useToast();
@@ -69,7 +69,7 @@ const BookingForm = () => {
       (prop.is_active &&
         (prop?.service_type?.includes("changeover") ||
           prop?.service_type?.includes("hot_tub"))) ||
-      prop.id === booking?.property_id
+      prop.id === booking?.property_id,
   );
 
   const {
@@ -97,10 +97,10 @@ const BookingForm = () => {
         ...booking,
         bookingDates: {
           startDate: booking.arrival_date
-            ? new Date(booking.arrival_date)
+            ? new Date(`${booking.arrival_date}T00:00:00`)
             : null,
           endDate: booking.departure_date
-            ? new Date(booking.departure_date)
+            ? new Date(`${booking.departure_date}T00:00:00`)
             : null,
         },
       });
@@ -291,6 +291,17 @@ const BookingForm = () => {
             text={isSubmitting ? "Saving..." : "Save Changes"}
             icon={FaCheck}
             callbackFn={handleSubmit(async (data) => {
+              const formatForDB = (d) => {
+                if (!d) return null;
+
+                const date = new Date(d);
+
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+
+                return `${year}-${month}-${day}`;
+              };
               try {
                 const { bookingDates, ...rest } = data;
                 const nights =
@@ -298,7 +309,7 @@ const BookingForm = () => {
                     ? Math.round(
                         (new Date(bookingDates.endDate) -
                           new Date(bookingDates.startDate)) /
-                          (1000 * 60 * 60 * 24)
+                          (1000 * 60 * 60 * 24),
                       )
                     : null;
 
@@ -307,14 +318,18 @@ const BookingForm = () => {
                     ? {
                         id: watch("id"),
                         ...rest,
-                        arrival_date: bookingDates?.startDate || null,
-                        departure_date: bookingDates?.endDate || null,
+                        arrival_date:
+                          formatForDB(bookingDates?.startDate) || null,
+                        departure_date:
+                          formatForDB(bookingDates?.endDate) || null,
                         nights,
                       }
                     : {
                         ...rest,
-                        arrival_date: bookingDates?.startDate || null,
-                        departure_date: bookingDates?.endDate || null,
+                        arrival_date:
+                          formatForDB(bookingDates?.startDate) || null,
+                        departure_date:
+                          formatForDB(bookingDates?.endDate) || null,
                         nights,
                       };
 

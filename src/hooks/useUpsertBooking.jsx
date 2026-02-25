@@ -25,13 +25,21 @@ export const useUpsertBooking = () => {
       const { data: existingBookings, error: fetchError } = await query;
       if (fetchError) throw fetchError;
 
-      const newStart = new Date(arrival_date);
-      const newEnd = new Date(departure_date);
+      const toYYYYMMDD = (d) => {
+        if (!d) return null;
+        const date = new Date(d);
+        return date.toISOString().split("T")[0]; // "2026-07-10"
+      };
+
+      const newStartStr = toYYYYMMDD(arrival_date);
+      const newEndStr = toYYYYMMDD(departure_date);
 
       const overlappingBooking = existingBookings?.find((b) => {
-        const start = new Date(b.arrival_date);
-        const end = new Date(b.departure_date);
-        return newStart < end && newEnd > start;
+        const startStr = toYYYYMMDD(b.arrival_date);
+        const endStr = toYYYYMMDD(b.departure_date);
+
+        // allow newStart === old end or newEnd === old start
+        return newStartStr < endStr && newEndStr > startStr;
       });
 
       if (overlappingBooking) {
@@ -47,7 +55,7 @@ export const useUpsertBooking = () => {
 
         const error = new Error(
           `Booking conflict with reference ${
-            overlappingBooking.booking_ref || overlappingBooking.id
+            overlappingBooking.booking_id
           }. Existing booking runs from ${formattedStart} to ${formattedEnd}.`,
         );
         error.code = "OVERLAP";

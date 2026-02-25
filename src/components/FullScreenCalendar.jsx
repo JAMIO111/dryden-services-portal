@@ -284,11 +284,11 @@ export default function FullScreenCalendar() {
             laundryForDay.map((job, index) => (
               <span
                 key={index}
-                className="bg-purple-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                className="hover:scale-97 bg-purple-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                 <div className="bg-purple-500 rounded-full w-0.75 h-full"></div>
                 <div className="flex flex-col py-1 gap-1">
-                  <p className="font-semibold text-sm">Laundry Job</p>
-                  <p className="text-xs">{job.property_name}</p>
+                  <p className="text-xs">Laundry Job</p>
+                  <p className="font-semibold text-xs">{job.property_name}</p>
                   <p className="text-xs text-secondary-text">
                     {`${job.transport} ${
                       job.splitType === "Start" && job.transport === "Client"
@@ -316,8 +316,10 @@ export default function FullScreenCalendar() {
                         className={`${job.nextArrival === job.jobDate ? "bg-green-500" : "bg-red-500"} rounded-b-full w-0.75 h-full`}></div>
                     </div>
                     <div className="flex flex-col py-1 gap-1">
-                      <p className="font-semibold text-xs">Changeover</p>
-                      <p className="text-sm">{job.propertyDetails.name}</p>
+                      <p className="text-xs">Changeover</p>
+                      <p className="font-semibold text-sm">
+                        {job.propertyDetails.name}
+                      </p>
                       <p className="text-xs text-secondary-text">
                         {`Next Arrival: ${
                           job.nextArrival
@@ -353,11 +355,11 @@ export default function FullScreenCalendar() {
             cleanForDay.map((job, index) => (
               <span
                 key={index}
-                className="bg-green-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                className="hover:scale-97 bg-green-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                 <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
                 <div className="flex flex-col py-1 gap-1">
-                  <p className="font-semibold text-sm">Cleaning Job</p>
-                  <p className="text-xs">{job.property_name}</p>
+                  <p className="text-xs">Cleaning Job</p>
+                  <p className="font-semibold text-sm">{job.property_name}</p>
                 </div>
               </span>
             ))
@@ -368,13 +370,11 @@ export default function FullScreenCalendar() {
               ? meetingsForDay.map((meeting, index) => (
                   <span
                     key={index}
-                    className="bg-orange-400/30 p-1 rounded flex flex-row gap-2">
+                    className="hover:scale-97 bg-orange-400/30 p-1 rounded flex flex-row gap-2">
                     <div className="bg-orange-500 rounded-full w-0.75 h-full"></div>
                     <div className="flex flex-col py-1 gap-1">
+                      <p className="text-xs text-primary-text">Meeting</p>
                       <p className="text-sm font-semibold text-primary-text">
-                        Meeting
-                      </p>
-                      <p className="text-xs text-primary-text">
                         {meeting.title}
                       </p>
                       <p className="text-xs text-secondary-text">
@@ -401,7 +401,7 @@ export default function FullScreenCalendar() {
               ? absencesForDay.map((absence, index) => (
                   <span
                     key={index}
-                    className="bg-red-400/30 p-1 rounded flex flex-row gap-2">
+                    className="hover:scale-97 bg-red-400/30 p-1 rounded flex flex-row gap-2">
                     <div className="bg-red-500 rounded-full w-0.75 h-full"></div>
                     <div className="flex flex-col py-1 gap-1">
                       <p className="text-sm font-semibold text-primary-text">

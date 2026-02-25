@@ -148,50 +148,55 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                       <GiMagicBroom className="w-8 h-8 text-green-600 m-2" />
                     )}
                   </div>
-                  <div className="flex flex-col justify-center gap-1">
-                    <p className="font-semibold text-sm text-primary-text">
-                      {job.property_name || "Unnamed Property"}
-                    </p>
-                    <div className="flex flex-row items-center gap-2">
-                      <p className="text-xs text-secondary-text">
-                        {`${
-                          job.type === "Laundry"
-                            ? `${new Date(job.start_date).toLocaleString(
-                                "en-GB",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                },
-                              )} - ${new Date(job.end_date).toLocaleString(
-                                "en-GB",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                },
-                              )}`
-                            : new Date(job.single_date).toLocaleString(
-                                "en-GB",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                },
-                              )
-                        } - ${job?.ad_hoc_job_id || ""}`}
+                  <div className="flex w-full flex-col justify-around">
+                    <div className="flex flex-row justify-between gap-1">
+                      <p className="font-semibold text-sm text-primary-text">
+                        {job.property_name || "Unnamed Property"}
                       </p>
-                      {job.bookingId && (
-                        <button
-                          onClick={() => {
-                            navigate(`/Bookings/${job.bookingId}`);
-                            closeModal();
-                          }}
-                          className="text-icon-color hover:shadow-s p-1 rounded active:scale-95">
-                          <TbExternalLink className="w-4 h-4" />
-                        </button>
-                      )}
+                      <div className="flex flex-row items-center gap-2">
+                        <p className="text-xs text-secondary-text">
+                          {`${
+                            job.type === "Laundry"
+                              ? `${new Date(job.start_date).toLocaleString(
+                                  "en-GB",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  },
+                                )} - ${new Date(job.end_date).toLocaleString(
+                                  "en-GB",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  },
+                                )}`
+                              : new Date(job.single_date).toLocaleString(
+                                  "en-GB",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  },
+                                )
+                          } - ${job?.ad_hoc_job_id || ""}`}
+                        </p>
+                        {job.bookingId && (
+                          <button
+                            onClick={() => {
+                              navigate(`/Bookings/${job.bookingId}`);
+                              closeModal();
+                            }}
+                            className="text-icon-color hover:shadow-s p-1 rounded active:scale-95">
+                            <TbExternalLink className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
+                    <p className="text-xs text-secondary-text">
+                      {job?.notes || "No notes for this job"}
+                    </p>
                   </div>
                 </div>
                 {job?.type === "Laundry" && (
@@ -242,7 +247,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                           day: "numeric",
                           year: "numeric",
                         },
-                      )} ${job.propertyDetails.check_out || ""} - ${
+                      )} ${job.propertyDetails.check_out?.split(":").slice(0, 2).join(":") || ""} - ${
                         job?.bookingId || ""
                       }`}
                     </p>
@@ -253,7 +258,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                           closeModal();
                         }}
                         className="text-icon-color hover:shadow-s p-1 rounded active:scale-95">
-                        <TbExternalLink className="w-4 h-4" />
+                        <TbExternalLink className="cursor-pointer w-4 h-4" />
                       </button>
                     )}
                   </div>
@@ -266,7 +271,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                             month: "short",
                             day: "numeric",
                             year: "numeric",
-                          })} ${job.propertyDetails.check_in || ""} ${
+                          })} ${job.propertyDetails.check_in?.split(":").slice(0, 2).join(":") || ""} ${
                             job?.bookingDetails?.booking_id
                               ? `- ${job.bookingDetails.booking_id}`
                               : ""
@@ -283,7 +288,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                           closeModal();
                         }}
                         className="text-icon-color hover:shadow-s p-1 rounded active:scale-95">
-                        <TbExternalLink className="w-4 h-4" />
+                        <TbExternalLink className="cursor-pointer w-4 h-4" />
                       </button>
                     )}
                   </div>
