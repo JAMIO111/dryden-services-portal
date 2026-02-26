@@ -5,8 +5,8 @@ const fetchMeetings = async (startDate, endDate) => {
   const { data, error } = await supabase
     .from("Meetings")
     .select("*")
-    .gte("start_date", startDate.toISOString())
-    .lte("start_date", endDate.toISOString());
+    .gte("start_date", startDate)
+    .lte("start_date", endDate);
   if (error) throw new Error(error.message);
   return data;
 };

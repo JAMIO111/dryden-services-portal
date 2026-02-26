@@ -51,12 +51,12 @@ export const useBookings = ({
       query = query
         .order(sortColumn, { ascending: sortOrder === "asc" })
         .range(from, to)
-        .gte("departure_date", startDate.toISOString())
-        .lte("departure_date", endDate.toISOString());
+        .gte("departure_date", startDate)
+        .lte("departure_date", endDate);
 
       if (search) {
         query = query.or(
-          `lead_guest.ilike.%${search}%,booking_ref.ilike.%${search}%,property_name.ilike.%${search}%`
+          `lead_guest.ilike.%${search}%,booking_ref.ilike.%${search}%,property_name.ilike.%${search}%`,
         );
       }
 

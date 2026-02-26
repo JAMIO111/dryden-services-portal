@@ -107,13 +107,13 @@ export default function AbsenceList({
               Employee Absences
             </h2>
             <p className="text-sm text-secondary-text">
-              {`${
-                absences?.length
-              } absences between ${startDate?.toLocaleDateString("en-GB", {
+              {`${absences?.length} absences between ${new Date(
+                startDate,
+              ).toLocaleDateString("en-GB", {
                 year: "2-digit",
                 month: "short",
                 day: "numeric",
-              })} and ${endDate?.toLocaleDateString("en-GB", {
+              })} and ${new Date(endDate).toLocaleDateString("en-GB", {
                 year: "2-digit",
                 month: "short",
                 day: "numeric",
@@ -183,11 +183,11 @@ export default function AbsenceList({
                           };
                           const startStr = start.toLocaleDateString(
                             "en-GB",
-                            options
+                            options,
                           );
                           const endStr = end.toLocaleDateString(
                             "en-GB",
-                            options
+                            options,
                           );
                           return startStr === endStr
                             ? startStr

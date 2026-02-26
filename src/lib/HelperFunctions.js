@@ -49,7 +49,7 @@ export const normalizeFetchedData = (data) => {
       normalized[key] = value.map((item) =>
         typeof item === "object" && item !== null
           ? normalizeFetchedData(item)
-          : item
+          : item,
       );
     } else if (typeof value === "object") {
       normalized[key] = normalizeFetchedData(value);
@@ -72,6 +72,18 @@ export const getGreeting = () => {
 export function normalize(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
+
+export const formatToDateString = (d) => {
+  if (!d) return null;
+
+  const date = new Date(d);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
 
 export function getStartOfWeek(date, weekStartsOn = 1) {
   const d = new Date(date);

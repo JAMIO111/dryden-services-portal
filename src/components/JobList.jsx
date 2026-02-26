@@ -6,11 +6,11 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
   const navigate = useNavigate();
 
   const typeClasses = {
-    Changeover: "bg-pink-500/10 text-pink-600",
+    changeover: "bg-pink-500/10 text-pink-600",
     Clean: "bg-green-500/10 text-green-600",
     Maintenance: "bg-yellow-500/10 text-yellow-600",
     Laundry: "bg-purple-500/10 text-purple-600",
-    "Hot Tub": "bg-blue-500/10 text-blue-600",
+    hot_tub: "bg-blue-500/10 text-blue-600",
   };
   return (
     <div className="flex flex-col bg-secondary-bg p-2 h-full rounded-2xl shadow-m">
@@ -30,10 +30,10 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
             jobs.length === 0
               ? "No jobs available to preview"
               : isLoading
-              ? "Loading jobs..."
-              : error
-              ? "Error loading jobs"
-              : ""
+                ? "Loading jobs..."
+                : error
+                  ? "Error loading jobs"
+                  : ""
           }
         />
       </div>
@@ -74,40 +74,40 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
                         month: "short",
                       })
                     : job?.itemType === "adHocJob" && job?.type === "Laundry"
-                    ? new Date(job.start_date).toLocaleDateString("en-GB", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                      })
-                    : new Date(job.single_date).toLocaleDateString("en-GB", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                      })}
+                      ? new Date(job.start_date).toLocaleDateString("en-GB", {
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                        })
+                      : new Date(job.single_date).toLocaleDateString("en-GB", {
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                        })}
                 </div>
                 <div className="flex items-center px-3 py-1">
                   {job?.itemType === "job" && !job.nextArrival
                     ? "No Booking"
                     : job?.itemType === "job" && job.nextArrival
-                    ? new Date(job.nextArrival).toLocaleDateString("en-GB", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                      })
-                    : job?.itemType === "adHocJob" && job?.type === "Laundry"
-                    ? new Date(job.end_date).toLocaleDateString("en-GB", {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                      })
-                    : "-"}
+                      ? new Date(job.nextArrival).toLocaleDateString("en-GB", {
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                        })
+                      : job?.itemType === "adHocJob" && job?.type === "Laundry"
+                        ? new Date(job.end_date).toLocaleDateString("en-GB", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                          })
+                        : "-"}
                 </div>
                 <div className=" justify-center items-center px-3 py-1">
                   <p
                     className={`py-0.5 px-2 text-center shadow-s rounded-md ${
                       typeClasses[
-                        job.itemType === "job" ? "Changeover" : job.type
-                      ]
+                        job.itemType === "job" ? job.sheetType : job.type
+                      ] || "bg-gray-500/10 text-gray-600"
                     }`}>
                     {job.itemType === "job"
                       ? job.sheetType

@@ -30,13 +30,15 @@ export function useJobs(startDate, endDate) {
             check_out,
             service_type,
             hired_laundry,
-            notes
+            notes,
+            hired_laundry_items,
+            laundry_items
           )
         `,
         )
         .is("deleted_at", null)
-        .gte("departure_date", startDate.toISOString())
-        .lte("departure_date", endDate.toISOString())
+        .gte("departure_date", startDate)
+        .lte("departure_date", endDate)
         .order("departure_date", { ascending: true });
 
       if (error) throw error;

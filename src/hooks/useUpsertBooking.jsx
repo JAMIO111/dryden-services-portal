@@ -20,6 +20,8 @@ export const useUpsertBooking = () => {
         .select("id, arrival_date, departure_date, booking_ref, booking_id")
         .eq("property_id", property_id);
 
+      query = query.is("deleted_at", null);
+
       if (id) query = query.neq("id", id);
 
       const { data: existingBookings, error: fetchError } = await query;

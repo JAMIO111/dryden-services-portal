@@ -12,6 +12,13 @@ function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
 }
 
+const toISODate = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
 function generateCalendar(year, month) {
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
@@ -24,7 +31,7 @@ function generateCalendar(year, month) {
       week.push(
         dayCounter < 1 || dayCounter > daysInMonth
           ? null
-          : new Date(year, month, dayCounter)
+          : new Date(year, month, dayCounter),
       );
       dayCounter++;
     }
@@ -69,8 +76,24 @@ export default function DateRangePicker({
     month: new Date().getMonth(),
   });
 
-  const startDate = value.startDate ? normalize(value.startDate) : null;
-  const endDate = value.endDate ? normalize(value.endDate) : null;
+  const parseISO = (iso) => {
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  };
+
+  const startDate =
+    value.startDate && typeof value.startDate === "string"
+      ? parseISO(value.startDate)
+      : value.startDate instanceof Date
+        ? value.startDate
+        : null;
+
+  const endDate =
+    value.endDate && typeof value.endDate === "string"
+      ? parseISO(value.endDate)
+      : value.endDate instanceof Date
+        ? value.endDate
+        : null;
 
   const visiblePresets = presets.length
     ? presets
@@ -98,11 +121,11 @@ export default function DateRangePicker({
   // ---- Calendar navigation ----
   const goToPreviousMonth = () =>
     setCalendarDate(({ year, month }) =>
-      month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 }
+      month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 },
     );
   const goToNextMonth = () =>
     setCalendarDate(({ year, month }) =>
-      month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 }
+      month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 },
     );
 
   const { year, month } = calendarDate;
@@ -110,37 +133,56 @@ export default function DateRangePicker({
 
   // ---- Day selection ----
   const handleDayClick = (day) => {
-    const normalizedDay = new Date(day);
-    normalizedDay.setHours(0, 0, 0, 0);
-
     if (!startDate || (startDate && endDate)) {
-      onChange({ startDate: normalizedDay, endDate: null });
+      // first click or restarting selection
+      onChange({ startDate: toISODate(day), endDate: null });
+      return;
+    }
+
+    // second click
+    if (day < startDate) {
+      onChange({
+        startDate: toISODate(day),
+        endDate: toISODate(startDate),
+      });
     } else {
-      if (normalizedDay < startDate) {
-        onChange({ startDate: normalizedDay, endDate: startDate });
-      } else {
-        onChange({ startDate, endDate: normalizedDay });
-      }
+      onChange({
+        startDate: toISODate(startDate),
+        endDate: toISODate(day),
+      });
     }
   };
 
   const isInRange = (day) => {
-    if (startDate && !endDate && hoverDate) {
-      const min = hoverDate > startDate ? startDate : hoverDate;
-      const max = hoverDate > startDate ? hoverDate : startDate;
-      return day >= min && day <= max;
-    }
-    return startDate && endDate && day >= startDate && day <= endDate;
-  };
+    if (!day) return false;
 
-  const isEdge = (day) =>
-    (startDate && day.getTime() === startDate.getTime()) ||
-    (endDate && day.getTime() === endDate.getTime());
+    const start = startDate;
+    const end = endDate || hoverDate;
+
+    if (!start || !end) return false;
+
+    const toNumber = (d) => {
+      if (!d) return 0;
+      if (typeof d === "string") return Number(d.replace(/-/g, ""));
+      return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+    };
+
+    const nDay = toNumber(day);
+    const nStart = toNumber(start);
+    const nEnd = toNumber(end);
+
+    const min = Math.min(nStart, nEnd);
+    const max = Math.max(nStart, nEnd);
+
+    return nDay >= min && nDay <= max;
+  };
 
   const isSameDay = (d1, d2) =>
     d1?.getFullYear() === d2?.getFullYear() &&
     d1?.getMonth() === d2?.getMonth() &&
     d1?.getDate() === d2?.getDate();
+
+  const isEdge = (day) => isSameDay(day, startDate) || isSameDay(day, endDate);
 
   const isSameRange = (s1, e1, s2, e2) =>
     isSameDay(s1, s2) && isSameDay(e1, e2);
@@ -188,8 +230,8 @@ export default function DateRangePicker({
             startDate && endDate
               ? `${formatDate(startDate)} - ${formatDate(endDate)}`
               : startDate
-              ? `${formatDate(startDate)} -`
-              : ""
+                ? `${formatDate(startDate)} -`
+                : ""
           }
           placeholder="Select date range"
         />
@@ -245,19 +287,19 @@ export default function DateRangePicker({
                               startDate.getTime() === endDate.getTime()
                               ? "bg-cta-color text-white rounded-xl"
                               : day.getTime() === startDate?.getTime()
-                              ? "bg-cta-color text-white rounded-l-xl"
-                              : "bg-cta-color text-white rounded-r-xl"
+                                ? "bg-cta-color text-white rounded-l-xl"
+                                : "bg-cta-color text-white rounded-r-xl"
                             : isInRange(day)
-                            ? "bg-cta-color/20 text-blue-800"
-                            : "hover:bg-cta-color/5 rounded-xl"
+                              ? "bg-cta-color/20 text-blue-800"
+                              : "hover:bg-cta-color/5 rounded-xl"
                         }
                       `}>
                       {day.getDate()}
                     </button>
                   ) : (
                     <div key={`${i}-${j}`} />
-                  )
-                )
+                  ),
+                ),
               )}
             </div>
 
@@ -274,9 +316,9 @@ export default function DateRangePicker({
                   {Math.abs(
                     Math.round(
                       ((endDate || hoverDate || startDate) - startDate) /
-                        (1000 * 60 * 60 * 24)
-                    )
-                  )}{" "}
+                        (1000 * 60 * 60 * 24),
+                    ),
+                  ) + (rangeCounterText === "Days" ? 1 : 0)}{" "}
                   {rangeCounterText}
                 </div>
               )}
@@ -287,7 +329,11 @@ export default function DateRangePicker({
                 title="Apply Date Range"
                 icon={null}
                 callbackFn={() => {
-                  if (startDate && endDate) onChange({ startDate, endDate });
+                  if (startDate && endDate)
+                    onChange({
+                      startDate: toISODate(startDate),
+                      endDate: toISODate(endDate),
+                    });
                   setIsOpen(false);
                 }}
               />

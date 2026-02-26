@@ -6,6 +6,7 @@ import SlidingSelectorGeneric from "./ui/SlidingSelectorGeneric";
 import { useCalendarItems } from "@/hooks/useCalendarItems";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { GoPlus } from "react-icons/go";
+import { formatToDateString } from "@/lib/HelperFunctions";
 
 // --- UTC helpers to avoid DST issues ---
 function getSundayUTC(date) {
@@ -73,9 +74,12 @@ export default function FullScreenCalendar() {
     }
   }, [normalizedDate, view]);
 
+  console.log("Calendar Start Date:", calendarStartDate);
+  console.log("Calendar End Date:", calendarEndDate);
+
   const { data: calendarItems, isLoading } = useCalendarItems(
-    calendarStartDate,
-    calendarEndDate,
+    formatToDateString(calendarStartDate),
+    formatToDateString(calendarEndDate),
   );
 
   console.log("Calendar Items:", calendarItems);
@@ -309,7 +313,7 @@ export default function FullScreenCalendar() {
               ? jobsForDay.map((job, index) => (
                   <span
                     key={index}
-                    className="hover:scale-97 bg-purple-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
+                    className="hover:scale-97 bg-pink-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
                     <div className="flex flex-col">
                       <div className="bg-red-500 rounded-t-full w-0.75 h-full"></div>
                       <div

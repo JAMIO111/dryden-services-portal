@@ -4,7 +4,7 @@ import DateRangePicker from "../ui/DateRangePicker";
 import { useUser } from "@/contexts/UserProvider";
 import CTAButton from "../CTAButton";
 import { useNavigate } from "react-router-dom";
-import { getGreeting } from "@/lib/HelperFunctions";
+import { getGreeting, formatToDateString } from "@/lib/HelperFunctions";
 import AdHocJobsTable from "../AdHocJobsTable";
 import { useAdHocJobs } from "@/hooks/useAdHocJobs";
 import { useAdHocJobsFilters } from "@/hooks/useAdHocJobsFilters";
@@ -43,23 +43,26 @@ const AdHocJobsDashboard = () => {
 
   const [selectedRange, setSelectedRange] = useState(() => {
     return {
-      startDate: location?.state?.startDate ?? today,
-      endDate: location?.state?.endDate ?? end,
+      startDate:
+        formatToDateString(location?.state?.startDate) ??
+        formatToDateString(today),
+      endDate:
+        formatToDateString(location?.state?.endDate) ?? formatToDateString(end),
     };
   });
 
   useEffect(() => {
     if (location.state?.dateRange) {
       setSelectedRange({
-        startDate: new Date(location.state.dateRange.startDate),
-        endDate: new Date(location.state.dateRange.endDate),
+        startDate: formatToDateString(location.state.dateRange.startDate),
+        endDate: formatToDateString(location.state.dateRange.endDate),
       });
     }
   }, [location.state]);
 
   const memoisedRange = useMemo(
     () => selectedRange,
-    [selectedRange.startDate, selectedRange.endDate]
+    [selectedRange.startDate, selectedRange.endDate],
   );
 
   const setPage = (newPage) => {
@@ -88,10 +91,11 @@ const AdHocJobsDashboard = () => {
     sortOrder,
     page,
     pageSize,
-    startDate: memoisedRange.startDate,
-    endDate: memoisedRange.endDate,
+    startDate: formatToDateString(memoisedRange.startDate),
+    endDate: formatToDateString(memoisedRange.endDate),
   });
 
+  console.log("Ad-Hoc Jobs Dates:", memoisedRange);
   console.log("Ad-Hoc Jobs Dashboard - Ad-Hoc Jobs Data:", adHocJobsData);
 
   useEffect(() => {
@@ -117,7 +121,7 @@ const AdHocJobsDashboard = () => {
 
   const handleToggle = (row) => {
     setSelectedRows((prev) =>
-      isSelected(row.id) ? prev.filter((r) => r.id !== row.id) : [...prev, row]
+      isSelected(row.id) ? prev.filter((r) => r.id !== row.id) : [...prev, row],
     );
   };
 
@@ -174,7 +178,7 @@ const AdHocJobsDashboard = () => {
   }, [modalPos]);
 
   const activeFilters = ["property", "notes", "bookingId", "type"].filter(
-    (key) => searchParams.get(key)
+    (key) => searchParams.get(key),
   );
   const filterCount = activeFilters.length;
 

@@ -1,11 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
 
-const getMonthKey = (date) =>
-  new Date(date).toLocaleString("default", { month: "short", year: "2-digit" });
+const parseISO = (iso) => {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d); // local midnight, no UTC shift
+};
 
-// Generate all month keys between two dates
-const generateMonthKeys = (start, end) => {
+const getMonthKey = (date) =>
+  date.toLocaleString("default", { month: "short", year: "2-digit" });
+
+// Generate all month keys between two ISO strings
+const generateMonthKeys = (startISO, endISO) => {
+  const start = parseISO(startISO);
+  const end = parseISO(endISO);
+
   const keys = [];
   const date = new Date(start.getFullYear(), start.getMonth(), 1);
 
@@ -27,29 +35,29 @@ export const useBookingVolume = (startDate, endDate) => {
         .from("Bookings")
         .select("id, departure_date")
         .is("deleted_at", null)
-        .gte("departure_date", startDate.toISOString())
-        .lte("departure_date", endDate.toISOString());
+        .gte("departure_date", startDate) // ISO string works perfectly in SQL
+        .lte("departure_date", endDate);
 
       if (error) throw error;
 
       // Group bookings by month
       const grouped = bookings.reduce((acc, booking) => {
-        const month = getMonthKey(booking.departure_date);
+        const date = parseISO(booking.departure_date);
+        const month = getMonthKey(date);
+
         if (!acc[month]) acc[month] = 0;
         acc[month]++;
+
         return acc;
       }, {});
 
       // Generate full month range
       const monthKeys = generateMonthKeys(startDate, endDate);
 
-      // Map to array with bookings count (0 if none)
-      const months = monthKeys.map((month) => ({
+      return monthKeys.map((month) => ({
         month,
         bookings: grouped[month] || 0,
       }));
-
-      return months;
     },
     enabled: !!startDate && !!endDate,
     staleTime: 5 * 60 * 1000,

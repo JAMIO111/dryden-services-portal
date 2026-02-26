@@ -3,7 +3,7 @@ import { PiUsersThree } from "react-icons/pi";
 import { FaUmbrellaBeach } from "react-icons/fa";
 import { MdOutlineSick } from "react-icons/md";
 import DateRangePicker from "../ui/DateRangePicker";
-import { getGreeting } from "@/lib/HelperFunctions";
+import { getGreeting, formatToDateString } from "@/lib/HelperFunctions";
 import { useState, useMemo } from "react";
 import DashboardCard from "./DashboardCard";
 import { useActiveEmployees } from "@/hooks/useEmployees";
@@ -13,11 +13,11 @@ import { useAbsences } from "@/hooks/useAbsences";
 const HRDashboard = () => {
   const { profile } = useUser();
   const { data: employees, isLoading } = useActiveEmployees();
-  const today = useMemo(() => new Date(), []);
+  const today = useMemo(() => formatToDateString(new Date()), []);
   const end = useMemo(() => {
     const s = new Date(today);
-    s.setDate(today.getDate() + 14);
-    return s;
+    s.setDate(s.getDate() + 14);
+    return formatToDateString(s);
   }, [today]);
 
   const [selectedRange, setSelectedRange] = useState({
@@ -33,7 +33,7 @@ const HRDashboard = () => {
 
   const { data: absences, isAbsencesLoading } = useAbsences(
     selectedRange.startDate,
-    selectedRange.endDate
+    selectedRange.endDate,
   );
 
   return (

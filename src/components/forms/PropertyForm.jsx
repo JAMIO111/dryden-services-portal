@@ -38,6 +38,7 @@ import KeyCodeForm from "./KeyCodeForm";
 import PropertyOwnerForm from "./PropertyOwnerForm";
 import PropertyAddressForm from "./PropertyAddressForm";
 import PropertyDetailsForm from "./PropertyDetailsForm";
+import LaundryInfoForm from "./LaundryInfoForm";
 import Pill from "@components/Pill";
 
 const defaultFormData = {
@@ -63,6 +64,8 @@ const defaultFormData = {
   check_out: "15:00",
   property_ref: undefined,
   owner_ref: undefined,
+  laundry_items: [],
+  hired_laundry_items: [],
 };
 
 const PropertyForm = () => {
@@ -165,6 +168,27 @@ const PropertyForm = () => {
           }}
           onCancel={closeModal}
         />
+      ),
+    });
+  };
+
+  const openLaundryInfoModal = () => {
+    openModal({
+      title: "Laundry Information",
+      content: (
+        <div>
+          <LaundryInfoForm
+            propertyId={property?.id}
+            control={control}
+            onSave={() => {
+              closeModal();
+            }}
+            onCancel={closeModal}
+          />
+          <div className="flex justify-end gap-2 mt-4">
+            <CTAButton type="cancel" text="Close" callbackFn={closeModal} />
+          </div>
+        </div>
       ),
     });
   };
@@ -484,6 +508,21 @@ const PropertyForm = () => {
               />
             )}
           />
+          <div
+            onClick={() => openEditDetailsModal()}
+            className="cursor-pointer relative flex-1 bg-amber-100 text-sm p-3 rounded-lg shadow-sm overflow-hidden">
+            {/* Fold */}
+            <div className="absolute top-0 left-0 w-6 h-6 bg-amber-200 rotate-45 -translate-x-1/2 -translate-y-1/2 shadow-sm" />
+
+            {watch("notes") || "No additional notes entered yet."}
+          </div>
+          <div className="flex items-center justify-end">
+            <CTAButton
+              type="main"
+              text="Edit Laundry Info"
+              callbackFn={() => openLaundryInfoModal()}
+            />
+          </div>
           <Controller
             name="hired_laundry"
             control={control}
@@ -498,14 +537,6 @@ const PropertyForm = () => {
               />
             )}
           />
-          <div
-            onClick={() => openEditDetailsModal()}
-            className="cursor-pointer relative flex-1 bg-amber-100 text-sm p-3 rounded-lg shadow-sm overflow-hidden">
-            {/* Fold */}
-            <div className="absolute top-0 left-0 w-6 h-6 bg-amber-200 rotate-45 -translate-x-1/2 -translate-y-1/2 shadow-sm" />
-
-            {watch("notes") || "No additional notes entered yet."}
-          </div>
         </div>
       </div>
       <div className="flex flex-col h-full gap-3">

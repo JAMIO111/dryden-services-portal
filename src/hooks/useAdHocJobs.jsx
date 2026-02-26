@@ -44,13 +44,13 @@ export const useAdHocJobs = ({
       query = query
         .order(sortColumn, { ascending: sortOrder === "asc" })
         .range(from, to)
-        .lte("sort_date_start", endDate.toISOString()) // job starts before user range ends
-        .gte("sort_date_end", startDate.toISOString()) // job ends after user range starts
+        .lte("sort_date_start", endDate) // job starts before user range ends
+        .gte("sort_date_end", startDate) // job ends after user range starts
         .order("sort_date_start", { ascending: true });
 
       if (search) {
         query = query.or(
-          `property_name.ilike.%${search}%,notes.ilike.%${search}%,ad_hoc_job_id.ilike.%${search}%,type.ilike.%${search}%`
+          `property_name.ilike.%${search}%,notes.ilike.%${search}%,ad_hoc_job_id.ilike.%${search}%,type.ilike.%${search}%`,
         );
       }
 
@@ -63,5 +63,6 @@ export const useAdHocJobs = ({
       return { data, count };
     },
     staleTime: 1000 * 60 * 5,
+    enabled: startDate !== null && endDate !== null, // only run if both dates are set
   });
 };

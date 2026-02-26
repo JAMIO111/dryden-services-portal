@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import JobList from "@components/JobList";
 import { useUser } from "@/contexts/UserProvider";
 import DateRangePicker from "@components/ui/DateRangePicker";
-import { getGreeting } from "@/lib/HelperFunctions";
+import { getGreeting, formatToDateString } from "@/lib/HelperFunctions";
 import StackedBarChart from "@components/charts/StackedBarChart";
 import { useBookingVolume } from "@/hooks/useBookingVolume";
 import { getPeriodLabel } from "@/lib/utils";
@@ -16,11 +16,14 @@ import { TbIroning3 } from "react-icons/tb";
 const Dashboard = () => {
   const { profile, orgUsers } = useUser();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const today = useMemo(() => new Date(), []);
+
+  const today = useMemo(() => {
+    return formatToDateString(new Date());
+  }, []);
   const end = useMemo(() => {
-    const s = new Date(today);
-    s.setDate(today.getDate() + 14);
-    return s;
+    const s = new Date();
+    s.setDate(s.getDate() + 14);
+    return formatToDateString(s);
   }, [today]);
 
   console.log("Org Users in Dashboard:", orgUsers);
@@ -33,7 +36,7 @@ const Dashboard = () => {
 
   const memoisedRange = useMemo(
     () => selectedRange,
-    [selectedRange.startDate, selectedRange.endDate]
+    [selectedRange.startDate, selectedRange.endDate],
   );
 
   const {
@@ -47,16 +50,10 @@ const Dashboard = () => {
 
   const { data } = useBookingVolume(
     memoisedRange.startDate,
-    memoisedRange.endDate
+    memoisedRange.endDate,
   );
 
   console.log("Booking Volume Data:", data);
-
-  useEffect(() => {
-    const end = new Date();
-    end.setDate(today.getDate() + 14);
-    setSelectedRange({ startDate: today, endDate: end });
-  }, [today]);
 
   return (
     <div className="h-full w-full">
@@ -100,6 +97,7 @@ const Dashboard = () => {
             <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
               <DateRangePicker
                 alignment="right"
+                rangeCounterText="Days"
                 width="w-80"
                 onChange={setSelectedRange}
                 value={memoisedRange}
@@ -154,7 +152,7 @@ const Dashboard = () => {
                   subtitle={`Changeovers for ${getPeriodLabel(
                     memoisedRange.startDate,
                     memoisedRange.endDate,
-                    "current"
+                    "current",
                   )}`}
                 />
               </div>

@@ -95,7 +95,7 @@ const BookingsTable = ({
   const rows = Array.isArray(data?.data) ? data.data : [];
 
   return (
-    <div className="flex h-full shadow-md flex-col border relative border-border-color rounded-2xl max-h-[100vh] overflow-y-auto min-h-[14px]">
+    <div className="flex m-3 flex-1 shadow-md flex-col border relative border-border-color rounded-2xl overflow-y-auto">
       <div className="flex-1 text-[13px] bg-secondary-bg overflow-y-auto relative">
         <table className="w-full border-collapse">
           <thead>

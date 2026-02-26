@@ -5,8 +5,8 @@ const fetchAbsences = async (startDate, endDate) => {
   const { data, error } = await supabase
     .from("Absences")
     .select("*, employee:Employees(id, avatar, first_name, surname, job_title)")
-    .lte("start_date", endDate.toISOString()) // starts before query end
-    .gte("end_date", startDate.toISOString()); // ends after query start
+    .lte("start_date", endDate) // starts before query end
+    .gte("end_date", startDate); // ends after query start
 
   if (error) throw new Error(error.message);
   return data;

@@ -107,6 +107,93 @@ const BookingForm = () => {
     }
   }, [bookingId, booking, reset]);
 
+  const handleSaveBooking = async (data, exit = true) => {
+    const formatForDB = (d) => {
+      if (!d) return null;
+
+      const date = new Date(d);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    };
+
+    try {
+      const { bookingDates, ...rest } = data;
+
+      const nights =
+        bookingDates?.startDate && bookingDates?.endDate
+          ? Math.round(
+              (new Date(bookingDates.endDate) -
+                new Date(bookingDates.startDate)) /
+                (1000 * 60 * 60 * 24),
+            )
+          : null;
+
+      const payload =
+        bookingId !== "New-Booking"
+          ? {
+              id: watch("id"),
+              ...rest,
+              arrival_date: formatForDB(bookingDates?.startDate),
+              departure_date: formatForDB(bookingDates?.endDate),
+              nights,
+            }
+          : {
+              ...rest,
+              arrival_date: formatForDB(bookingDates?.startDate),
+              departure_date: formatForDB(bookingDates?.endDate),
+              nights,
+            };
+
+      const result = await upsertBooking.mutateAsync(payload);
+
+      showToast({
+        type: "success",
+        title:
+          bookingId !== "New-Booking" ? "Booking Updated" : "Booking Created",
+        message:
+          bookingId !== "New-Booking"
+            ? "The booking has been successfully updated."
+            : "New booking successfully entered.",
+      });
+
+      await createNotification({
+        title:
+          bookingId !== "New-Booking" ? "Booking Updated" : "Booking Created",
+        body:
+          bookingId !== "New-Booking"
+            ? "has made ammendments to a booking:"
+            : "has entered a new booking:",
+        metaData: {
+          url: `/Jobs/Bookings/${result.booking_id}`,
+          buttonText: "View Booking",
+        },
+        docRef: result.booking_id,
+        category: "Bookings",
+        type: bookingId !== "New-Booking" ? "update" : "new",
+      });
+
+      if (exit) {
+        navigate("/Jobs/Bookings");
+      } else {
+        navigate(`/Jobs/Bookings/New-Booking`);
+        reset(defaultFormData);
+      }
+    } catch (error) {
+      console.error("Save failed:", error.message);
+
+      if (error.code === "OVERLAP") {
+        showToast({
+          type: "error",
+          title: "Booking Overlap",
+          message: `Failed to save changes: ${error.message}`,
+        });
+      }
+    }
+  };
+
   return (
     <div className="flex bg-primary-bg flex-1 flex-row p-4 gap-4">
       <div className="shadow-m rounded-2xl flex h-full gap-3 flex-1 p-5 flex-col bg-secondary-bg">
@@ -200,34 +287,34 @@ const BookingForm = () => {
           )}
         />
       </div>
-
-      <div className="flex flex-1 shadow-m h-full justify-between p-3 px-5 flex-col bg-secondary-bg rounded-2xl">
-        {[
-          ["adults", "Adults", IoIosMan, true],
-          ["children", "Children", FaChildren],
-          ["infants", "Infants", MdChildFriendly],
-          ["pets", "Pets", FaDog],
-          ["highchairs", "Highchairs", TbChairDirector],
-          ["cots", "Cots", FaBed],
-          ["stairgates", "Stairgates", LuFence],
-        ].map(([name, label, Icon, required]) => (
-          <Controller
-            key={name}
-            name={name}
-            control={control}
-            render={({ field, fieldState }) => (
-              <NumericInputGroup
-                label={label}
-                required={required}
-                value={field.value}
-                onChange={field.onChange}
-                icon={Icon}
-                error={fieldState.error}
-              />
-            )}
-          />
-        ))}
-      </div>
+      {!watch("is_owner_booking") && (
+        <div className="flex flex-1 shadow-m h-full justify-between p-3 px-5 flex-col bg-secondary-bg rounded-2xl">
+          {[
+            ["adults", "Adults", IoIosMan],
+            ["children", "Children", FaChildren],
+            ["infants", "Infants", MdChildFriendly],
+            ["pets", "Pets", FaDog],
+            ["highchairs", "Highchairs", TbChairDirector],
+            ["cots", "Cots", FaBed],
+            ["stairgates", "Stairgates", LuFence],
+          ].map(([name, label, Icon]) => (
+            <Controller
+              key={name}
+              name={name}
+              control={control}
+              render={({ field, fieldState }) => (
+                <NumericInputGroup
+                  label={label}
+                  value={field.value}
+                  onChange={field.onChange}
+                  icon={Icon}
+                  error={fieldState.error}
+                />
+              )}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-1 gap-4 flex-col">
         <div className="flex flex-1 gap-3 shadow-m flex-col bg-secondary-bg justify-start rounded-2xl p-3">
@@ -260,10 +347,10 @@ const BookingForm = () => {
             )}
           />
         </div>
-        <div className="flex flex-row shadow-m gap-3 bg-secondary-bg rounded-2xl p-3">
+        <div className="flex flex-col shadow-m gap-3 bg-secondary-bg rounded-2xl p-3">
           <CTAButton
             disabled={!isDirty}
-            width="w-[50%]"
+            width="w-full"
             type="cancel"
             text="Revert Changes"
             icon={IoIosUndo}
@@ -286,91 +373,20 @@ const BookingForm = () => {
           <CTAButton
             isLoading={isSubmitting}
             disabled={!isDirty || !isValid || isSubmitting}
-            width="w-[50%]"
-            type="success"
-            text={isSubmitting ? "Saving..." : "Save Changes"}
+            width="w-full"
+            type="main"
+            text={isSubmitting ? "Saving..." : "Save & Create New"}
             icon={FaCheck}
-            callbackFn={handleSubmit(async (data) => {
-              const formatForDB = (d) => {
-                if (!d) return null;
-
-                const date = new Date(d);
-
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, "0");
-                const day = String(date.getDate()).padStart(2, "0");
-
-                return `${year}-${month}-${day}`;
-              };
-              try {
-                const { bookingDates, ...rest } = data;
-                const nights =
-                  bookingDates?.startDate && bookingDates?.endDate
-                    ? Math.round(
-                        (new Date(bookingDates.endDate) -
-                          new Date(bookingDates.startDate)) /
-                          (1000 * 60 * 60 * 24),
-                      )
-                    : null;
-
-                const payload =
-                  bookingId !== "New-Booking"
-                    ? {
-                        id: watch("id"),
-                        ...rest,
-                        arrival_date:
-                          formatForDB(bookingDates?.startDate) || null,
-                        departure_date:
-                          formatForDB(bookingDates?.endDate) || null,
-                        nights,
-                      }
-                    : {
-                        ...rest,
-                        arrival_date:
-                          formatForDB(bookingDates?.startDate) || null,
-                        departure_date:
-                          formatForDB(bookingDates?.endDate) || null,
-                        nights,
-                      };
-
-                console.log("Submitting payload:", payload);
-                const result = await upsertBooking.mutateAsync(payload);
-                console.log("Upsert result:", result);
-
-                navigate("/Jobs/Bookings");
-
-                showToast({
-                  type: "success",
-                  title: bookingId ? "Booking Updated" : "Booking Created",
-                  message: bookingId
-                    ? "The booking has been successfully updated."
-                    : "New booking successfully entered.",
-                });
-
-                await createNotification({
-                  title: bookingId ? "Booking Updated" : "Booking Created",
-                  body: bookingId
-                    ? "has made ammendments to a booking:"
-                    : "has entered a new booking:",
-                  metaData: {
-                    url: `/Jobs/Bookings/${result.booking_id}`,
-                    buttonText: "View Booking",
-                  },
-                  docRef: result.booking_id,
-                  category: "Bookings",
-                  type: bookingId ? "update" : "new",
-                });
-              } catch (error) {
-                console.error("Save failed:", error.message);
-                if (error.code === "OVERLAP") {
-                  showToast({
-                    type: "error",
-                    title: "Booking Overlap",
-                    message: `Failed to save changes: ${error.message}`,
-                  });
-                }
-              }
-            })}
+            callbackFn={handleSubmit((data) => handleSaveBooking(data, false))}
+          />
+          <CTAButton
+            isLoading={isSubmitting}
+            disabled={!isDirty || !isValid || isSubmitting}
+            width="w-full"
+            type="success"
+            text={isSubmitting ? "Saving..." : "Save & Exit"}
+            icon={FaCheck}
+            callbackFn={handleSubmit((data) => handleSaveBooking(data, true))}
           />
         </div>
       </div>

@@ -7,8 +7,8 @@ const fetchAdHocJobsCalendar = async (startDate, endDate) => {
     .from("v_ad_hoc_jobs")
     .select("*")
     .is("deleted_at", null)
-    .lte("sort_date_start", endDate.toISOString())
-    .gte("sort_date_end", startDate.toISOString())
+    .lte("sort_date_start", endDate)
+    .gte("sort_date_end", startDate)
     .order("sort_date_start", { ascending: true });
 
   if (error) throw new Error(error.message);

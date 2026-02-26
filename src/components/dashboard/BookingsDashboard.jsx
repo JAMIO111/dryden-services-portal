@@ -5,7 +5,7 @@ import DateRangePicker from "../ui/DateRangePicker";
 import { useUser } from "@/contexts/UserProvider";
 import CTAButton from "../CTAButton";
 import { useNavigate } from "react-router-dom";
-import { getGreeting } from "@/lib/HelperFunctions";
+import { getGreeting, formatToDateString } from "@/lib/HelperFunctions";
 import BookingsTable from "../BookingsTable";
 import { useBookings } from "@/hooks/useBookings";
 import { useBookingsFilters } from "@/hooks/useBookingsFilters";
@@ -42,23 +42,26 @@ const BookingsDashboard = () => {
 
   const [selectedRange, setSelectedRange] = useState(() => {
     return {
-      startDate: location?.state?.startDate ?? today,
-      endDate: location?.state?.endDate ?? end,
+      startDate:
+        formatToDateString(location?.state?.startDate) ??
+        formatToDateString(today),
+      endDate:
+        formatToDateString(location?.state?.endDate) ?? formatToDateString(end),
     };
   });
 
   useEffect(() => {
     if (location.state?.dateRange) {
       setSelectedRange({
-        startDate: new Date(location.state.dateRange.startDate),
-        endDate: new Date(location.state.dateRange.endDate),
+        startDate: formatToDateString(location.state.dateRange.startDate),
+        endDate: formatToDateString(location.state.dateRange.endDate),
       });
     }
   }, [location.state]);
 
   const memoisedRange = useMemo(
     () => selectedRange,
-    [selectedRange.startDate, selectedRange.endDate]
+    [selectedRange.startDate, selectedRange.endDate],
   );
 
   const setPage = (newPage) => {
@@ -87,9 +90,16 @@ const BookingsDashboard = () => {
     sortOrder,
     page,
     pageSize,
-    startDate: memoisedRange.startDate,
-    endDate: memoisedRange.endDate,
+    startDate: formatToDateString(memoisedRange.startDate),
+    endDate: formatToDateString(memoisedRange.endDate),
   });
+
+  console.log("Bookings Dashboard Dates:", memoisedRange);
+  console.log(
+    "Bookings Dashboard Date strings:",
+    formatToDateString(memoisedRange.startDate),
+    formatToDateString(memoisedRange.endDate),
+  );
 
   console.log("Bookings Dashboard Data:", bookingsData);
 
@@ -116,7 +126,7 @@ const BookingsDashboard = () => {
 
   const handleToggle = (row) => {
     setSelectedRows((prev) =>
-      isSelected(row.id) ? prev.filter((r) => r.id !== row.id) : [...prev, row]
+      isSelected(row.id) ? prev.filter((r) => r.id !== row.id) : [...prev, row],
     );
   };
 
@@ -131,7 +141,7 @@ const BookingsDashboard = () => {
   const totalRows = selectedRows.length;
   const totalQuantity = selectedRows.reduce(
     (acc, r) => acc + r.quantity_defective,
-    0
+    0,
   );
   const totalCost = selectedRows.reduce((acc, r) => acc + r.total_cost, 0);
 
@@ -192,7 +202,7 @@ const BookingsDashboard = () => {
 
   return (
     <div className="flex bg-primary-bg flex-col flex-grow overflow-hidden">
-      <div className="flex flex-col gap-2 xl:flex-row items-start  xl:items-center justify-between px-6 py-1 shadow-sm border-b border-border-color shrink-0 bg-primary-bg">
+      <div className="flex flex-col gap-2 xl:flex-row items-start xl:items-center justify-between px-6 py-1 shadow-sm border-b border-border-color shrink-0 bg-primary-bg">
         <div className="flex flex-col">
           <h1 className="text-xl whitespace-nowrap text-primary-text">
             Bookings Dashboard
@@ -254,28 +264,28 @@ const BookingsDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="p-3 flex-1">
-        <BookingsTable
-          isLoading={isBookingsLoading}
-          onOpenModal={handleOpenModal}
-          selectedItem={selectedItem}
-          setSelectedItem={setSelectedItem}
-          data={bookingsData}
-          costData={costData}
-          handleActiveModalType={handleActiveModalType}
-          onRefresh={refetch}
-          selectedRows={selectedRows}
-          isSelected={isSelected}
-          onToggle={handleToggle}
-          onSelectAll={handleSelectAll}
-          onClearAll={handleClearAll}
-          page={page}
-          pageSize={pageSize}
-          setPage={setPage}
-          totalCount={totalCount}
-          setPageSize={setPageSize}
-        />
-      </div>
+
+      <BookingsTable
+        isLoading={isBookingsLoading}
+        onOpenModal={handleOpenModal}
+        selectedItem={selectedItem}
+        setSelectedItem={setSelectedItem}
+        data={bookingsData}
+        costData={costData}
+        handleActiveModalType={handleActiveModalType}
+        onRefresh={refetch}
+        selectedRows={selectedRows}
+        isSelected={isSelected}
+        onToggle={handleToggle}
+        onSelectAll={handleSelectAll}
+        onClearAll={handleClearAll}
+        page={page}
+        pageSize={pageSize}
+        setPage={setPage}
+        totalCount={totalCount}
+        setPageSize={setPageSize}
+      />
+
       {activeModalType === "Actions" && (
         <ActionsModal
           type="booking"

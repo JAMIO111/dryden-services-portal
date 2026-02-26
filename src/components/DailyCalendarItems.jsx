@@ -1,6 +1,6 @@
 import MeetingCard from "./MeetingCard";
 import { TbExternalLink } from "react-icons/tb";
-import { MdHotTub, MdPublishedWithChanges } from "react-icons/md";
+import { MdHotTub } from "react-icons/md";
 import { BsTruck } from "react-icons/bs";
 import { GiMagicBroom } from "react-icons/gi";
 import { TbIroning3 } from "react-icons/tb";
@@ -155,7 +155,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                       </p>
                       <div className="flex flex-row items-center gap-2">
                         <p className="text-xs text-secondary-text">
-                          {`${
+                          {`${job?.ad_hoc_job_id || ""} - ${
                             job.type === "Laundry"
                               ? `${new Date(job.start_date).toLocaleString(
                                   "en-GB",
@@ -180,7 +180,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                                     year: "numeric",
                                   },
                                 )
-                          } - ${job?.ad_hoc_job_id || ""}`}
+                          }`}
                         </p>
                         {job.bookingId && (
                           <button
@@ -200,7 +200,7 @@ const DailyCalendarItems = ({ date, items, navigate, closeModal }) => {
                   </div>
                 </div>
                 {job?.type === "Laundry" && (
-                  <div className="absolute top-2 right-2 gap-3 rounded-md shadow-s flex flex-row items-center justify-between py-1 px-2 bg-secondary-bg">
+                  <div className="absolute bottom-2 right-2 gap-3 rounded-md shadow-s flex flex-row items-center justify-between py-1 px-2 bg-secondary-bg">
                     <BsTruck className="w-4 h-4 text-secondary-text" />
                     <p className="text-xs text-secondary-text">
                       {`${job.transport} ${

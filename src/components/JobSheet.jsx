@@ -134,7 +134,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
                     })}  ${
                       job?.propertyDetails?.check_out
                         ? new Date(
-                            `1970-01-01T${job.propertyDetails.check_out}`
+                            `1970-01-01T${job.propertyDetails.check_out}`,
                           )
                             .toLocaleTimeString([], {
                               hour: "numeric",
@@ -142,7 +142,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
                               hour12: true,
                             })
                             .replace(/\b(am|pm)\b/, (match) =>
-                              match.toUpperCase()
+                              match.toUpperCase(),
                             )
                         : ""
                     }  (${job?.bookingId}) ${
@@ -165,11 +165,11 @@ const JobSheet = forwardRef(({ job }, ref) => {
                             day: "numeric",
                             month: "short",
                             year: "2-digit",
-                          }
+                          },
                         )}  ${
                           job?.propertyDetails?.check_in
                             ? new Date(
-                                `1970-01-01T${job.propertyDetails.check_in}`
+                                `1970-01-01T${job.propertyDetails.check_in}`,
                               )
                                 .toLocaleTimeString([], {
                                   hour: "numeric",
@@ -177,7 +177,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
                                   hour12: true,
                                 })
                                 .replace(/\b(am|pm)\b/, (match) =>
-                                  match.toUpperCase()
+                                  match.toUpperCase(),
                                 )
                             : ""
                         } (${job?.bookingDetails?.booking_id}) ${
@@ -209,7 +209,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
                             hour12: true,
                           })
                           .replace(/\b(am|pm)\b/, (match) =>
-                            match.toUpperCase()
+                            match.toUpperCase(),
                           )
                       : ""
                   } (${job?.ad_hoc_job_id})`}
@@ -271,74 +271,87 @@ const JobSheet = forwardRef(({ job }, ref) => {
             {job?.bookingDetails ? (
               <div className="flex gap-5">
                 <div className="flex flex-col items-stretch p-2 flex-1">
-                  <div className="flex justify-between flex-row gap-3">
-                    <div className="font-semibold">
-                      <span className="mr-2">
-                        {job.bookingDetails.adults || 0}
-                      </span>
-                      Adult{(job.bookingDetails.adults || 0) !== 1 ? "s" : ""}
+                  {job.bookingDetails.adults > 0 && (
+                    <div className="flex justify-between flex-row gap-3">
+                      <div className="font-semibold">
+                        <span className="mr-2">
+                          {job.bookingDetails.adults || 0}
+                        </span>
+                        Adult{(job.bookingDetails.adults || 0) !== 1 ? "s" : ""}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="flex justify-between flex-row gap-3">
-                    <div className="font-semibold">
-                      <span className="mr-2">
-                        {job.bookingDetails.children || 0}
-                      </span>
-                      Child
-                      {(job.bookingDetails.children || 0) !== 1 ? "ren" : ""}
+                  {job.bookingDetails.children > 0 && (
+                    <div className="flex justify-between flex-row gap-3">
+                      <div className="font-semibold">
+                        <span className="mr-2">
+                          {job.bookingDetails.children || 0}
+                        </span>
+                        Child
+                        {(job.bookingDetails.children || 0) !== 1 ? "ren" : ""}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="flex justify-between flex-row gap-3">
-                    <div className="font-semibold">
-                      <span className="mr-2">
-                        {job.bookingDetails.infants || 0}
-                      </span>
-                      Infant{(job.bookingDetails.infants || 0) !== 1 ? "s" : ""}
+                  {job.bookingDetails.infants > 0 && (
+                    <div className="flex justify-between flex-row gap-3">
+                      <div className="font-semibold">
+                        <span className="mr-2">
+                          {job.bookingDetails.infants || 0}
+                        </span>
+                        Infant
+                        {(job.bookingDetails.infants || 0) !== 1 ? "s" : ""}
+                      </div>
                     </div>
-                  </div>
+                  )}
+                </div>
+
+                <div className="p-2 flex-1">
+                  {job.bookingDetails.pets > 0 && (
+                    <div className="flex justify-between flex-row gap-3">
+                      <div className="font-semibold">
+                        <span className="mr-2">
+                          {job.bookingDetails.pets || 0}
+                        </span>
+                        Pet{(job.bookingDetails.pets || 0) !== 1 ? "s" : ""}
+                      </div>
+                    </div>
+                  )}
+                  {job.bookingDetails.stairgates > 0 && (
+                    <div className="flex justify-between flex-row gap-3">
+                      <div className="font-semibold">
+                        <span className="mr-2">
+                          {job.bookingDetails.stairgates || 0}
+                        </span>
+                        Stairgate
+                        {(job.bookingDetails.stairgates || 0) !== 1 ? "s" : ""}
+                      </div>
+                    </div>
+                  )}
+                  {job.bookingDetails.highchairs > 0 && (
+                    <div className="flex justify-between flex-row gap-3">
+                      <div className="font-semibold">
+                        <span className="mr-2">
+                          {job.bookingDetails.highchairs || 0}
+                        </span>
+                        Highchair
+                        {(job.bookingDetails.highchairs || 0) !== 1 ? "s" : ""}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-2 flex-1">
                   <div className="flex justify-between flex-row gap-3">
-                    <div className="font-semibold">
-                      <span className="mr-2">
-                        {job.bookingDetails.pets || 0}
-                      </span>
-                      Pet{(job.bookingDetails.pets || 0) !== 1 ? "s" : ""}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between flex-row gap-3">
-                    <div className="font-semibold">
-                      <span className="mr-2">
-                        {job.bookingDetails.stairgates || 0}
-                      </span>
-                      Stairgate
-                      {(job.bookingDetails.stairgates || 0) !== 1 ? "s" : ""}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between flex-row gap-3">
-                    <div className="font-semibold">
-                      <span className="mr-2">
-                        {job.bookingDetails.highchairs || 0}
-                      </span>
-                      Highchair
-                      {(job.bookingDetails.highchairs || 0) !== 1 ? "s" : ""}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-2 flex-1">
-                  <div className="flex justify-between flex-row gap-3">
-                    <div className="font-semibold">
-                      <span className="mr-2">
-                        {job.bookingDetails.cots || 0}
-                      </span>
-                      Cot{(job.bookingDetails.cots || 0) !== 1 ? "s" : ""}
-                    </div>
+                    {job.bookingDetails.cots > 0 && (
+                      <div className="font-semibold">
+                        <span className="mr-2">
+                          {job.bookingDetails.cots || 0}
+                        </span>
+                        Cot{(job.bookingDetails.cots || 0) !== 1 ? "s" : ""}
+                      </div>
+                    )}
                   </div>
                   {job.bookingDetails.is_return_guest && (
                     <div className="py-0.5 px-1.5 flex-1 w-fit rounded-lg bg-orange-200">
@@ -391,29 +404,20 @@ const JobSheet = forwardRef(({ job }, ref) => {
         job?.propertyDetails?.hired_laundry && (
           <section className="rounded-lg overflow-hidden border mb-3">
             <h2 className="p-1 border-b font-semibold bg-gray-200">
-              Laundry{" "}
+              Hired Laundry{" "}
               <span className="text-[10px]">(Record quantity used)</span>
             </h2>
 
-            <div className="flex flex-wrap gap-10 p-1">
-              {[
-                ["Superking Set", "King Set", "Double Set"],
-                ["Single Set", "Hand Towels", "Tea Towels"],
-                ["Bath Mats", "Oven Gloves", "Bathrobes"],
-              ].map((group, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col flex-1 min-w-[200px] gap-1">
-                  {group.map((item) => (
-                    <div
-                      key={item}
-                      className="flex justify-between gap-2 items-center flex-row">
-                      <div className="h-7 w-7 border rounded" />
-                      <div className="flex-1 text-left font-semibold">
-                        {item}
-                      </div>
-                    </div>
-                  ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1 p-1">
+              {job?.propertyDetails?.hired_laundry_items?.map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="h-7 w-7 border rounded shrink-0" />
+
+                  <div className="text-xs font-semibold leading-tight">
+                    {item
+                      .replaceAll("_", " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </div>
                 </div>
               ))}
             </div>
@@ -471,7 +475,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
                       </div>
                     ))}
                   </div>
-                )
+                ),
               )}
             </div>
           </section>
@@ -484,48 +488,20 @@ const JobSheet = forwardRef(({ job }, ref) => {
             <span className="text-[10px]">(Record quantity used)</span>
           </h2>
           <div className="flex flex-wrap gap-2 p-1">
-            {[
-              [
-                "Super King Sheets",
-                "Super King Duvet Covers",
-                "Super King Protectors",
-                "Super King Duvets",
-              ],
-              [
-                "King Sheets",
-                "King Duvet Covers",
-                "King Protectors",
-                "King Duvets",
-              ],
-              [
-                "Double Sheets",
-                "Double Duvet Covers",
-                "Double Protectors",
-                "Double Duvets",
-              ],
-              [
-                "Single Sheets",
-                "Single Duvet Covers",
-                "Single Protectors",
-                "Single Duvets",
-              ],
-              ["Pillowcases", "Pillows", "Pillow Protectors", "Cushion Covers"],
-              ["Hand Towels", "Bath Towels", "Bath Sheets", "Tea Towels"],
-              ["Bath Mats", "Bathrobes", "Face Cloths"],
-              ["Oven Gloves", "Large Table Cloths", "Small Table Cloths"],
-              ["Rugs", "Large Throws", "Small Throws"],
-            ].map((group, i) => (
+            {job?.propertyDetails?.laundry_items?.map((item, i) => (
               <div
                 key={i}
                 className="flex flex-col flex-1 min-w-[200px] gap-0.5">
-                {group.map((item) => (
-                  <div
-                    key={item}
-                    className="flex justify-between gap-2 items-center flex-row">
-                    <div className="h-6 w-6 border rounded" />
-                    <div className="flex-1 text-left font-semibold">{item}</div>
+                <div
+                  key={item}
+                  className="flex justify-between gap-2 items-center flex-row">
+                  <div className="h-6 w-6 border rounded" />
+                  <div className="flex-1 text-left font-semibold">
+                    {item
+                      .replaceAll("_", " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
                   </div>
-                ))}
+                </div>
               </div>
             ))}
           </div>
