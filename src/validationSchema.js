@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const postcodeRegex =
   /^([Gg][Ii][Rr]0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z]))))\s?[0-9][A-Za-z]{2})$/;
 const what3WordsRegex =
@@ -127,6 +128,8 @@ export const PropertyFormSchema = z.object({
       }),
     )
     .optional(),
+  laundry_items: z.array(z.string()).optional(),
+  hired_laundry_items: z.array(z.string()).optional(),
   package: z.number(),
   service_type: z.array(z.string()),
   hired_laundry: z.boolean(),
@@ -219,15 +222,19 @@ export const BookingFormSchema = z.object({
     .uuid("You must select a valid property"),
 
   booking_ref: z
-    .string()
+    .string({ required_error: "Booking reference is required" })
     .max(50, { message: "Booking reference must not exceed 50 characters" }),
 
   bookingDates: z
     .object({
       startDate: z
-        .date({ required_error: "Start date is required" })
+        .string({ required_error: "Start date is required" })
+        .regex(isoDateRegex, "Invalid start date format")
         .nullable(),
-      endDate: z.date({ required_error: "End date is required" }).nullable(),
+      endDate: z
+        .string({ required_error: "End date is required" })
+        .regex(isoDateRegex, "Invalid end date format")
+        .nullable(),
     })
     .refine((val) => val.startDate && val.endDate, {
       message: "Please select an arrival and departure date",
@@ -235,7 +242,7 @@ export const BookingFormSchema = z.object({
 
   adults: z
     .number({ message: "Please enter a valid number of adults" })
-    .min(1, { message: "At least one adult is required" }),
+    .min(0, { message: "Adults cannot be negative" }),
   children: z.preprocess(
     (val) => (typeof val === "string" ? parseInt(val, 10) : val),
     z
