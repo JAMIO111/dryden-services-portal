@@ -1,4 +1,3 @@
-import { BsActivity } from "react-icons/bs";
 import ToggleButton from "@components/ui/ToggleButton";
 import { Controller } from "react-hook-form";
 
@@ -110,75 +109,81 @@ const hiredLaundryItems = [
   { id: 9, name: "Bathrobes", value: "bathrobes", icon: "robe" },
 ];
 
-const LaundryInfoForm = ({ control }) => {
+const LaundryInfoForm = ({ control, hiredLaundry, laundry }) => {
   return (
-    <div className="flex flex-row p-3 gap-3 w-[70vw] max-h-[75vh]">
+    <div className="flex flex-row p-3 gap-5 max-h-[75vh]">
       {/* Categories Column */}
-      <div className="flex-1 flex flex-col gap-2">
-        <h2 className="font-semibold text-primary-text mb-2">Laundry Items</h2>
-        <div className="flex-1 flex flex-col gap-3 pr-2 overflow-y-auto">
-          <Controller
-            name="laundry_items"
-            control={control}
-            render={({ field }) => {
-              const selected = field.value || [];
+      {laundry && (
+        <div className="flex-1 bg-secondary-bg pl-3 pt-3 rounded-2xl shadow-s min-w-[400px] flex flex-col gap-2">
+          <h2 className="font-semibold text-primary-text mb-2">
+            Laundry Items
+          </h2>
+          <div className="flex-1 flex flex-col gap-3 pr-2 overflow-y-auto">
+            <Controller
+              name="laundry_items"
+              control={control}
+              render={({ field }) => {
+                const selected = field.value || [];
 
-              const toggleItem = (value) => {
-                if (selected.includes(value)) {
-                  field.onChange(selected.filter((v) => v !== value));
-                } else {
-                  field.onChange([...selected, value]);
-                }
-              };
+                const toggleItem = (value) => {
+                  if (selected.includes(value)) {
+                    field.onChange(selected.filter((v) => v !== value));
+                  } else {
+                    field.onChange([...selected, value]);
+                  }
+                };
 
-              return categories.map((category) => (
-                <ToggleButton
-                  key={category.id}
-                  label={category.name}
-                  checked={selected.includes(category.value)}
-                  onChange={() => toggleItem(category.value)}
-                  trueLabel="Included"
-                  falseLabel="Not Included"
-                />
-              ));
-            }}
-          />
+                return categories.map((category) => (
+                  <ToggleButton
+                    key={category.id}
+                    label={category.name}
+                    checked={selected.includes(category.value)}
+                    onChange={() => toggleItem(category.value)}
+                    trueLabel="Included"
+                    falseLabel="Not Included"
+                  />
+                ));
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
       {/* Hired Laundry Items Column */}
-      <div className="flex-1 flex flex-col gap-2">
-        <h2 className="font-semibold text-primary-text mb-2">
-          Hired Laundry Items
-        </h2>
-        <div className="flex-1 flex flex-col gap-3 pr-2 overflow-y-auto">
-          <Controller
-            name="hired_laundry_items"
-            control={control}
-            render={({ field }) => {
-              const selected = field.value || [];
+      {hiredLaundry && (
+        <div className="flex-1 bg-secondary-bg pl-3 pt-3 rounded-2xl shadow-s min-w-[400px] flex flex-col gap-2">
+          <h2 className="font-semibold text-primary-text mb-2">
+            Hired Laundry Items
+          </h2>
+          <div className="flex-1 flex flex-col gap-3 pr-2 overflow-y-auto">
+            <Controller
+              name="hired_laundry_items"
+              control={control}
+              render={({ field }) => {
+                const selected = field.value || [];
 
-              const toggleItem = (value) => {
-                if (selected.includes(value)) {
-                  field.onChange(selected.filter((v) => v !== value));
-                } else {
-                  field.onChange([...selected, value]);
-                }
-              };
+                const toggleItem = (value) => {
+                  if (selected.includes(value)) {
+                    field.onChange(selected.filter((v) => v !== value));
+                  } else {
+                    field.onChange([...selected, value]);
+                  }
+                };
 
-              return hiredLaundryItems.map((item) => (
-                <ToggleButton
-                  key={item.id}
-                  label={item.name}
-                  checked={selected.includes(item.value)}
-                  onChange={() => toggleItem(item.value)}
-                  trueLabel="Included"
-                  falseLabel="Not Included"
-                />
-              ));
-            }}
-          />
+                return hiredLaundryItems.map((item) => (
+                  <ToggleButton
+                    key={item.id}
+                    label={item.name}
+                    checked={selected.includes(item.value)}
+                    onChange={() => toggleItem(item.value)}
+                    trueLabel="Included"
+                    falseLabel="Not Included"
+                  />
+                ));
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

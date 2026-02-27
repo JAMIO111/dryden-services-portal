@@ -184,6 +184,8 @@ const PropertyForm = () => {
               closeModal();
             }}
             onCancel={closeModal}
+            hiredLaundry={watch("hired_laundry")}
+            laundry={watch("service_type")?.includes("laundry")}
           />
           <div className="flex justify-end gap-2 mt-4">
             <CTAButton type="cancel" text="Close" callbackFn={closeModal} />
@@ -255,6 +257,8 @@ const PropertyForm = () => {
       ),
     });
   };
+
+  console.log("Form Values:", watch());
 
   if (isLoading) {
     return (
@@ -516,13 +520,16 @@ const PropertyForm = () => {
 
             {watch("notes") || "No additional notes entered yet."}
           </div>
-          <div className="flex items-center justify-end">
-            <CTAButton
-              type="main"
-              text="Edit Laundry Info"
-              callbackFn={() => openLaundryInfoModal()}
-            />
-          </div>
+          {(watch("hired_laundry") ||
+            watch("service_type")?.includes("laundry")) && (
+            <div className="flex items-center justify-end">
+              <CTAButton
+                type="main"
+                text="Edit Laundry Info"
+                callbackFn={() => openLaundryInfoModal()}
+              />
+            </div>
+          )}
           <Controller
             name="hired_laundry"
             control={control}
