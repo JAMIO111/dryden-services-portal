@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { RxCalendar } from "react-icons/rx";
 import { IoChevronDown } from "react-icons/io5";
 import CTAButton from "../CTAButton";
-import { datePresets, normalize } from "@/lib/HelperFunctions";
+import { datePresets } from "@/lib/HelperFunctions";
 import { MdErrorOutline } from "react-icons/md";
 
 const daysOfWeek = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -193,6 +193,17 @@ export default function DateRangePicker({
     setIsOpen(false);
     setMode("quick");
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const baseDate = startDate instanceof Date ? startDate : new Date();
+
+    setCalendarDate({
+      year: baseDate.getFullYear(),
+      month: baseDate.getMonth(),
+    });
+  }, [isOpen]);
 
   return (
     <div className={`relative ${width}`} ref={containerRef}>

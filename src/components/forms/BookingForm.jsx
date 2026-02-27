@@ -92,16 +92,13 @@ const BookingForm = () => {
     if (bookingId === "New-Booking") {
       reset(defaultFormData);
     } else if (booking) {
+      console.log("Resetting form with booking data:", booking);
       reset({
         ...defaultFormData,
         ...booking,
         bookingDates: {
-          startDate: booking.arrival_date
-            ? new Date(`${booking.arrival_date}T00:00:00`)
-            : null,
-          endDate: booking.departure_date
-            ? new Date(`${booking.departure_date}T00:00:00`)
-            : null,
+          startDate: booking.arrival_date,
+          endDate: booking.departure_date,
         },
       });
     }
@@ -361,10 +358,10 @@ const BookingForm = () => {
                     ...booking,
                     bookingDates: {
                       startDate: booking?.arrival_date
-                        ? new Date(booking.arrival_date)
+                        ? booking.arrival_date
                         : null,
                       endDate: booking?.departure_date
-                        ? new Date(booking.departure_date)
+                        ? booking.departure_date
                         : null,
                     },
                   })

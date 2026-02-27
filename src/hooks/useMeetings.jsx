@@ -2,11 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
 
 const fetchMeetings = async (startDate, endDate) => {
+  const exclusiveEndDate = new Date(endDate);
+  exclusiveEndDate.setUTCDate(exclusiveEndDate.getUTCDate() + 1);
+
   const { data, error } = await supabase
     .from("Meetings")
     .select("*")
     .gte("start_date", startDate)
-    .lte("start_date", endDate);
+    .lt("start_date", exclusiveEndDate.toISOString());
   if (error) throw new Error(error.message);
   return data;
 };

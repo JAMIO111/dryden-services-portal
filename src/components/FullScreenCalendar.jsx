@@ -5,16 +5,19 @@ import DailyCalendarItems from "@components/DailyCalendarItems";
 import SlidingSelectorGeneric from "./ui/SlidingSelectorGeneric";
 import { useCalendarItems } from "@/hooks/useCalendarItems";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { GoPlus } from "react-icons/go";
+import { IoAddOutline } from "react-icons/io5";
 import { formatToDateString } from "@/lib/HelperFunctions";
+import NewCalendarItemForm from "./forms/NewCalendarItemForm";
 
 // --- UTC helpers to avoid DST issues ---
 function getSundayUTC(date) {
   const d = new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
   );
+
   const day = d.getUTCDay();
   d.setUTCDate(d.getUTCDate() - day);
+
   return d;
 }
 
@@ -107,7 +110,9 @@ export default function FullScreenCalendar() {
   const handleNewItem = () => {
     openModal({
       title: "Insert New Calendar Item",
-      content: <NewCalendarItemForm date={selectedDate} />,
+      content: (
+        <NewCalendarItemForm closeModal={closeModal} date={selectedDate} />
+      ),
     });
   };
 
@@ -461,17 +466,16 @@ export default function FullScreenCalendar() {
                   normalizedDate,
                 )}, ${normalizedDate.getUTCFullYear()}`}
           </h1>
-          {false && (
-            <div className="flex gap-2 items-center shadow-s bg-secondary-bg p-1 rounded-xl">
-              <CTAButton
-                icon={GoPlus}
-                width="w-28"
-                type="main"
-                text="Insert Item"
-                callbackFn={handleNewItem}
-              />
-            </div>
-          )}
+
+          <div className="flex gap-2 items-center shadow-s bg-secondary-bg p-1 rounded-xl">
+            <CTAButton
+              icon={IoAddOutline}
+              type="main"
+              text="Insert Item"
+              callbackFn={handleNewItem}
+            />
+          </div>
+
           <div className="flex w-60 items-center gap-4">
             <SlidingSelectorGeneric
               options={["Weekly", "Monthly"]}

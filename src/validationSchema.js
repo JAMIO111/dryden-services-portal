@@ -6,10 +6,8 @@ const postcodeRegex =
 const what3WordsRegex =
   /^(?:\/\/\/)?[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?$/;
 const phoneRegex = /^[+()\-0-9\s]{6,20}$/;
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const emailMaxLength = 255;
 const nameMaxLength = 30;
-const phoneMaxLength = 20;
+const timeStringRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
 
 const transformPhoneNumber = (val) => {
   if (!val) return "";
@@ -374,8 +372,16 @@ export const MeetingFormSchema = z
       .min(1, { message: "Title is required" })
       .max(50, { message: "Title must not exceed 50 characters" }),
     date: z.date({ required_error: "Date is required" }),
-    start_time: z.date({ required_error: "Start time is required" }),
-    end_time: z.date({ required_error: "End time is required" }),
+    start_time: z
+      .string({ required_error: "Start time is required" })
+      .regex(timeStringRegex, {
+        message: "Start time must be in HH:mm:ss format",
+      }),
+    end_time: z
+      .string({ required_error: "End time is required" })
+      .regex(timeStringRegex, {
+        message: "End time must be in HH:mm:ss format",
+      }),
     location: z
       .string()
       .trim()

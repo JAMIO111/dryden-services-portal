@@ -10,31 +10,22 @@ import { useInsertMeeting } from "@/hooks/useInsertMeeting";
 import DatePicker from "../ui/DatePicker";
 import { IoLocationOutline } from "react-icons/io5";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useUser } from "@/contexts/UserProvider";
 
 const defaultFormData = {
-  id: null,
-  lead_id: null,
-  created_by: null,
+  title: "",
   location: "",
-  created_at: null,
-  date: new Date(), // defaults to today
-  start_time: (() => {
-    const d = new Date();
-    d.setHours(12, 0, 0, 0); // 12:00
-    return d;
-  })(),
-  end_time: (() => {
-    const d = new Date();
-    d.setHours(12, 0, 0, 0); // 12:00
-    return d;
-  })(),
+  date: new Date(),
+  start_time: "08:00:00",
+  end_time: "09:00:00",
 };
 
-const MeetingForm = ({ leadId, leadTitle }) => {
+const MeetingForm = ({ leadId, leadTitle, closeForm }) => {
   const { createNotification } = useCreateNotification();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const insertMeeting = useInsertMeeting();
+  const { profile } = useUser();
 
   const {
     register,
@@ -52,6 +43,8 @@ const MeetingForm = ({ leadId, leadTitle }) => {
     delayError: 250,
   });
   console.log("Form Values:", watch());
+  console.log("Is Dirty:", isDirty);
+  console.log("Is Valid:", isValid);
 
   return (
     <div className="flex flex-1 h-full flex-col">
@@ -128,50 +121,85 @@ const MeetingForm = ({ leadId, leadTitle }) => {
         <CTAButton
           type="success"
           text="Schedule Meeting"
-          disabled={!isValid || isSubmitting}
+          disabled={!isDirty || !isValid || isSubmitting}
+          isLoading={isSubmitting}
           callbackFn={handleSubmit(async (data) => {
-            const combineDateAndTime = (date, time) => {
-              if (!date || !time) return null;
+            const combineDateAndTime = (date, timeString) => {
+              if (!date || !timeString) return null;
 
-              const combined = new Date(date); // copy date
-              combined.setHours(time.getHours());
-              combined.setMinutes(time.getMinutes());
-              combined.setSeconds(0);
-              combined.setMilliseconds(0);
+              if (!(date instanceof Date) || isNaN(date)) return null;
+
+              const [hours, minutes, seconds] = timeString
+                .split(":")
+                .map(Number);
+
+              if (
+                Number.isNaN(hours) ||
+                Number.isNaN(minutes) ||
+                Number.isNaN(seconds)
+              ) {
+                return null;
+              }
+
+              const combined = new Date(date);
+              combined.setHours(hours, minutes, seconds || 0, 0);
+
               return combined;
             };
 
-            const { date, start_time, end_time, ...rest } = data;
+            const startDateTime = combineDateAndTime(
+              data.date,
+              data.start_time,
+            );
+            const endDateTime = combineDateAndTime(data.date, data.end_time);
 
-            const calculatedStart = combineDateAndTime(
-              date,
-              start_time
-            ).toISOString();
-            const calculatedEnd = combineDateAndTime(
-              date,
-              end_time
-            ).toISOString();
+            if (!startDateTime || !endDateTime) {
+              console.log("Invalid date or time:", {
+                date: data.date,
+                start_time: data.start_time,
+                end_time: data.end_time,
+              });
+              console.log("Combined DateTimes:", {
+                startDateTime,
+                endDateTime,
+              });
+              showToast({
+                type: "error",
+                title: "Invalid Time",
+                message: "Please select a valid date and time.",
+              });
+              return;
+            }
 
-            const meetingData = {
-              ...rest, // the remaining fields
-              start_date: calculatedStart,
-              end_date: calculatedEnd,
-            };
+            if (endDateTime <= startDateTime) {
+              showToast({
+                type: "error",
+                title: "Invalid Time Range",
+                message: "End time must be after start time.",
+              });
+              return;
+            }
 
             try {
               await insertMeeting.mutateAsync({
                 lead_id: leadId,
-                start_date: calculatedStart,
-                end_date: calculatedEnd,
-                ...meetingData,
+                title: data.title,
+                location: data.location,
+                start_date: startDateTime.toISOString(),
+                end_date: endDateTime.toISOString(),
+                created_by: profile.id,
               });
 
               reset(defaultFormData);
+
+              if (closeForm) closeForm();
+
               showToast({
                 type: "success",
                 title: "Meeting Scheduled",
                 message: "The meeting has been successfully scheduled.",
               });
+
               await createNotification({
                 title: "Meeting Scheduled",
                 body: "has scheduled a new meeting for lead:",
@@ -186,23 +214,19 @@ const MeetingForm = ({ leadId, leadTitle }) => {
             } catch (error) {
               if (
                 error instanceof Error &&
-                error.message.includes(
-                  "overlaps with another meeting in the same location"
-                )
+                error.message.includes("overlaps")
               ) {
-                // Specific toast for overlapping meeting
                 showToast({
                   type: "error",
                   title: "Meeting Conflict",
                   message:
-                    "This meeting overlaps with another meeting in the same location. Please choose a different time.",
+                    "This meeting overlaps with another meeting in the same location.",
                 });
               } else {
-                // Generic error toast
                 showToast({
                   type: "error",
                   title: "Submission Failed",
-                  message: error?.message || "An unexpected error occurred.",
+                  message: error?.message || "Unexpected error occurred.",
                 });
               }
             }
