@@ -8,6 +8,19 @@ export const useUpsertAdHocJob = () => {
   const queryClient = useQueryClient();
   const { profile } = useUser();
 
+  const toDateOnly = (date) => {
+    if (!date) return null;
+
+    // If already string (safe from RHF / Supabase)
+    if (typeof date === "string") return date.slice(0, 10);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
   return useMutation({
     mutationFn: async ({ adHocJobData, recurrenceDates = [] }) => {
       const { property_id, id, type, start_date, end_date, single_date } =
@@ -46,18 +59,18 @@ export const useUpsertAdHocJob = () => {
         for (let i = 0; i < recurrenceDates.length; i++) {
           const date = recurrenceDates[i];
           const ad_hoc_job_id = `JOB-${yearSuffix}-${String(
-            nextNumber + i
+            nextNumber + i,
           ).padStart(3, "0")}`;
 
           const jobDates =
             type === "Laundry"
               ? {
-                  start_date: start_date ? new Date(start_date) : date,
-                  end_date: end_date ? new Date(end_date) : date,
+                  start_date: toDateOnly(start_date || date),
+                  end_date: toDateOnly(end_date || date),
                   single_date: null,
                 }
               : {
-                  single_date: date,
+                  single_date: toDateOnly(date),
                   start_date: null,
                   end_date: null,
                 };
@@ -72,8 +85,9 @@ export const useUpsertAdHocJob = () => {
               .eq("property_id", property_id)
               .eq("type", "Laundry")
               .or(
-                `start_date.eq.${jobDates.start_date.toISOString()},end_date.eq.${jobDates.end_date.toISOString()}`
+                `start_date.eq.${jobDates.start_date},end_date.eq.${jobDates.end_date}`,
               )
+              .eq("deleted_at", null)
               .limit(1)
               .single();
 
@@ -81,7 +95,7 @@ export const useUpsertAdHocJob = () => {
               showToast({
                 type: "error",
                 title: "Job Conflict",
-                message: `A Laundry job already starts or ends on ${date.toLocaleDateString()} for this property. Skipping.`,
+                message: `A Laundry job already starts or ends on ${new Date(jobDates.start_date).toLocaleDateString()} for this property. Skipping.`,
               });
               continue;
             }
@@ -95,6 +109,7 @@ export const useUpsertAdHocJob = () => {
               .eq("property_id", property_id)
               .eq("type", type)
               .eq("single_date", jobDates.single_date)
+              .eq("deleted_at", null)
               .limit(1)
               .single();
 
@@ -157,8 +172,9 @@ export const useUpsertAdHocJob = () => {
           .eq("property_id", property_id)
           .eq("type", "Laundry")
           .or(
-            `start_date.eq.${jobDates.start_date.toISOString()},end_date.eq.${jobDates.end_date.toISOString()}`
+            `start_date.eq.${jobDates.start_date},end_date.eq.${jobDates.end_date}`,
           )
+          .eq("deleted_at", null)
           .limit(1)
           .single();
 
@@ -166,7 +182,7 @@ export const useUpsertAdHocJob = () => {
           showToast({
             type: "error",
             title: "Job Conflict",
-            message: `A Laundry job already starts or ends on ${jobDates.start_date.toLocaleDateString()} for this property.`,
+            message: `A Laundry job already starts or ends on ${jobDates.start_date} for this property.`,
           });
           throw new Error("Laundry job boundary conflict.");
         }
@@ -180,6 +196,7 @@ export const useUpsertAdHocJob = () => {
           .eq("property_id", property_id)
           .eq("type", type)
           .eq("single_date", jobDates.single_date)
+          .eq("deleted_at", null)
           .limit(1)
           .single();
 
@@ -187,7 +204,7 @@ export const useUpsertAdHocJob = () => {
           showToast({
             type: "error",
             title: "Job Conflict",
-            message: `A ${type} job already exists on ${jobDates.single_date.toLocaleDateString()}.`,
+            message: `A ${type} job already exists on ${jobDates.single_date}.`,
           });
           throw new Error("Job conflict detected.");
         }

@@ -28,6 +28,19 @@ const defaultFormData = {
   notes: "",
 };
 
+const toDateOnly = (date) => {
+  if (!date) return null;
+
+  // If already string (safe from RHF / Supabase)
+  if (typeof date === "string") return date.slice(0, 10);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
 const AdHocJobForm = ({ adHocJob, navigate }) => {
   const { createNotification } = useCreateNotification();
   const queryClient = useQueryClient();
@@ -105,6 +118,9 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
       const result = await upsertAdHocJob.mutateAsync({
         adHocJobData: {
           ...data,
+          single_date: toDateOnly(data.single_date),
+          start_date: toDateOnly(data.start_date),
+          end_date: toDateOnly(data.end_date),
           ...(adHocJob?.id ? { id: adHocJob.id } : {}),
         },
         recurrenceDates,
