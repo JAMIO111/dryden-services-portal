@@ -5,11 +5,13 @@ import { useAdHocJobsCalendar } from "./useAdHocJobsCalendar";
 export const useJobSheetJobs = (startDate, endDate, split = true) => {
   const { data: jobs = [], isLoading: jobsLoading } = useJobs(
     startDate,
-    endDate
+    endDate,
   );
 
   const { data: adHocJobs = [], isLoading: adHocJobsLoading } =
     useAdHocJobsCalendar(startDate, endDate);
+
+  console.log("Ad-Hoc Jobs Hook:", adHocJobs);
 
   const items = useMemo(() => {
     // Standard Jobs
@@ -20,7 +22,7 @@ export const useJobSheetJobs = (startDate, endDate, split = true) => {
 
       // We're only interested in splitting these:
       const sheetTypes = types.filter((t) =>
-        ["changeover", "hot_tub"].includes(t)
+        ["changeover", "hot_tub"].includes(t),
       );
 
       const base = {

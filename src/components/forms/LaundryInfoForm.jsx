@@ -93,6 +93,8 @@ const categories = [
   { id: 31, name: "Rugs", value: "rugs", icon: "rug" },
   { id: 32, name: "Large Throws", value: "large_throws", icon: "blanket" },
   { id: 33, name: "Small Throws", value: "small_throws", icon: "blanket" },
+  { id: 34, name: "Dog Towels", value: "dog_towels", icon: "dog" },
+  { id: 35, name: "Spa Towels", value: "spa_towels", icon: "hottub" },
 ];
 
 const hiredLaundryItems = [
@@ -100,13 +102,14 @@ const hiredLaundryItems = [
   { id: 2, name: "King Set", value: "king_set", icon: "bed" },
   { id: 3, name: "Double Set", value: "double_set", icon: "bed" },
   { id: 4, name: "Single Set", value: "single_set", icon: "bed" },
-
   { id: 5, name: "Hand Towels", value: "hand_towels", icon: "towel" },
   { id: 6, name: "Tea Towels", value: "tea_towels", icon: "towel" },
   { id: 7, name: "Bath Mats", value: "bath_mats", icon: "bath" },
+  { id: 10, name: "Dog Towels", value: "dog_towels", icon: "dog" },
 
   { id: 8, name: "Oven Gloves", value: "oven_gloves", icon: "glove" },
   { id: 9, name: "Bathrobes", value: "bathrobes", icon: "robe" },
+  { id: 11, name: "Spa Towels", value: "spa_towels", icon: "hottub" },
 ];
 
 const LaundryInfoForm = ({ control, hiredLaundry, laundry }) => {

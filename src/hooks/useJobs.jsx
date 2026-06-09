@@ -25,6 +25,7 @@ export function useJobs(startDate, endDate) {
             line_2,
             town,
             postcode,
+            what_3_words,
             county,
             check_in,
             check_out,

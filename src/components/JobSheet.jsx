@@ -70,7 +70,7 @@ const JobSheet = forwardRef(({ job }, ref) => {
         <section className="flex-2 rounded-lg overflow-hidden border mb-3">
           <div className="p-1 pr-2 flex justify-between items-center border-b bg-gray-200">
             <h2 className="font-semibold">Property Details</h2>
-            <p></p>
+            <p>{job?.propertyDetails?.what_3_words}</p>
           </div>
           <div className="p-2">
             <div className="flex gap-3 flex-row mb-1.5">
@@ -543,27 +543,43 @@ const JobSheet = forwardRef(({ job }, ref) => {
       </section>
 
       <section className="border rounded-lg overflow-hidden">
-        <h2 className="p-1 border-b font-semibold bg-gray-200">Sign-Off</h2>
-        <div className="p-3 flex flex-col gap-5">
-          <p>
-            The above works have been completed and checked to my complete
-            satisfaction.
-          </p>
-          <div className="flex h-12 gap-6 items-end">
-            <div className="mb-7">Team Leader:</div>
-            <div className="flex-3 items-stretch flex flex-col gap-1">
-              <div className="border-b"></div>
-              <p className="text-center text-sm">PRINT NAME</p>
+        <h2 className="p-2 border-b font-semibold bg-gray-200">Sign-Off</h2>
+        <div className="p-4 flex flex-col gap-6">
+          {/* Satisfaction statement + time/staff fields */}
+          <div className="flex flex-col gap-4">
+            <p>
+              The above works have been completed and checked to my complete
+              satisfaction
+            </p>
+            <div className="flex flex-row gap-4">
+              {[
+                ["Start Time:", "start"],
+                ["End Time:", "end"],
+                ["No. of Staff:", "staff"],
+              ].map(([label, key]) => (
+                <div key={key} className="flex flex-1 items-center gap-2">
+                  <div className="w-28 text-right text-sm shrink-0">
+                    {label}
+                  </div>
+                  <div className="border h-8 flex-1" />
+                </div>
+              ))}
             </div>
+          </div>
 
-            <div className="flex-3 items-stretch flex flex-col gap-1">
-              <div className="border-b"></div>
-              <p className="text-center text-sm">SIGNATURE</p>
-            </div>
-            <div className="flex-2 items-stretch flex flex-col gap-1">
-              <div className="border-b"></div>
-              <p className="text-center text-sm">DATE</p>
-            </div>
+          {/* Team leader sign-off row */}
+          <div className="flex items-end gap-4">
+            <div className="shrink-0 pb-5 text-sm">Team Leader:</div>
+            {[
+              ["PRINT NAME", "flex-1"],
+              ["SIGNATURE", "flex-1"],
+              ["DATE", "w-32"],
+            ].map(([label, cls]) => (
+              <div key={label} className={`${cls} flex flex-col gap-1`}>
+                <div className="border-b h-8" />
+                <p className="text-center text-xs text-gray-500">{label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
