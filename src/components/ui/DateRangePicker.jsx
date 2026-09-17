@@ -251,9 +251,9 @@ export default function DateRangePicker({
       {isOpen && (
         <div
           ref={popupRef}
-          className={`absolute ${label ? "top-18" : "top-12"} ${
-            alignment === "right" ? "right-0" : "left-0"
-          } z-50 flex items-stretch bg-secondary-bg rounded-xl shadow-s w-fit`}>
+          className={`absolute ${label ? "top-18" : "top-12"} left-0 lg:left-auto ${
+            alignment === "right" ? "lg:right-0" : "lg:left-0"
+          } z-50 flex flex-col lg:flex-row items-stretch bg-secondary-bg rounded-xl shadow-s w-fit max-w-[calc(100vw-2rem)] lg:max-w-none`}>
           {/* Calendar */}
           <div className="flex flex-col flex-1 w-70 p-4">
             <div className="flex justify-between items-center mb-2">
@@ -354,8 +354,8 @@ export default function DateRangePicker({
           {/* Sidebar */}
           {mode !== "static" && (
             <>
-              <div className="w-0.25 bg-border-color"></div>
-              <div className="w-40 p-3">
+              <div className="h-0.25 w-full lg:h-auto lg:w-0.25 bg-border-color"></div>
+              <div className="w-full lg:w-40 p-3">
                 {visiblePresets.map(({ label, range }) => {
                   const [presetStart, presetEnd] = range();
                   const isSelected =
