@@ -1,5 +1,5 @@
 // ./ui/DateRangePicker.jsx
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { RxCalendar } from "react-icons/rx";
 import { IoChevronDown } from "react-icons/io5";
 import CTAButton from "../CTAButton";
@@ -85,6 +85,7 @@ export default function DateRangePicker({
   const popupRef = useRef(null);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [popupOffset, setPopupOffset] = useState(0);
   const [hoverDate, setHoverDate] = useState(null);
   const [mode, setMode] = useState(switchMode ? "quick" : "static");
   const [calendarDate, setCalendarDate] = useState({
@@ -221,6 +222,34 @@ export default function DateRangePicker({
     });
   }, [isOpen]);
 
+  // ---- Keep the popup on-screen regardless of where the trigger sits ----
+  // The popup is anchored to the trigger via CSS (left/right), but that
+  // anchor alone isn't enough: the same trigger can end up near the left
+  // edge on one page and the right edge on another (depending on what else
+  // shares the header), so a static anchor can still push the popup off
+  // either side of the viewport. Nudge it back in bounds after it renders.
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      setPopupOffset(0);
+      return;
+    }
+    const el = popupRef.current;
+    if (!el) return;
+
+    const margin = 16;
+    const rect = el.getBoundingClientRect();
+    let offset = 0;
+
+    if (rect.right > window.innerWidth - margin) {
+      offset -= rect.right - (window.innerWidth - margin);
+    }
+    if (rect.left + offset < margin) {
+      offset += margin - (rect.left + offset);
+    }
+
+    setPopupOffset(offset);
+  }, [isOpen]);
+
   return (
     <div className={`relative ${width}`} ref={containerRef}>
       {label && (
@@ -314,8 +343,11 @@ export default function DateRangePicker({
       {isOpen && (
         <div
           ref={popupRef}
-          className={`absolute ${label ? "top-18" : "top-12"} left-0 lg:left-auto ${
-            alignment === "right" ? "lg:right-0" : "lg:left-0"
+          style={
+            popupOffset ? { transform: `translateX(${popupOffset}px)` } : undefined
+          }
+          className={`absolute ${label ? "top-18" : "top-12"} ${
+            alignment === "right" ? "right-0 left-auto" : "left-0"
           } z-50 flex flex-col lg:flex-row items-stretch bg-secondary-bg rounded-xl shadow-s w-fit max-w-[calc(100vw-2rem)] lg:max-w-none`}>
           {/* Calendar */}
           <div className="flex flex-col flex-1 w-70 p-4">
