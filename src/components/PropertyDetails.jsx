@@ -1,6 +1,7 @@
 import { BsPencil, BsFillPersonVcardFill } from "react-icons/bs";
 import CTAButton from "./CTAButton";
 import { TfiEmail } from "react-icons/tfi";
+import { HiOutlineHomeModern } from "react-icons/hi2";
 import { IoLocationOutline, IoPerson } from "react-icons/io5";
 import { useOwnersByProperty } from "@/hooks/useOwnersByProperty";
 import { useNavigate } from "react-router-dom";
@@ -42,29 +43,43 @@ const PropertyDetails = ({ property, selectedProperty }) => {
             />
           </div>
           <div className="flex overflow-y-auto flex-col">
-            <div className="relative w-full">
-              {property?.avatar ? (
+            {property?.avatar ? (
+              <div className="relative w-full">
                 <img
                   className="aspect-video w-full object-cover"
                   src={property?.avatar}
                   alt={property?.name}
                 />
-              ) : (
-                <div className="h-64 w-full bg-tertiary-bg flex items-center justify-center">
-                  <span className="text-primary-text">No Image</span>
+                <div className="absolute z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 bottom-0 left-0 w-full p-4 sm:pb-3 sm:px-5">
+                  <div className="rounded-xl w-fit max-w-full border border-black bg-black/30 px-3 py-1">
+                    <p className="text-lg sm:text-xl text-white font-semibold truncate">
+                      {property?.name}
+                    </p>
+                  </div>
+                  <PackagePill
+                    className="w-fit shrink-0"
+                    maintPackage={property?.Packages}
+                  />
                 </div>
-              )}
-              <div className="absolute z-10 rounded-xl justify-end bottom-0 left-5 border border-black bg-black/30 px-3 py-1">
-                <p className="text-xl text-white font-semibold">
-                  {property?.name}
-                </p>
+                <div className="absolute flex px-4 flex-col justify-end h-1/2 bottom-0 left-0 w-full z-0 bg-gradient-to-b from-transparent via-secondary-bg/80 to-secondary-bg py-1"></div>
               </div>
-              <PackagePill
-                className="absolute z-10 bottom-0 right-5"
-                maintPackage={property?.Packages}
-              />
-              <div className="absolute flex px-4 flex-col justify-end h-1/2 bottom-0 left-0 w-full z-0 bg-gradient-to-b from-transparent via-secondary-bg/80 to-secondary-bg py-1"></div>
-            </div>
+            ) : (
+              <>
+                <div className="aspect-video w-full bg-tertiary-bg flex flex-col items-center justify-center">
+                  <HiOutlineHomeModern className="w-12 h-12 text-secondary-text mb-2" />
+                  <span className="text-secondary-text">No Image</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 px-4 pt-4">
+                  <h2 className="text-xl font-semibold text-primary-text truncate">
+                    {property?.name}
+                  </h2>
+                  <PackagePill
+                    className="w-fit shrink-0"
+                    maintPackage={property?.Packages}
+                  />
+                </div>
+              </>
+            )}
             <div className="p-4 pt-6 flex flex-col">
               <div className="flex flex-row mb-3 items-start gap-2">
                 <IoLocationOutline className="text-primary-text mt-0.5 w-6 h-6 shrink-0" />
@@ -125,22 +140,22 @@ const PropertyDetails = ({ property, selectedProperty }) => {
                 owners.map((owner) => (
                   <div
                     key={owner.id}
-                    className="mt-3 flex rounded-2xl border border-brand-primary/30 bg-brand-primary/20 p-2 flex-row gap-2">
+                    className="mt-3 flex flex-col sm:flex-row rounded-2xl border border-brand-primary/30 bg-brand-primary/20 p-3 gap-3">
                     {owner.avatar ? (
                       <img
-                        className="rounded-xl w-24 h-24 object-cover"
+                        className="rounded-xl w-20 h-20 sm:w-24 sm:h-24 object-cover shrink-0"
                         src={owner?.avatar}
                         alt={owner?.first_name}
                       />
                     ) : (
-                      <div className="rounded-xl w-24 h-24 bg-secondary-bg flex items-center justify-center">
+                      <div className="rounded-xl w-20 h-20 sm:w-24 sm:h-24 shrink-0 bg-secondary-bg flex items-center justify-center">
                         <p className="text-secondary-text text-2xl">
                           {owner?.owner?.first_name?.charAt(0)}
                           {owner?.owner?.surname?.charAt(0)}{" "}
                         </p>
                       </div>
                     )}
-                    <div className="ml-2 flex flex-1 flex-col gap-2 h-full justify-around min-w-0">
+                    <div className="flex flex-1 flex-col gap-2 min-w-0 justify-center sm:justify-around">
                       <div className="flex items-center gap-3">
                         <BsFillPersonVcardFill className="text-primary-text w-6 h-6 shrink-0" />
                         <p
@@ -169,9 +184,9 @@ const PropertyDetails = ({ property, selectedProperty }) => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2 h-full justify-around">
+                    <div className="flex flex-row sm:flex-col gap-2 sm:justify-around shrink-0">
                       <CTAButton
-                        width="full"
+                        width="flex-1 sm:w-full"
                         type="success"
                         text="View details"
                         callbackFn={() =>
@@ -181,7 +196,7 @@ const PropertyDetails = ({ property, selectedProperty }) => {
                         }
                       />
                       <CTAButton
-                        width="full"
+                        width="flex-1 sm:w-full"
                         type="neutral"
                         text="Edit details"
                         callbackFn={() =>

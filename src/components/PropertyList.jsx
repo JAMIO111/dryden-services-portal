@@ -69,7 +69,7 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
             .map((property) => (
               <li
                 key={property.id}
-                className={`flex border-b p-2 pr-5 border-border-color items-center cursor-pointer ${
+                className={`flex flex-col sm:flex-row border-b p-3 sm:p-2 sm:pr-5 border-border-color items-stretch sm:items-center cursor-pointer transition-colors ${
                   selectedProperty?.id === property.id
                     ? "bg-brand-primary/10"
                     : "hover:bg-brand-primary/5"
@@ -83,19 +83,19 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
                   <img
                     src={property.avatar}
                     alt={property?.name}
-                    className="aspect-video rounded-xl h-36 border-r border-border-color object-cover mr-4"
+                    className="w-full sm:w-auto aspect-video sm:h-36 rounded-xl sm:border-r border-b sm:border-b-0 border-border-color object-cover mb-3 sm:mb-0 sm:mr-4"
                   />
                 ) : (
                   <div
-                    className={`aspect-video h-36 rounded-xl flex flex-col items-center justify-center border-r border-border-color mr-4 bg-primary-bg`}>
+                    className={`w-full sm:w-auto aspect-video sm:h-36 rounded-xl flex flex-col items-center justify-center sm:border-r border-b sm:border-b-0 border-border-color mb-3 sm:mb-0 sm:mr-4 bg-primary-bg`}>
                     <HiOutlineHomeModern className="w-12 h-12 text-secondary-text mb-2" />
                     <span className="text-secondary-text">No Image</span>
                   </div>
                 )}
 
                 {/* Property Details */}
-                <div className="flex flex-col flex-1 py-4 gap-2">
-                  <p className={`text-primary-text font-semibold text-lg`}>
+                <div className="flex flex-col flex-1 min-w-0 sm:py-4 gap-2">
+                  <p className={`text-primary-text font-semibold text-lg truncate`}>
                     {property.name}
                   </p>
                   <p className={`text-sm text-secondary-text`}>
@@ -109,17 +109,17 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
                       .filter(Boolean)
                       .join(", ")}
                   </p>
-                  <div className="flex flex-row gap-3 items-center">
+                  <div className="flex flex-row flex-wrap gap-2 items-center">
                     {property?.Packages && (
                       <div
-                        className={`mt-1 w-fit text-xs font-medium px-2 py-1 rounded-lg ${getPackageStyles(
+                        className={`w-fit text-xs font-medium px-2 py-1 rounded-lg ${getPackageStyles(
                           property.Packages.name
                         )}`}>
                         {property.Packages.name}
                       </div>
                     )}
                     <div
-                      className={`mt-1 w-fit text-xs font-medium px-2 py-1 rounded-lg ${
+                      className={`w-fit text-xs font-medium px-2 py-1 rounded-lg ${
                         property.is_active
                           ? "bg-green-400/20 text-green-500 border-green-600 border"
                           : "bg-red-400/20 text-red-500 border-red-600 border"
