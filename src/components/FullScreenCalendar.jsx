@@ -262,7 +262,7 @@ export default function FullScreenCalendar() {
         </span>
 
         {/* Indicators */}
-        <div className="absolute top-7 bottom-1 left-1 right-1 overflow-y-auto overflow-x-hidden flex flex-col justify-start gap-1">
+        <div className="absolute hide-scrollbar top-7 bottom-1 left-1 right-1 overflow-y-auto overflow-x-hidden flex flex-col justify-start gap-1">
           {hotTubForDay.length > 0 && view === "Monthly" ? (
             <span className="bg-blue-400/30 text-primary-text text-xs px-1 rounded">
               {hotTubForDay.length} Hot Tub Job
@@ -276,7 +276,9 @@ export default function FullScreenCalendar() {
                 className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded min-w-0">
                 <div className="bg-blue-500 rounded-full w-0.75 h-full shrink-0"></div>
                 <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
-                  <p className="font-semibold text-sm break-words">Hot Tub Job</p>
+                  <p className="font-semibold text-sm break-words">
+                    Hot Tub Job
+                  </p>
                   <p className="text-xs break-words">{job.property_name}</p>
                 </div>
               </span>
@@ -297,7 +299,9 @@ export default function FullScreenCalendar() {
                 <div className="bg-purple-500 rounded-full w-0.75 h-full shrink-0"></div>
                 <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
                   <p className="text-xs break-words">Laundry Job</p>
-                  <p className="font-semibold text-xs break-words">{job.property_name}</p>
+                  <p className="font-semibold text-xs break-words">
+                    {job.property_name}
+                  </p>
                   <p className="text-xs text-secondary-text break-words">
                     {`${job.transport} ${
                       job.splitType === "Start" && job.transport === "Client"
@@ -368,7 +372,9 @@ export default function FullScreenCalendar() {
                 <div className="bg-green-500 rounded-full w-0.75 h-full shrink-0"></div>
                 <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
                   <p className="text-xs break-words">Cleaning Job</p>
-                  <p className="font-semibold text-sm break-words">{job.property_name}</p>
+                  <p className="font-semibold text-sm break-words">
+                    {job.property_name}
+                  </p>
                 </div>
               </span>
             ))
@@ -382,7 +388,9 @@ export default function FullScreenCalendar() {
                     className="hover:scale-97 bg-orange-400/30 p-1 rounded flex flex-row gap-2 min-w-0">
                     <div className="bg-orange-500 rounded-full w-0.75 h-full shrink-0"></div>
                     <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
-                      <p className="text-xs text-primary-text break-words">Meeting</p>
+                      <p className="text-xs text-primary-text break-words">
+                        Meeting
+                      </p>
                       <p className="text-sm font-semibold text-primary-text break-words">
                         {meeting.title}
                       </p>
@@ -471,7 +479,7 @@ export default function FullScreenCalendar() {
             <CTAButton
               icon={IoAddOutline}
               type="main"
-              text="Insert Item"
+              text="Insert"
               callbackFn={handleNewItem}
             />
           </div>
@@ -499,9 +507,9 @@ export default function FullScreenCalendar() {
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col min-h-0 overflow-x-auto lg:overflow-x-visible">
+        <div className="flex-1 flex flex-col min-h-0 overflow-x-auto hide-scrollbar lg:overflow-x-visible">
           {/* Weekday Headers */}
-          <div className="grid grid-cols-7 min-w-[910px] lg:min-w-0 bg-secondary-bg border-t border-border-color shrink-0">
+          <div className="grid grid-cols-7 min-w-[1000px] lg:min-w-0 bg-secondary-bg border-t border-border-color shrink-0">
             {weekDays.map((day) => (
               <div
                 key={day}
@@ -513,7 +521,7 @@ export default function FullScreenCalendar() {
 
           {/* Calendar Grid */}
           <main
-            className={`flex-1 min-w-[910px] lg:min-w-0 border-border-color border-t bg-secondary-bg grid ${
+            className={`flex-1 min-w-[1000px] lg:min-w-0 border-border-color border-t bg-secondary-bg grid ${
               view === "Monthly" ? "grid-cols-7" : "grid-cols-7 grid-rows-1"
             } overflow-hidden`}>
             {view === "Monthly"

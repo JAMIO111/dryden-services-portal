@@ -84,6 +84,9 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
             <button
               title="Close Menu"
               onClick={onCloseMobile}
+              style={{
+                rotate: !isMenuExpanded ? "180deg" : "0deg",
+              }}
               className="cursor-pointer md:hidden">
               <GoSidebarExpand className="h-6 w-6 fill-icon-color hover:fill-primary-text" />
             </button>
@@ -142,7 +145,7 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
                 closeMenu={closeMenu}
               />
               <div className="border-t-1 mx-3 border-border-color md:hidden"></div>
-              <div className="flex items-center gap-3 px-3 pt-2 md:hidden">
+              <div className="flex items-center gap-3 px-3 py-2 md:hidden">
                 {profile?.avatar ? (
                   <img
                     className="rounded-xl border border-border-color w-11 h-11 object-cover shrink-0"
@@ -159,7 +162,9 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
                 )}
                 <div className="flex flex-col min-w-0">
                   <span className="text-primary-text font-semibold truncate">
-                    {profile ? `${profile.first_name} ${profile.surname}` : "User"}
+                    {profile
+                      ? `${profile.first_name} ${profile.surname}`
+                      : "User"}
                   </span>
                   <span className="text-sm text-secondary-text truncate">
                     {profile?.job_title || ""}
@@ -167,7 +172,7 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
                 </div>
               </div>
               <div className="border-t-1 mx-3 border-border-color"></div>
-              <div className="flex flex-col justify-between items-start gap-2 pt-2">
+              <div className="flex flex-col pl-3 justify-between items-start gap-4 py-2">
                 <ThemeToggle menuExpanded={showExpandedContent} />
                 <Logout isExpanded={showExpandedContent} />
               </div>
