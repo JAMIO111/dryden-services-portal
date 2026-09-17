@@ -7,10 +7,12 @@ import Logout from "./Logout";
 import { menuStructure } from "../MenuStructure";
 import SubMenuItem from "./SubMenuItem";
 import ThemeToggle from "./ThemeToggle";
+import { useUser } from "../contexts/UserProvider";
 
 const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(null);
+  const { profile } = useUser();
 
   // On mobile the nav renders as a full-width drawer, so the collapsed
   // icon-only state (desktop-only) shouldn't apply there.
@@ -41,11 +43,11 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
         />
       )}
       <div
-        className={`flex bg-secondary-bg fixed inset-y-0 left-0 z-50 transition-transform duration-300 md:static md:z-auto md:translate-x-0 md:transition-none ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        className={`flex bg-secondary-bg fixed inset-y-0 right-0 z-50 transition-transform duration-300 md:static md:z-auto md:translate-x-0 md:transition-none ${
+          isMobileOpen ? "translate-x-0" : "translate-x-full"
         }`}>
         <nav
-          className={`flex flex-col border-r ${
+          className={`flex flex-col border-l md:border-r ${
             !isMenuExpanded ? "md:transition-all md:duration-500" : null
           } min-w-fit border-border-color h-full w-68 ${
             isMenuExpanded ? "md:w-68" : "md:w-14"
@@ -143,6 +145,31 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
               <div className="flex flex-col justify-between items-start gap-2 pt-2">
                 <ThemeToggle menuExpanded={showExpandedContent} />
                 <Logout isExpanded={showExpandedContent} />
+              </div>
+              <div className="border-t-1 mx-3 border-border-color md:hidden"></div>
+              <div className="flex items-center gap-3 px-3 pt-2 md:hidden">
+                {profile?.avatar ? (
+                  <img
+                    className="rounded-xl border border-border-color w-11 h-11 object-cover shrink-0"
+                    src={profile.avatar}
+                    alt="Profile"
+                  />
+                ) : (
+                  <div className="rounded-xl border border-border-color w-11 h-11 flex items-center justify-center bg-primary-bg shrink-0">
+                    <span className="text-secondary-text text-sm">
+                      {profile?.first_name?.charAt(0)}
+                      {profile?.surname?.charAt(0)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex flex-col min-w-0">
+                  <span className="text-primary-text font-semibold truncate">
+                    {profile ? `${profile.first_name} ${profile.surname}` : "User"}
+                  </span>
+                  <span className="text-sm text-secondary-text truncate">
+                    {profile?.job_title || ""}
+                  </span>
+                </div>
               </div>
             </ul>
           </div>

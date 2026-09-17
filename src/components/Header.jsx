@@ -22,12 +22,6 @@ const Header = ({ onOpenMobileNav }) => {
 
   return (
     <header className="flex justify-between items-center border-b-1 border-border-color bg-secondary-bg px-2 sm:px-4 gap-2 pt-[env(safe-area-inset-top)]">
-      <button
-        title="Open Menu"
-        onClick={onOpenMobileNav}
-        className="cursor-pointer p-2 -ml-2 md:hidden shrink-0">
-        <BsList className="h-6 w-6 fill-icon-color hover:fill-primary-text" />
-      </button>
       <div className="hidden sm:flex sm:w-40 md:w-1/3">
         <SearchBar />
       </div>
@@ -53,19 +47,27 @@ const Header = ({ onOpenMobileNav }) => {
           </span>
           <span className="text-right text-secondary-text">{jobTitle}</span>
         </div>
-        {profile?.avatar ? (
-          <img
-            className="rounded-xl border-1 border-border-color w-10 h-10 sm:w-12 sm:h-12 object-cover shrink-0"
-            src={profile.avatar}
-            alt="Profile Pic"
-          />
-        ) : (
-          <div className="rounded-xl border-1 border-border-color w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-primary-bg shrink-0">
-            <span className="text-secondary-text">{`${profile.first_name.charAt(
-              0
-            )}${profile.surname.charAt(0)}`}</span>
-          </div>
-        )}
+        <div className="hidden md:block">
+          {profile?.avatar ? (
+            <img
+              className="rounded-xl border-1 border-border-color w-10 h-10 sm:w-12 sm:h-12 object-cover shrink-0"
+              src={profile.avatar}
+              alt="Profile Pic"
+            />
+          ) : (
+            <div className="rounded-xl border-1 border-border-color w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-primary-bg shrink-0">
+              <span className="text-secondary-text">{`${profile.first_name.charAt(
+                0
+              )}${profile.surname.charAt(0)}`}</span>
+            </div>
+          )}
+        </div>
+        <button
+          title="Open Menu"
+          onClick={onOpenMobileNav}
+          className="cursor-pointer p-2 -mr-2 md:hidden shrink-0">
+          <BsList className="h-6 w-6 fill-icon-color hover:fill-primary-text" />
+        </button>
       </div>
     </header>
   );
