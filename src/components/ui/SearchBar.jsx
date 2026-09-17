@@ -1,16 +1,19 @@
+import { useId } from "react";
 import { CgClose } from "react-icons/cg";
 import { BsSearch } from "react-icons/bs";
 import { useGlobalSearch } from "../../contexts/SearchProvider";
 
-const SearchBar = () => {
+const SearchBar = ({ autoFocus = false }) => {
   const { searchTerm, setSearchTerm } = useGlobalSearch();
+  const inputId = useId();
 
   return (
     <div className="flex w-full p-2 relative items-center ">
       <BsSearch className="hover:fill-primary-text absolute fill-icon-color h-4 w-4 inset-x-5" />
       <input
-        id="Global Search Bar"
+        id={inputId}
         name="search-bar"
+        autoFocus={autoFocus}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full h-10 shadow-s hover:shadow-m bg-text-input-color text-primary-text placeholder-muted hover:border-border-dark-color focus:border-blue-300 focus:ring focus:ring-blue-200 focus:outline-none rounded-xl pl-12"
