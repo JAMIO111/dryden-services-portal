@@ -98,7 +98,8 @@ const Dashboard = () => {
               <DateRangePicker
                 alignment="right"
                 rangeCounterText="Days"
-                width="w-80"
+                width="w-10 sm:w-64 md:w-80"
+                compact
                 onChange={setSelectedRange}
                 value={memoisedRange}
                 presets={[

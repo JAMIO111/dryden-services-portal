@@ -51,6 +51,16 @@ function formatDate(date) {
     : "";
 }
 
+function formatDateShort(date) {
+  return date
+    ? date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      })
+    : "";
+}
+
 export default function DateRangePicker({
   alignment = "left",
   label,
@@ -63,6 +73,12 @@ export default function DateRangePicker({
   rangeCounterText = "nights",
   error,
   presets = [],
+  // When true, the trigger shrinks its display (full date -> dd/mm/yy ->
+  // icon-only) as the viewport narrows, instead of always showing the
+  // full "ddd, dd mmm yy" text. Intended for header placements that need
+  // to avoid wrapping; leave off for dedicated form fields with their
+  // own room (e.g. BookingForm), which should keep showing full text.
+  compact = false,
 }) {
   const triggerRef = useRef(null);
   const containerRef = useRef(null);
@@ -224,28 +240,75 @@ export default function DateRangePicker({
           setIsOpen((prev) => !prev);
         }}
         title={error && error.message}
-        className="relative flex items-center w-full cursor-pointer"
+        role="button"
+        tabIndex={0}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        aria-label="Select date range"
+        className={`relative flex items-center cursor-pointer ${
+          compact ? "w-fit sm:w-full" : "w-full"
+        }`}
         ref={triggerRef}>
-        {error ? (
-          <MdErrorOutline className="absolute left-2.5 top-2.5 text-error-color w-5 h-5" />
-        ) : (
-          <RxCalendar className="absolute left-2.5 top-2.5 text-primary-text w-5 h-5" />
+        {compact && (
+          <div
+            className={`sm:hidden flex items-center justify-center w-10 h-10 shrink-0 border ${
+              isOpen ? "border-cta-color" : "border-transparent"
+            } ${
+              error ? "border-error-color" : ""
+            } shadow-s hover:shadow-m rounded-lg bg-text-input-color`}>
+            {error ? (
+              <MdErrorOutline className="text-error-color w-5 h-5" />
+            ) : (
+              <RxCalendar className="text-primary-text w-5 h-5" />
+            )}
+          </div>
         )}
-        <input
-          type="text"
-          readOnly
-          className={`border ${isOpen ? "border-cta-color" : ""} ${
+
+        <div
+          className={`${compact ? "hidden sm:flex" : "flex"} relative items-center w-full border ${
+            isOpen ? "border-cta-color" : ""
+          } ${
             error ? "border-error-color" : "border-transparent"
-          } placeholder:normal-case cursor-pointer placeholder:text-sm placeholder:text-muted w-full shadow-s hover:shadow-m text-primary-text pr-4 pl-11 py-2 rounded-lg bg-text-input-color focus:outline-none`}
-          value={
-            startDate && endDate
-              ? `${formatDate(startDate)} - ${formatDate(endDate)}`
-              : startDate
-                ? `${formatDate(startDate)} -`
-                : ""
-          }
-          placeholder="Select date range"
-        />
+          } shadow-s hover:shadow-m text-primary-text pr-4 pl-11 py-2 rounded-lg bg-text-input-color`}>
+          {error ? (
+            <MdErrorOutline className="absolute left-2.5 top-1/2 -translate-y-1/2 text-error-color w-5 h-5" />
+          ) : (
+            <RxCalendar className="absolute left-2.5 top-1/2 -translate-y-1/2 text-primary-text w-5 h-5" />
+          )}
+          {startDate ? (
+            compact ? (
+              <>
+                <span className="md:hidden truncate">
+                  {startDate && endDate
+                    ? `${formatDateShort(startDate)} - ${formatDateShort(endDate)}`
+                    : `${formatDateShort(startDate)} -`}
+                </span>
+                <span className="hidden md:inline truncate">
+                  {startDate && endDate
+                    ? `${formatDate(startDate)} - ${formatDate(endDate)}`
+                    : `${formatDate(startDate)} -`}
+                </span>
+              </>
+            ) : (
+              <span className="truncate">
+                {startDate && endDate
+                  ? `${formatDate(startDate)} - ${formatDate(endDate)}`
+                  : `${formatDate(startDate)} -`}
+              </span>
+            )
+          ) : (
+            <span className="text-sm text-muted truncate">
+              {compact ? (
+                <>
+                  <span className="md:hidden">Select dates</span>
+                  <span className="hidden md:inline">Select date range</span>
+                </>
+              ) : (
+                "Select date range"
+              )}
+            </span>
+          )}
+        </div>
       </div>
 
       {isOpen && (

@@ -53,7 +53,8 @@ const HRDashboard = () => {
           <div className="w-full gap-3 md:w-fit flex flex-wrap items-center justify-start xl:justify-center">
             <DateRangePicker
               alignment="right"
-              width="w-80"
+              width="w-10 sm:w-64 md:w-80"
+              compact
               rangeCounter={false}
               onChange={setSelectedRange}
               value={memoisedRange}
