@@ -51,7 +51,7 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
             isMenuExpanded ? "md:w-68" : "md:w-14"
           }`}>
           <div
-            className={`flex justify-start items-center py-3 border-b-1 border-border-color ${
+            className={`flex justify-start items-center py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b-1 border-border-color ${
               showExpandedContent ? "flex-row mx-3" : "md:flex-col md:gap-3"
             }`}>
             <div className="flex bg-primary-bg border border-primary-text rounded-xl p-0.5 items-center justify-start gap-3">
@@ -123,7 +123,7 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
               ))}
             </ul>
             <div className="border-t-1 mt-2 border-border-color"></div>
-            <ul className="gap-2 flex my-2 flex-col">
+            <ul className="gap-2 flex my-2 flex-col pb-[env(safe-area-inset-bottom)]">
               <NavItem
                 label="Settings"
                 icon={BsGear}

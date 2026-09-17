@@ -21,7 +21,7 @@ const Header = ({ onOpenMobileNav }) => {
     : 0;
 
   return (
-    <header className="flex justify-between items-center border-b-1 border-border-color bg-secondary-bg px-2 sm:px-4 gap-2">
+    <header className="flex justify-between items-center border-b-1 border-border-color bg-secondary-bg px-2 sm:px-4 gap-2 pt-[env(safe-area-inset-top)]">
       <button
         title="Open Menu"
         onClick={onOpenMobileNav}
