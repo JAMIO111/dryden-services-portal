@@ -262,7 +262,7 @@ export default function FullScreenCalendar() {
         </span>
 
         {/* Indicators */}
-        <div className="absolute top-7 bottom-1 left-1 right-1 overflow-y-auto flex flex-col justify-start gap-1">
+        <div className="absolute top-7 bottom-1 left-1 right-1 overflow-y-auto overflow-x-hidden flex flex-col justify-start gap-1">
           {hotTubForDay.length > 0 && view === "Monthly" ? (
             <span className="bg-blue-400/30 text-primary-text text-xs px-1 rounded">
               {hotTubForDay.length} Hot Tub Job
@@ -273,11 +273,11 @@ export default function FullScreenCalendar() {
             hotTubForDay.map((job, index) => (
               <span
                 key={index}
-                className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
-                <div className="bg-blue-500 rounded-full w-0.75 h-full"></div>
-                <div className="flex flex-col py-1 gap-1">
-                  <p className="font-semibold text-sm">Hot Tub Job</p>
-                  <p className="text-xs">{job.property_name}</p>
+                className="bg-blue-400/30 text-primary-text p-1 flex flex-row gap-2 rounded min-w-0">
+                <div className="bg-blue-500 rounded-full w-0.75 h-full shrink-0"></div>
+                <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
+                  <p className="font-semibold text-sm break-words">Hot Tub Job</p>
+                  <p className="text-xs break-words">{job.property_name}</p>
                 </div>
               </span>
             ))
@@ -293,12 +293,12 @@ export default function FullScreenCalendar() {
             laundryForDay.map((job, index) => (
               <span
                 key={index}
-                className="hover:scale-97 bg-purple-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
-                <div className="bg-purple-500 rounded-full w-0.75 h-full"></div>
-                <div className="flex flex-col py-1 gap-1">
-                  <p className="text-xs">Laundry Job</p>
-                  <p className="font-semibold text-xs">{job.property_name}</p>
-                  <p className="text-xs text-secondary-text">
+                className="hover:scale-97 bg-purple-400/30 text-primary-text p-1 flex flex-row gap-2 rounded min-w-0">
+                <div className="bg-purple-500 rounded-full w-0.75 h-full shrink-0"></div>
+                <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
+                  <p className="text-xs break-words">Laundry Job</p>
+                  <p className="font-semibold text-xs break-words">{job.property_name}</p>
+                  <p className="text-xs text-secondary-text break-words">
                     {`${job.transport} ${
                       job.splitType === "Start" && job.transport === "Client"
                         ? "Dropoff"
@@ -318,18 +318,18 @@ export default function FullScreenCalendar() {
               ? jobsForDay.map((job, index) => (
                   <span
                     key={index}
-                    className="hover:scale-97 bg-pink-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
-                    <div className="flex flex-col">
+                    className="hover:scale-97 bg-pink-400/30 text-primary-text p-1 flex flex-row gap-2 rounded min-w-0">
+                    <div className="flex flex-col shrink-0">
                       <div className="bg-red-500 rounded-t-full w-0.75 h-full"></div>
                       <div
                         className={`${job.nextArrival === job.jobDate ? "bg-green-500" : "bg-red-500"} rounded-b-full w-0.75 h-full`}></div>
                     </div>
-                    <div className="flex flex-col py-1 gap-1">
-                      <p className="text-xs">Changeover</p>
-                      <p className="font-semibold text-sm">
+                    <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
+                      <p className="text-xs break-words">Changeover</p>
+                      <p className="font-semibold text-sm break-words">
                         {job.propertyDetails.name}
                       </p>
-                      <p className="text-xs text-secondary-text">
+                      <p className="text-xs text-secondary-text break-words">
                         {`Next Arrival: ${
                           job.nextArrival
                             ? new Date(job.nextArrival).toLocaleDateString(
@@ -364,11 +364,11 @@ export default function FullScreenCalendar() {
             cleanForDay.map((job, index) => (
               <span
                 key={index}
-                className="hover:scale-97 bg-green-400/30 text-primary-text p-1 flex flex-row gap-2 rounded">
-                <div className="bg-green-500 rounded-full w-0.75 h-full"></div>
-                <div className="flex flex-col py-1 gap-1">
-                  <p className="text-xs">Cleaning Job</p>
-                  <p className="font-semibold text-sm">{job.property_name}</p>
+                className="hover:scale-97 bg-green-400/30 text-primary-text p-1 flex flex-row gap-2 rounded min-w-0">
+                <div className="bg-green-500 rounded-full w-0.75 h-full shrink-0"></div>
+                <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
+                  <p className="text-xs break-words">Cleaning Job</p>
+                  <p className="font-semibold text-sm break-words">{job.property_name}</p>
                 </div>
               </span>
             ))
@@ -379,14 +379,14 @@ export default function FullScreenCalendar() {
               ? meetingsForDay.map((meeting, index) => (
                   <span
                     key={index}
-                    className="hover:scale-97 bg-orange-400/30 p-1 rounded flex flex-row gap-2">
-                    <div className="bg-orange-500 rounded-full w-0.75 h-full"></div>
-                    <div className="flex flex-col py-1 gap-1">
-                      <p className="text-xs text-primary-text">Meeting</p>
-                      <p className="text-sm font-semibold text-primary-text">
+                    className="hover:scale-97 bg-orange-400/30 p-1 rounded flex flex-row gap-2 min-w-0">
+                    <div className="bg-orange-500 rounded-full w-0.75 h-full shrink-0"></div>
+                    <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
+                      <p className="text-xs text-primary-text break-words">Meeting</p>
+                      <p className="text-sm font-semibold text-primary-text break-words">
                         {meeting.title}
                       </p>
-                      <p className="text-xs text-secondary-text">
+                      <p className="text-xs text-secondary-text break-words">
                         {`${new Date(meeting.start_date).toLocaleTimeString(
                           "en-GB",
                           { hour: "2-digit", minute: "2-digit" },
@@ -410,28 +410,28 @@ export default function FullScreenCalendar() {
               ? absencesForDay.map((absence, index) => (
                   <span
                     key={index}
-                    className="hover:scale-97 bg-red-400/30 p-1 rounded flex flex-row gap-2">
-                    <div className="bg-red-500 rounded-full w-0.75 h-full"></div>
-                    <div className="flex flex-col py-1 gap-1">
-                      <p className="text-sm font-semibold text-primary-text">
+                    className="hover:scale-97 bg-red-400/30 p-1 rounded flex flex-row gap-2 min-w-0">
+                    <div className="bg-red-500 rounded-full w-0.75 h-full shrink-0"></div>
+                    <div className="flex flex-col py-1 gap-1 min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-primary-text break-words">
                         Absence
                       </p>
-                      <div className="flex flex-row gap-2 items-center">
+                      <div className="flex flex-row gap-2 items-center min-w-0">
                         {absence.employee.avatar ? (
                           <img
-                            className="w-6 h-6 rounded-full object-cover"
+                            className="w-6 h-6 rounded-full object-cover shrink-0"
                             src={absence.employee.avatar}
                             alt={`${absence.employee.first_name} ${absence.employee.surname}`}
                           />
                         ) : (
-                          <div className="w-5 h-5 p-3 bg-secondary-text/20 text-xs rounded-full flex items-center justify-center">
+                          <div className="w-5 h-5 p-3 bg-secondary-text/20 text-xs rounded-full flex items-center justify-center shrink-0">
                             {absence.employee.first_name
                               .charAt(0)
                               .toUpperCase()}
                             {absence.employee.surname.charAt(0).toUpperCase()}
                           </div>
                         )}
-                        <p className="text-sm text-primary-text">
+                        <p className="text-sm text-primary-text break-words min-w-0">
                           {`${absence.employee.first_name} ${absence.employee.surname}`}
                         </p>
                       </div>
@@ -501,7 +501,7 @@ export default function FullScreenCalendar() {
 
         <div className="flex-1 flex flex-col min-h-0 overflow-x-auto lg:overflow-x-visible">
           {/* Weekday Headers */}
-          <div className="grid grid-cols-7 min-w-[700px] lg:min-w-0 bg-secondary-bg border-t border-border-color shrink-0">
+          <div className="grid grid-cols-7 min-w-[910px] lg:min-w-0 bg-secondary-bg border-t border-border-color shrink-0">
             {weekDays.map((day) => (
               <div
                 key={day}
@@ -513,7 +513,7 @@ export default function FullScreenCalendar() {
 
           {/* Calendar Grid */}
           <main
-            className={`flex-1 min-w-[700px] lg:min-w-0 border-border-color border-t bg-secondary-bg grid ${
+            className={`flex-1 min-w-[910px] lg:min-w-0 border-border-color border-t bg-secondary-bg grid ${
               view === "Monthly" ? "grid-cols-7" : "grid-cols-7 grid-rows-1"
             } overflow-hidden`}>
             {view === "Monthly"
