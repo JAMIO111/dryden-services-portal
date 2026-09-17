@@ -141,11 +141,6 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
                 path="/Help"
                 closeMenu={closeMenu}
               />
-              <div className="border-t-1 mx-3 border-border-color"></div>
-              <div className="flex flex-col justify-between items-start gap-2 pt-2">
-                <ThemeToggle menuExpanded={showExpandedContent} />
-                <Logout isExpanded={showExpandedContent} />
-              </div>
               <div className="border-t-1 mx-3 border-border-color md:hidden"></div>
               <div className="flex items-center gap-3 px-3 pt-2 md:hidden">
                 {profile?.avatar ? (
@@ -170,6 +165,11 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
                     {profile?.job_title || ""}
                   </span>
                 </div>
+              </div>
+              <div className="border-t-1 mx-3 border-border-color"></div>
+              <div className="flex flex-col justify-between items-start gap-2 pt-2">
+                <ThemeToggle menuExpanded={showExpandedContent} />
+                <Logout isExpanded={showExpandedContent} />
               </div>
             </ul>
           </div>
