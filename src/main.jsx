@@ -233,7 +233,7 @@ createRoot(document.getElementById("root")).render(
                 <ModalProvider>
                   <Suspense
                     fallback={
-                      <div className="flex items-center justify-center h-screen bg-primary-bg">
+                      <div className="flex items-center justify-center h-dvh bg-primary-bg">
                         <LoadingSpinner />
                       </div>
                     }>

@@ -13,7 +13,7 @@ function App() {
     <SearchProvider>
       <NotificationProvider>
         <NotificationPane />
-        <div className="flex w-screen h-screen overflow-hidden pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+        <div className="flex w-screen h-dvh overflow-hidden pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
           <Navbar
             isMobileOpen={isMobileNavOpen}
             onCloseMobile={() => setIsMobileNavOpen(false)}

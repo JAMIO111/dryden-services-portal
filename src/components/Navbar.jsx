@@ -47,7 +47,7 @@ const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
         <nav
           className={`flex flex-col border-r ${
             !isMenuExpanded ? "md:transition-all md:duration-500" : null
-          } min-w-fit border-border-color h-screen w-68 ${
+          } min-w-fit border-border-color h-full w-68 ${
             isMenuExpanded ? "md:w-68" : "md:w-14"
           }`}>
           <div

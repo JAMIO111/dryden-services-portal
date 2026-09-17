@@ -7,7 +7,7 @@ const ProtectedRoute = () => {
 
   if (user === undefined)
     return (
-      <div className="w-full bg-primary-bg h-screen flex flex-col justify-center items-center">
+      <div className="w-full bg-primary-bg h-dvh flex flex-col justify-center items-center">
         <Spinner />
       </div>
     ); // Optional: handle loading state

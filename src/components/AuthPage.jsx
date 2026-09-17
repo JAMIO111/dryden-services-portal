@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 const AuthPage = () => {
   return (
-    <div className="flex flex-row items-center justify-between h-screen w-screen bg-primary-bg p-3 gap-3">
+    <div className="flex flex-row items-center justify-between h-dvh w-screen bg-primary-bg p-3 gap-3">
       <div className="flex flex-col items-center justify-center grow-1 h-full bg-secondary-bg shadow-md rounded-2xl">
         <Outlet />
       </div>

@@ -7,7 +7,7 @@ const RequireProfile = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full bg-primary-bg h-screen flex justify-center items-center">
+      <div className="w-full bg-primary-bg h-dvh flex justify-center items-center">
         <Spinner />
       </div>
     );

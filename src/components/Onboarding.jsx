@@ -116,7 +116,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="relative px-4 py-8 bg-primary-bg flex flex-row gap-10 items-center min-h-screen">
+    <div className="relative px-4 py-8 bg-primary-bg flex flex-row gap-10 items-center h-dvh overflow-y-auto">
       <img
         src="\Logo-black-on-yellow.png"
         alt="Logo"
