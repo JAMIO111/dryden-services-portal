@@ -117,7 +117,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row gap-3 p-3 flex-grow overflow-y-auto lg:overflow-hidden">
+        <div className="flex flex-col lg:flex-row gap-3 p-3 flex-grow overflow-y-auto overscroll-contain lg:overflow-hidden">
           <div className="flex flex-col gap-3 flex-1 lg:min-h-0">
             <div className="flex flex-col gap-3 flex-1">
               <div className="flex gap-3 h-30">

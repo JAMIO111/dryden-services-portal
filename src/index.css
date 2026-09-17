@@ -61,6 +61,11 @@
   box-sizing: border-box;
   font-family: "Poppins";
 }
+
+#root {
+  height: 100dvh;
+  overflow: hidden;
+}
 .light {
   --brand-primary: var(--color-violet-700);
   --brand-secondary: var(--color-orange-700);
