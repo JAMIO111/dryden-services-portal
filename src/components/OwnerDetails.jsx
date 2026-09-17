@@ -63,7 +63,7 @@ const OwnerDetails = ({ owner }) => {
   };
 
   return (
-    <div className="bg-secondary-bg flex-1 h-full flex flex-col rounded-2xl shadow-m">
+    <div className="bg-secondary-bg flex-1 min-h-[60vh] lg:min-h-0 lg:h-full flex flex-col rounded-2xl shadow-m">
       {!owner ? (
         <div className="w-full h-full flex items-center justify-center rounded-2xl">
           <div className="flex flex-col items-center gap-4 p-12 rounded-2xl bg-primary-bg border border-border-color shadow-md text-center">
@@ -96,9 +96,9 @@ const OwnerDetails = ({ owner }) => {
           </div>
 
           {/* Details */}
-          <div className="flex flex-1 flex-row gap-3 overflow-hidden p-3">
+          <div className="flex flex-1 flex-col lg:flex-row gap-3 overflow-y-auto lg:overflow-hidden p-3">
             {/* Left Column */}
-            <div className="flex flex-col gap-3 w-[60%] h-full">
+            <div className="flex flex-col gap-3 w-full lg:w-[60%] lg:h-full">
               <div className="flex flex-row border border-brand-primary/60 p-3 rounded-2xl bg-brand-primary/30 items-center">
                 {/* Avatar */}
                 <div className="relative mr-4">
@@ -280,7 +280,7 @@ const OwnerDetails = ({ owner }) => {
             </div>
 
             {/* Right Column */}
-            <div className="flex flex-col w-[40%] h-full overflow-y-auto gap-3">
+            <div className="flex flex-col w-full lg:w-[40%] min-h-64 lg:h-full lg:overflow-y-auto gap-3">
               {isLoading ? (
                 <div className="flex justify-center bg-tertiary-bg shadow-s rounded-2xl items-center h-200">
                   <p className="text-secondary-text animate-pulse">

@@ -68,11 +68,11 @@ export default function LeadList() {
         {/* Header INSIDE the scroll container */}
         <div
           id="lead-list-header"
-          className="sticky top-0 inset-m z-10 rounded-t-3xl backdrop-blur-md bg-secondary-bg/70 
-                 border-b border-transparent 
-                 data-[scrolled=true]:border-border-color/60 
+          className="sticky top-0 inset-m z-10 rounded-t-3xl backdrop-blur-md bg-secondary-bg/70
+                 border-b border-transparent
+                 data-[scrolled=true]:border-border-color/60
                  data-[scrolled=true]:bg-secondary-bg/50
-                 p-6 py-3 flex justify-between items-center">
+                 p-4 sm:p-6 py-3 flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center">
           <div className="flex flex-col justify-between items-start">
             <h2 className="text-xl text-primary-text font-semibold">
               Business Leads
@@ -81,7 +81,7 @@ export default function LeadList() {
               {leads?.length} Open leads to manage
             </p>
           </div>
-          <div className="flex flex-1 justify-end gap-3">
+          <div className="flex flex-1 sm:flex-none justify-between sm:justify-end gap-3">
             <div className="w-34">
               <ToggleButton
                 checked={statusFilter === "All"}

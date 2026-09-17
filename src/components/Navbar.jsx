@@ -8,9 +8,13 @@ import { menuStructure } from "../MenuStructure";
 import SubMenuItem from "./SubMenuItem";
 import ThemeToggle from "./ThemeToggle";
 
-const Navbar = () => {
+const Navbar = ({ isMobileOpen = false, onCloseMobile }) => {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(null);
+
+  // On mobile the nav renders as a full-width drawer, so the collapsed
+  // icon-only state (desktop-only) shouldn't apply there.
+  const showExpandedContent = isMenuExpanded || isMobileOpen;
 
   const toggleMenu = () => {
     setIsSubMenuOpen(null);
@@ -20,6 +24,7 @@ const Navbar = () => {
   const closeMenu = () => {
     setIsSubMenuOpen(null);
     setIsMenuExpanded(false);
+    onCloseMobile?.();
   };
 
   const toggleSubMenu = (name) => {
@@ -27,103 +32,123 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex bg-secondary-bg">
-      <nav
-        className={`flex flex-col border-r ${
-          !isMenuExpanded ? "transition-all duration-500" : null
-        } min-w-fit border-border-color h-screen ${
-          isMenuExpanded ? "w-68" : "w-14"
-        }`}>
+    <>
+      {/* Mobile backdrop */}
+      {isMobileOpen && (
         <div
-          className={`flex justify-start items-center py-3 border-b-1 border-border-color ${
-            isMenuExpanded ? "flex-row mx-3" : "flex-col gap-3"
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={onCloseMobile}
+        />
+      )}
+      <div
+        className={`flex bg-secondary-bg fixed inset-y-0 left-0 z-50 transition-transform duration-300 md:static md:z-auto md:translate-x-0 md:transition-none ${
+          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}>
+        <nav
+          className={`flex flex-col border-r ${
+            !isMenuExpanded ? "md:transition-all md:duration-500" : null
+          } min-w-fit border-border-color h-screen w-68 ${
+            isMenuExpanded ? "md:w-68" : "md:w-14"
           }`}>
-          <div className="flex bg-primary-bg border border-primary-text rounded-xl p-0.5 items-center justify-start gap-3">
-            <div className="flex justify-center items-center bg-white rounded-[10px] p-1">
-              <img className="w-6 h-6" src={Logo} alt="Logo" />
+          <div
+            className={`flex justify-start items-center py-3 border-b-1 border-border-color ${
+              showExpandedContent ? "flex-row mx-3" : "md:flex-col md:gap-3"
+            }`}>
+            <div className="flex bg-primary-bg border border-primary-text rounded-xl p-0.5 items-center justify-start gap-3">
+              <div className="flex justify-center items-center bg-white rounded-[10px] p-1">
+                <img className="w-6 h-6" src={Logo} alt="Logo" />
+              </div>
             </div>
+            {showExpandedContent && (
+              <div className="flex flex-col justify-between items-start flex-1">
+                <h1 className="ml-3 flex-1 text-sm text-primary-text">
+                  Dryden Services Ltd
+                </h1>
+                <p className="ml-3 flex-1 text-xs text-secondary-text">
+                  Business Portal
+                </p>
+              </div>
+            )}
+            <button
+              title={isMenuExpanded ? "Hide Menu" : "Expand Menu"}
+              onClick={toggleMenu}
+              className="cursor-pointer hidden md:block">
+              <GoSidebarExpand
+                className={`h-6 w-6 fill-icon-color hover:fill-primary-text ${
+                  !isMenuExpanded && "rotate-180"
+                }`}
+              />
+            </button>
+            <button
+              title="Close Menu"
+              onClick={onCloseMobile}
+              className="cursor-pointer md:hidden">
+              <GoSidebarExpand className="h-6 w-6 fill-icon-color hover:fill-primary-text" />
+            </button>
           </div>
-          {isMenuExpanded && (
-            <div className="flex flex-col justify-between items-start flex-1">
-              <h1 className="ml-3 flex-1 text-sm text-primary-text">
-                Dryden Services Ltd
-              </h1>
-              <p className="ml-3 flex-1 text-xs text-secondary-text">
-                Business Portal
-              </p>
-            </div>
-          )}
-          <button
-            title={isMenuExpanded ? "Hide Menu" : "Expand Menu"}
-            onClick={toggleMenu}
-            className="cursor-pointer">
-            <GoSidebarExpand
-              className={`h-6 w-6 fill-icon-color hover:fill-primary-text ${
-                !isMenuExpanded && "rotate-180"
-              }`}
-            />
-          </button>
-        </div>
-        <div className="flex flex-col h-full overflow-y-auto justify-between">
-          <ul className="gap-1 flex-1 flex flex-col pt-3">
-            {menuStructure.map((item) => (
-              <li key={item.name}>
-                <NavItem
-                  title={item.name}
-                  label={item.name}
-                  icon={item.icon}
-                  path={item.path}
-                  isExpanded={isMenuExpanded}
-                  closeMenu={closeMenu}
-                  hasSubMenu={
-                    Array.isArray(item.subMenu) && item.subMenu.length > 0
-                  }
-                  onToggleSubMenu={() => toggleSubMenu(item.name)}
-                  isSubMenuOpen={isSubMenuOpen}
-                />
-                {item.subMenu && isSubMenuOpen === item.name && (
-                  <ul className="ml-4 flex flex-col">
-                    {item.subMenu?.map((subItem, index) => (
-                      <li key={subItem.name}>
-                        <SubMenuItem
-                          title={subItem.name}
-                          label={subItem.name}
-                          path={subItem.path}
-                          isFirst={index === 0}
-                          isLast={index === item.subMenu?.length - 1}
-                          closeMenu={closeMenu}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-          <div className="border-t-1 mt-2 border-border-color"></div>
-          <ul className="gap-2 flex my-2 flex-col">
-            <NavItem
-              label="Settings"
-              icon={BsGear}
-              isExpanded={isMenuExpanded}
-              onClick={() => {}}
-              path="/Settings"
-            />
-            <NavItem
-              label="Help Centre"
-              icon={BsQuestionCircle}
-              isExpanded={isMenuExpanded}
-              path="/Help"
-            />
-            <div className="border-t-1 mx-3 border-border-color"></div>
-            <div className="flex flex-col justify-between items-start gap-2 pt-2">
-              <ThemeToggle menuExpanded={isMenuExpanded} />
-              <Logout isExpanded={isMenuExpanded} />
-            </div>
-          </ul>
-        </div>
-      </nav>
-    </div>
+          <div className="flex flex-col h-full overflow-y-auto justify-between">
+            <ul className="gap-1 flex-1 flex flex-col pt-3">
+              {menuStructure.map((item) => (
+                <li key={item.name}>
+                  <NavItem
+                    title={item.name}
+                    label={item.name}
+                    icon={item.icon}
+                    path={item.path}
+                    isExpanded={showExpandedContent}
+                    closeMenu={closeMenu}
+                    hasSubMenu={
+                      Array.isArray(item.subMenu) && item.subMenu.length > 0
+                    }
+                    onToggleSubMenu={() => toggleSubMenu(item.name)}
+                    isSubMenuOpen={isSubMenuOpen}
+                  />
+                  {item.subMenu && isSubMenuOpen === item.name && (
+                    <ul className="ml-4 flex flex-col">
+                      {item.subMenu?.map((subItem, index) => (
+                        <li key={subItem.name}>
+                          <SubMenuItem
+                            title={subItem.name}
+                            label={subItem.name}
+                            path={subItem.path}
+                            isFirst={index === 0}
+                            isLast={index === item.subMenu?.length - 1}
+                            closeMenu={closeMenu}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <div className="border-t-1 mt-2 border-border-color"></div>
+            <ul className="gap-2 flex my-2 flex-col">
+              <NavItem
+                label="Settings"
+                icon={BsGear}
+                isExpanded={showExpandedContent}
+                onClick={() => {}}
+                path="/Settings"
+                closeMenu={closeMenu}
+              />
+              <NavItem
+                label="Help Centre"
+                icon={BsQuestionCircle}
+                isExpanded={showExpandedContent}
+                path="/Help"
+                closeMenu={closeMenu}
+              />
+              <div className="border-t-1 mx-3 border-border-color"></div>
+              <div className="flex flex-col justify-between items-start gap-2 pt-2">
+                <ThemeToggle menuExpanded={showExpandedContent} />
+                <Logout isExpanded={showExpandedContent} />
+              </div>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </>
   );
 };
 

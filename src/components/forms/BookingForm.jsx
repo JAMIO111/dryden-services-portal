@@ -192,8 +192,8 @@ const BookingForm = () => {
   };
 
   return (
-    <div className="flex bg-primary-bg flex-1 flex-row p-4 gap-4">
-      <div className="shadow-m rounded-2xl flex h-full gap-3 flex-1 p-5 flex-col bg-secondary-bg">
+    <div className="flex bg-primary-bg flex-1 flex-col lg:flex-row p-4 gap-4 overflow-y-auto lg:overflow-hidden">
+      <div className="shadow-m rounded-2xl flex lg:h-full gap-3 flex-1 p-5 flex-col bg-secondary-bg">
         <Controller
           name="booking_ref"
           control={control}
@@ -285,7 +285,7 @@ const BookingForm = () => {
         />
       </div>
       {!watch("is_owner_booking") && (
-        <div className="flex flex-1 shadow-m h-full justify-between p-3 px-5 flex-col bg-secondary-bg rounded-2xl">
+        <div className="flex flex-1 shadow-m lg:h-full justify-between p-3 px-5 flex-col bg-secondary-bg rounded-2xl">
           {[
             ["adults", "Adults", IoIosMan],
             ["children", "Children", FaChildren],

@@ -72,8 +72,8 @@ const PropertyAddressForm = ({ control }) => {
       />
 
       {/* County + Postcode side by side */}
-      <div className="flex gap-3">
-        <div className="w-1/2">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="w-full sm:w-1/2">
           <Controller
             name="county"
             control={control}
@@ -90,7 +90,7 @@ const PropertyAddressForm = ({ control }) => {
           />
         </div>
 
-        <div className="w-1/2">
+        <div className="w-full sm:w-1/2">
           <Controller
             name="postcode"
             control={control}

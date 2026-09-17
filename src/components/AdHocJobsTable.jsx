@@ -93,8 +93,8 @@ const AdHocJobsTable = ({
 
   return (
     <div className="flex flex-1 shadow-md flex-col border relative border-border-color rounded-2xl overflow-y-auto min-h-[14px]">
-      <div className="flex-1 text-[13px] bg-secondary-bg overflow-y-auto relative">
-        <table className="w-full border-collapse">
+      <div className="flex-1 text-[13px] bg-secondary-bg overflow-auto relative">
+        <table className="w-full max-lg:min-w-[900px] border-collapse">
           <thead>
             <tr className="text-left border-b border-border-color th-sticky">
               <th className="pl-2 pr-2">

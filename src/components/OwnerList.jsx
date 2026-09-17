@@ -40,7 +40,7 @@ const OwnerList = ({
       : owners;
 
   return (
-    <div className="bg-secondary-bg w-1/4 p-0.5 rounded-2xl shadow-m flex flex-col h-full overflow-hidden relative">
+    <div className="bg-secondary-bg w-full lg:w-1/4 p-0.5 rounded-2xl shadow-m flex flex-col h-[60vh] lg:h-full overflow-hidden relative shrink-0">
       {/* Header */}
       <div
         className="

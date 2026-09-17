@@ -39,7 +39,7 @@ const MaintenanceDashboard = () => {
           </p>
         </div>
         <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
-          <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
+          <div className="w-full gap-3 md:w-fit flex flex-wrap items-center justify-start xl:justify-center">
             <DateRangePicker
               alignment="right"
               width="w-80"
@@ -60,8 +60,8 @@ const MaintenanceDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col flex-1 ">
-        <div className="flex flex-row p-3 gap-3">
+      <div className="flex flex-col flex-1 overflow-y-auto">
+        <div className="flex flex-col sm:flex-row p-3 gap-3">
           <DashboardCard title="Jobs Pending" value={5} icon={PiUsersThree} />
           <DashboardCard
             title="Jobs Completed"
@@ -70,11 +70,11 @@ const MaintenanceDashboard = () => {
           />
           <DashboardCard title="Contractors" value={18} icon={MdOutlineSick} />
         </div>
-        <div className="flex flex-row flex-1 p-3 pt-0 gap-3">
-          <div className="flex-3 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
+        <div className="flex flex-col lg:flex-row flex-1 p-3 pt-0 gap-3">
+          <div className="flex-3 min-h-32 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
             More to come soon!
           </div>
-          <div className="flex-2 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
+          <div className="flex-2 min-h-32 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
             More to come soon!
           </div>
         </div>

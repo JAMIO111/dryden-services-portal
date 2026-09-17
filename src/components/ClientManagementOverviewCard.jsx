@@ -146,10 +146,10 @@ export default function ClientManagementOverviewCard({
       <div className="relative flex flex-col md:flex-row bg-primary-bg p-2 shadow-s rounded-3xl gap-6 overflow-hidden">
         {/* Animated background indicator */}
         <div
-          className={`absolute top-2 bottom-2 left-2 w-[calc(50%-0.75rem)] rounded-2xl bg-tertiary-bg transition-transform duration-500 ease-out ${
+          className={`absolute top-2 left-2 right-2 h-[calc(50%-0.75rem)] md:right-auto md:bottom-2 md:h-auto md:w-[calc(50%-0.75rem)] rounded-2xl bg-tertiary-bg transition-transform duration-500 ease-out ${
             active === "Properties"
-              ? "translate-x-[calc(100%+0.5rem)]"
-              : "translate-x-0"
+              ? "translate-y-[calc(100%+0.5rem)] md:translate-y-0 md:translate-x-[calc(100%+0.5rem)]"
+              : "translate-y-0 md:translate-x-0"
           }`}
           style={{ zIndex: 0 }}></div>
 

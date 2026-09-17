@@ -76,12 +76,12 @@ const Employees = () => {
 
   return (
     <div className="flex bg-primary-bg flex-1 overflow-auto flex-col gap-5 pt-5 p-3">
-      <div className="flex flex-row justify-between h-5 items-center">
+      <div className="flex flex-col sm:flex-row justify-between sm:h-5 items-start sm:items-center gap-3">
         <p className="text-primary-text text-xl font-semibold pl-1">
           Employee Directory
         </p>
-        <div className="flex flex-row gap-2">
-          <div className="w-56">
+        <div className="flex flex-wrap flex-row gap-2">
+          <div className="w-full sm:w-56">
             <ToggleButton
               checked={activeStatus === "Active"}
               onChange={(isActive) =>
@@ -111,15 +111,15 @@ const Employees = () => {
 
       <div className="flex flex-1 w-full shadow-s overflow-hidden bg-secondary-bg rounded-xl flex-col">
         <div className="flex text-secondary-text p-2 px-4 font-medium border-b border-secondary-text/20">
-          <div className="flex-1 flex items-start gap-3">
+          <div className="flex-1 flex items-start gap-3 min-w-0">
             {/* Invisible avatar placeholder for alignment */}
-            <div className="w-10 h-6 rounded-full opacity-0" />
+            <div className="w-10 h-6 rounded-full opacity-0 shrink-0 hidden sm:block" />
             <span>Name</span>
           </div>
-          <div className="flex-1">Job Title</div>
-          <div className="flex-1">Email</div>
-          <div className="flex-1">Phone</div>
-          <div className="flex gap-1 w-30">
+          <div className="hidden md:flex md:flex-1">Job Title</div>
+          <div className="hidden lg:flex lg:flex-1">Email</div>
+          <div className="hidden sm:flex sm:flex-1">Phone</div>
+          <div className="hidden lg:flex gap-1 w-30">
             <span>Hourly Rate</span>
             <button
               onMouseDown={() => setShowHourlyRate(true)}
@@ -129,7 +129,7 @@ const Employees = () => {
               {showHourlyRate ? <BiSolidShow /> : <BiSolidHide />}
             </button>
           </div>
-          <div className="w-25 text-center">Status</div>
+          <div className="w-20 sm:w-25 text-center shrink-0">Status</div>
         </div>
         <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden">
           {isLoading ? (
@@ -171,31 +171,35 @@ const Employees = () => {
                 } flex text-secondary-text border-secondary-text/10 p-2 px-4 items-center ${
                   index === filteredData.length - 1 ? "" : "border-b"
                 }  transition-colors`}>
-                <div className="flex-1 flex items-center gap-3">
+                <div className="flex-1 flex items-center gap-3 min-w-0">
                   {employee?.avatar ? (
                     <img
                       src={employee.avatar}
                       alt={employee.first_name}
-                      className="w-10 h-10 rounded-full object-cover border border-secondary-text/30"
+                      className="w-10 h-10 rounded-full object-cover border border-secondary-text/30 shrink-0"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-primary-bg flex items-center justify-center border border-secondary-text/30">
+                    <div className="w-10 h-10 rounded-full bg-primary-bg flex items-center justify-center border border-secondary-text/30 shrink-0">
                       <p className="text-secondary-text text-2lg">
                         {getInitials(employee.first_name, employee.surname)}
                       </p>
                     </div>
                   )}
 
-                  <span>
+                  <span className="truncate">
                     {employee.first_name} {employee.surname}
                   </span>
                 </div>
-                <div className="flex-1">
+                <div className="hidden md:flex md:flex-1">
                   {employee.contract_job_title || "-"}
                 </div>
-                <div className="flex-1">{employee.email || "-"}</div>
-                <div className="flex-1">{employee.phone || "-"}</div>
-                <div className="w-30">
+                <div className="hidden lg:flex lg:flex-1">
+                  {employee.email || "-"}
+                </div>
+                <div className="hidden sm:flex sm:flex-1">
+                  {employee.phone || "-"}
+                </div>
+                <div className="hidden lg:flex w-30">
                   {showHourlyRate
                     ? employee.hourly_rate != null &&
                       employee.hourly_rate !== ""
@@ -204,7 +208,7 @@ const Employees = () => {
                     : "*****"}
                 </div>
 
-                <div className="flex justify-center w-25">
+                <div className="flex justify-center w-20 sm:w-25 shrink-0">
                   {getStatusPill(employee.employee_period_id)}
                 </div>
               </div>

@@ -151,8 +151,8 @@ const OwnerForm = () => {
   if (isOwnerLoading || isPropertiesLoading) return <p>Loading...</p>;
 
   return (
-    <div className="flex bg-primary-bg flex-1 h-full flex-row p-3 gap-3">
-      <div className="bg-secondary-bg flex-1 rounded-2xl border p-3 border-border-color flex flex-col gap-3 h-full overflow-hidden">
+    <div className="flex bg-primary-bg flex-1 h-full flex-col lg:flex-row p-3 gap-3 overflow-y-auto lg:overflow-hidden">
+      <div className="bg-secondary-bg flex-1 rounded-2xl border p-3 border-border-color flex flex-col gap-3 lg:h-full lg:overflow-hidden">
         <div className="mb-5">
           <ProfileImageSection
             item={owner}
@@ -211,7 +211,7 @@ const OwnerForm = () => {
           )}
         />
       </div>
-      <div className="bg-secondary-bg gap-3 flex-1 rounded-2xl border p-3 border-border-color flex flex-col h-full overflow-hidden">
+      <div className="bg-secondary-bg gap-3 flex-1 rounded-2xl border p-3 border-border-color flex flex-col lg:h-full lg:overflow-hidden">
         <Controller
           name="primary_email"
           control={control}
@@ -287,8 +287,8 @@ const OwnerForm = () => {
           icon={BsActivity}
         />
       </div>
-      <div className="flex flex-1 flex-col gap-3 h-full">
-        <div className="bg-secondary-bg flex-1 rounded-2xl border p-3 border-border-color flex flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col gap-3 lg:h-full">
+        <div className="bg-secondary-bg flex-1 min-h-64 lg:min-h-0 rounded-2xl border p-3 border-border-color flex flex-col overflow-hidden">
           <h2 className="text-lg pb-2 pl-2 font-semibold text-primary-text">
             Properties
           </h2>

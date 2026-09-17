@@ -360,12 +360,12 @@ const EmployeeForm = ({ employee }) => {
 
   return (
     <form
-      className="flex h-[80vh] min-w-[80vw] flex-row"
+      className="flex h-[80vh] w-full lg:w-[80vw] flex-row"
       onSubmit={handleSubmit(handleSaveEmployee)}>
       <div className="flex flex-1 flex-col">
         <div className="flex flex-2 flex-col gap-4 overflow-y-auto p-6">
           {/* Profile section */}
-          <div className="flex justify-center">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center gap-4">
             <ProfileImageSection
               item={employee}
               bucket="avatars"
@@ -378,7 +378,7 @@ const EmployeeForm = ({ employee }) => {
                 queryClient.invalidateQueries(["Employee", employee.id]);
               }}
             />
-            <div className="ml-6 flex flex-1 flex-col justify-center gap-1">
+            <div className="w-full sm:ml-2 flex flex-1 flex-col justify-center gap-1">
               {/* First Name */}
               <Controller
                 name="first_name"
@@ -430,7 +430,7 @@ const EmployeeForm = ({ employee }) => {
 
           {/* Grid layout for fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
-            <div className="col-span-2">
+            <div className="md:col-span-2">
               {/* Date of Birth */}
               <Controller
                 name="dob"
@@ -511,7 +511,7 @@ const EmployeeForm = ({ employee }) => {
                 />
               )}
             />
-            <div className="col-span-2">
+            <div className="md:col-span-2">
               {/* Address */}
               <Controller
                 name="address"

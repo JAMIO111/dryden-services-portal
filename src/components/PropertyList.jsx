@@ -30,11 +30,11 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
   };
 
   return (
-    <div className="bg-secondary-bg w-1/2 rounded-2xl shadow-m flex flex-col h-full overflow-hidden">
+    <div className="bg-secondary-bg w-full lg:w-1/2 rounded-2xl shadow-m flex flex-col h-[60vh] lg:h-full overflow-hidden shrink-0">
       {/* Header */}
-      <div className="flex flex-row gap-3 items-center px-4 py-4 border-b border-border-color">
-        <BsHouses className="w-7 h-7 text-primary-text" />
-        <h2 className="text-xl flex-1 text-primary-text font-semibold">
+      <div className="flex flex-wrap gap-3 items-center px-4 py-4 border-b border-border-color">
+        <BsHouses className="w-7 h-7 text-primary-text shrink-0" />
+        <h2 className="text-xl flex-1 min-w-fit text-primary-text font-semibold">
           Property List
         </h2>
         <div className="w-36">

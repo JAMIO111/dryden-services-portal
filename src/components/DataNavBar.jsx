@@ -39,8 +39,8 @@ const DataNavBar = ({
   }, [page]);
 
   return (
-    <div className="flex flex-row justify-between items-center p-2 text-primary-text border-t border-border-color">
-      <div className="flex flex-row gap-2 items-center">
+    <div className="flex flex-wrap gap-2 justify-between items-center p-2 text-primary-text border-t border-border-color">
+      <div className="flex flex-wrap gap-2 items-center">
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}

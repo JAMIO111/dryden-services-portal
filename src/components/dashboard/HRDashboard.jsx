@@ -50,7 +50,7 @@ const HRDashboard = () => {
           </p>
         </div>
         <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
-          <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
+          <div className="w-full gap-3 md:w-fit flex flex-wrap items-center justify-start xl:justify-center">
             <DateRangePicker
               alignment="right"
               width="w-80"
@@ -74,7 +74,7 @@ const HRDashboard = () => {
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden gap-3">
-        <div className="flex flex-row p-3 pb-0 gap-3 shrink-0">
+        <div className="flex flex-col sm:flex-row p-3 pb-0 gap-3 shrink-0">
           <DashboardCard
             title="Active Employees"
             value={employees?.length}
@@ -103,9 +103,9 @@ const HRDashboard = () => {
         </div>
 
         {/* Absence List + Placeholder */}
-        <div className="flex flex-1 flex-row gap-3 p-3 pt-0 overflow-hidden">
+        <div className="flex flex-1 flex-col lg:flex-row gap-3 p-3 pt-0 overflow-y-auto lg:overflow-hidden">
           {/* Absence List */}
-          <div className="flex-[2] flex flex-col overflow-hidden rounded-2xl shadow-s bg-secondary-bg">
+          <div className="flex-[2] min-h-96 lg:min-h-0 flex flex-col overflow-hidden rounded-2xl shadow-s bg-secondary-bg">
             <AbsenceList
               absences={absences}
               isLoading={isAbsencesLoading}
@@ -115,7 +115,7 @@ const HRDashboard = () => {
           </div>
 
           {/* Placeholder */}
-          <div className="flex-[2] flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
+          <div className="flex-[2] min-h-32 flex justify-center items-center text-primary-text text-xl bg-secondary-bg rounded-2xl shadow-s">
             More to come soon!
           </div>
         </div>

@@ -6,7 +6,7 @@ const SearchBar = () => {
   const { searchTerm, setSearchTerm } = useGlobalSearch();
 
   return (
-    <div className="flex w-1/3 p-2 relative items-center ">
+    <div className="flex w-full p-2 relative items-center ">
       <BsSearch className="hover:fill-primary-text absolute fill-icon-color h-4 w-4 inset-x-5" />
       <input
         id="Global Search Bar"

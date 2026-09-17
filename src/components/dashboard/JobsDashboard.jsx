@@ -94,7 +94,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
-            <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
+            <div className="w-full gap-3 md:w-fit flex flex-wrap items-center justify-start xl:justify-center">
               <DateRangePicker
                 alignment="right"
                 rangeCounterText="Days"
@@ -117,8 +117,8 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="flex gap-3 p-3 flex-grow overflow-hidden">
-          <div className="flex flex-col gap-3 flex-1">
+        <div className="flex flex-col lg:flex-row gap-3 p-3 flex-grow overflow-y-auto lg:overflow-hidden">
+          <div className="flex flex-col gap-3 flex-1 lg:min-h-0">
             <div className="flex flex-col gap-3 flex-1">
               <div className="flex gap-3 h-30">
                 <DashboardCard
@@ -146,7 +146,7 @@ const Dashboard = () => {
                   isLoading={isLoading}
                 />
               </div>
-              <div className="flex-2">
+              <div className="flex-2 min-h-64 lg:min-h-0">
                 <StackedBarChart
                   data={data}
                   subtitle={`Changeovers for ${getPeriodLabel(
@@ -158,7 +158,7 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-h-96 lg:min-h-0">
             <JobList
               jobs={jobs}
               isLoading={isLoading}

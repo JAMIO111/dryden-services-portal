@@ -107,10 +107,10 @@ export const ModalProvider = ({ children }) => {
               dragMomentum={false}
               ref={modalRef}
               onClick={(e) => e.stopPropagation()}
-              className="bg-primary-bg shadow-l rounded-2xl p-3 relative w-fit overflow-hidden min-w-[300px]">
+              className="bg-primary-bg shadow-l rounded-2xl p-3 relative w-[calc(100vw-2rem)] sm:w-fit max-w-[calc(100vw-2rem)] min-w-[300px] max-h-[85vh] flex flex-col overflow-hidden">
               {/* Draggable Header */}
               <div
-                className="flex justify-between select-none pb-2 border-b border-border-color items-center cursor-move text-primary-text rounded-t-xl"
+                className="flex justify-between select-none pb-2 border-b border-border-color items-center cursor-move text-primary-text rounded-t-xl shrink-0"
                 onPointerDown={(e) => dragControls.start(e)}>
                 <h3 className="text-lg pl-2 select-none text-primary-text font-semibold">
                   {modalContent.title || "Modal Title"}
@@ -123,7 +123,9 @@ export const ModalProvider = ({ children }) => {
                 </button>
               </div>
 
-              <div>{modalContent.content}</div>
+              <div className="overflow-y-auto min-h-0 flex-1">
+                {modalContent.content}
+              </div>
             </motion.div>
           </div>,
           document.getElementById("modal-root")

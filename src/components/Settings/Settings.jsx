@@ -11,9 +11,9 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex flex-row p-2 gap-3 w-full flex-1 bg-primary-bg min-h-0">
+    <div className="flex flex-col lg:flex-row p-2 gap-3 w-full flex-1 bg-primary-bg min-h-0 overflow-y-auto lg:overflow-hidden">
       {/* Sidebar */}
-      <div className="flex flex-col bg-secondary-bg rounded-2xl shadow-s w-65 min-w-65 min-h-0">
+      <div className="flex flex-col bg-secondary-bg rounded-2xl shadow-s w-full lg:w-65 lg:min-w-65 min-h-0 shrink-0">
         <h1 className="text-primary-text text-2xl pl-3 py-2 border-b border-border-color font-semibold">
           Settings
         </h1>
@@ -101,7 +101,7 @@ const Settings = () => {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex flex-col flex-1 shadow-s overflow-hidden rounded-2xl min-h-0">
+      <div className="flex flex-col flex-1 min-h-[60vh] lg:min-h-0 shadow-s overflow-hidden rounded-2xl">
         <Outlet />
       </div>
     </div>

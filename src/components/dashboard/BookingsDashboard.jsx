@@ -212,7 +212,7 @@ const BookingsDashboard = () => {
           </p>
         </div>
         <div className="flex flex-col gap-2 md:flex-row items-center justify-between">
-          <div className="w-full gap-3 md:w-fit flex items-center justify-start xl:justify-center">
+          <div className="w-full gap-3 md:w-fit flex flex-wrap items-center justify-start xl:justify-center">
             <CTAButton
               callbackFn={() =>
                 navigate("/Jobs/Ad-hoc-Jobs", {

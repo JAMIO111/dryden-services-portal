@@ -455,8 +455,8 @@ export default function FullScreenCalendar() {
     <div className="h-full bg-primary-bg flex items-center justify-center">
       <div className="shadow-m h-full w-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="p-3 gap-3 border-border-color flex justify-between items-center bg-tertiary-bg text-primary-text">
-          <h1 className="text-2xl flex-1 font-bold">
+        <header className="p-3 gap-3 border-border-color flex flex-wrap justify-between items-center bg-tertiary-bg text-primary-text">
+          <h1 className="text-2xl flex-1 min-w-fit font-bold">
             {view === "Monthly"
               ? normalizedDate.toLocaleString("default", {
                   month: "long",
@@ -499,26 +499,28 @@ export default function FullScreenCalendar() {
           </div>
         </header>
 
-        {/* Weekday Headers */}
-        <div className="grid grid-cols-7 bg-secondary-bg border-t border-border-color">
-          {weekDays.map((day) => (
-            <div
-              key={day}
-              className="text-center font-semibold text-secondary-text uppercase py-2 border-r border-border-color last:border-r-0">
-              {day}
-            </div>
-          ))}
-        </div>
+        <div className="flex-1 flex flex-col min-h-0 overflow-x-auto lg:overflow-x-visible">
+          {/* Weekday Headers */}
+          <div className="grid grid-cols-7 min-w-[700px] lg:min-w-0 bg-secondary-bg border-t border-border-color shrink-0">
+            {weekDays.map((day) => (
+              <div
+                key={day}
+                className="text-center font-semibold text-secondary-text uppercase py-2 border-r border-border-color last:border-r-0">
+                {day}
+              </div>
+            ))}
+          </div>
 
-        {/* Calendar Grid */}
-        <main
-          className={`flex-1 border-border-color border-t bg-secondary-bg grid ${
-            view === "Monthly" ? "grid-cols-7" : "grid-cols-7 grid-rows-1"
-          } overflow-hidden`}>
-          {view === "Monthly"
-            ? calendarDays.map((date, idx) => renderDayCell(date, idx))
-            : weeklyDays.map((date, idx) => renderDayCell(date, idx))}
-        </main>
+          {/* Calendar Grid */}
+          <main
+            className={`flex-1 min-w-[700px] lg:min-w-0 border-border-color border-t bg-secondary-bg grid ${
+              view === "Monthly" ? "grid-cols-7" : "grid-cols-7 grid-rows-1"
+            } overflow-hidden`}>
+            {view === "Monthly"
+              ? calendarDays.map((date, idx) => renderDayCell(date, idx))
+              : weeklyDays.map((date, idx) => renderDayCell(date, idx))}
+          </main>
+        </div>
       </div>
     </div>
   );

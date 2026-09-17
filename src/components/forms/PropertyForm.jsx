@@ -269,7 +269,7 @@ const PropertyForm = () => {
   }
 
   return (
-    <div className="grid bg-primary-bg h-full p-3 gap-3 grid-cols-4">
+    <div className="grid bg-primary-bg h-auto lg:h-full p-3 gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 overflow-y-auto lg:overflow-hidden">
       <div className="flex flex-1 gap-3 flex-col">
         <div className="flex flex-1 overflow-y-auto justify-between flex-col bg-secondary-bg shadow-m rounded-2xl">
           <div className="p-3">
