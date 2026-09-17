@@ -60,11 +60,11 @@ export default function LeadList() {
   };
 
   return (
-    <div className="bg-secondary-bg shadow-m p-0.5 rounded-3xl h-full flex flex-col overflow-hidden">
+    <div className="bg-secondary-bg shadow-m p-0.5 rounded-3xl lg:h-full flex flex-col lg:overflow-hidden">
       {/* Make this the scroll container */}
       <div
         id="lead-list-scroll"
-        className="relative flex flex-col overflow-y-auto flex-grow [&::-webkit-scrollbar]:hidden">
+        className="relative flex flex-col lg:overflow-y-auto flex-grow [&::-webkit-scrollbar]:hidden">
         {/* Header INSIDE the scroll container */}
         <div
           id="lead-list-header"

@@ -101,7 +101,7 @@ const Settings = () => {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex flex-col flex-1 min-h-[60vh] lg:min-h-0 shadow-s overflow-hidden rounded-2xl">
+      <div className="flex flex-col flex-1 min-h-[60vh] lg:min-h-0 shadow-s lg:overflow-hidden rounded-2xl">
         <Outlet />
       </div>
     </div>

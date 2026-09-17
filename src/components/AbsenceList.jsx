@@ -89,11 +89,11 @@ export default function AbsenceList({
   };
 
   return (
-    <div className="w-full bg-secondary-bg shadow-s p-0.5 rounded-2xl h-full flex flex-col overflow-hidden">
+    <div className="w-full bg-secondary-bg shadow-s p-0.5 rounded-2xl lg:h-full flex flex-col lg:overflow-hidden">
       {/* Make this the scroll container */}
       <div
         id="absence-list-scroll"
-        className="relative flex flex-col overflow-y-auto flex-grow [&::-webkit-scrollbar]:hidden">
+        className="relative flex flex-col lg:overflow-y-auto flex-grow [&::-webkit-scrollbar]:hidden">
         {/* Header INSIDE the scroll container */}
         <div
           id="absence-list-header"

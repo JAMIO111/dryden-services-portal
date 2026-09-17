@@ -55,11 +55,11 @@ const SettingsNotifications = () => {
   // ----------------------------------------
 
   return (
-    <div className="flex flex-col bg-secondary-bg shadow-s flex-1 min-h-0 p-0 overflow-hidden">
+    <div className="flex flex-col bg-secondary-bg shadow-s flex-1 min-h-0 p-0 lg:overflow-hidden">
       {/* SCROLL CONTAINER */}
       <div
         id="settings-scroll"
-        className="flex flex-col flex-1 overflow-y-auto pt-0.5 [&::-webkit-scrollbar]:hidden min-h-0">
+        className="flex flex-col flex-1 lg:overflow-y-auto pt-0.5 [&::-webkit-scrollbar]:hidden min-h-0">
         {/* BLUR/STICKY HEADER */}
         <div
           id="settings-header"

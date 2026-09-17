@@ -13,7 +13,7 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
     hot_tub: "bg-blue-500/10 text-blue-600",
   };
   return (
-    <div className="flex flex-col bg-secondary-bg p-2 h-full rounded-2xl shadow-m">
+    <div className="flex flex-col bg-secondary-bg p-2 lg:h-full rounded-2xl shadow-m">
       {/* Header */}
 
       <div className="flex flex-row justify-between items-center pt-2 pb-3 px-1">
@@ -38,7 +38,7 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
         />
       </div>
 
-      <div className="flex flex-1 bg-tertiary-bg flex-col border border-border-color h-full rounded-2xl overflow-hidden">
+      <div className="flex flex-1 bg-tertiary-bg flex-col border border-border-color lg:h-full rounded-2xl overflow-hidden">
         <div className="grid grid-cols-[1.5fr_2.5fr_2fr_2fr_140px] border-b border-border-color text-sm bg-primary-bg text-secondary-text">
           <div className="p-2 border-r border-border-color">Job No.</div>
           <div className="p-2 border-r border-border-color">Property</div>
@@ -48,7 +48,7 @@ const JobList = ({ jobs = [], isLoading, error, openModal }) => {
         </div>
 
         {/* Body */}
-        <div className="flex-1 [&::-webkit-scrollbar]:hidden overflow-y-scroll">
+        <div className="flex-1 [&::-webkit-scrollbar]:hidden lg:overflow-y-scroll">
           {jobs.length > 0 ? (
             jobs.map((job, index) => (
               <div

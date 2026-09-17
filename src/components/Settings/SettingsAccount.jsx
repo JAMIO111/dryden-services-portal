@@ -133,7 +133,7 @@ const SettingsAccount = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row w-full overflow-y-auto">
+    <div className="flex flex-col lg:flex-row w-full lg:overflow-y-auto">
       <div className="flex flex-col p-3 gap-3 lg:w-1/2 w-full">
         {/* Profile Photo */}
         <div className="flex flex-row justify-between shadow-s items-center bg-tertiary-bg rounded-xl p-3">

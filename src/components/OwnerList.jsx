@@ -40,7 +40,7 @@ const OwnerList = ({
       : owners;
 
   return (
-    <div className="bg-secondary-bg w-full lg:w-1/4 p-0.5 rounded-2xl shadow-m flex flex-col h-[60vh] lg:h-full overflow-hidden relative shrink-0">
+    <div className="bg-secondary-bg w-full lg:w-1/4 p-0.5 rounded-2xl shadow-m flex flex-col lg:h-full lg:overflow-hidden relative shrink-0">
       {/* Header */}
       <div
         className="
@@ -64,7 +64,7 @@ const OwnerList = ({
       </div>
 
       {/* Scrollable List */}
-      <div className="flex-1 p-3 overflow-y-auto relative" ref={containerRef}>
+      <div className="lg:flex-1 p-3 lg:overflow-y-auto relative" ref={containerRef}>
         {selectedOwner && (
           <div
             className="absolute left-0 right-0 bg-primary-bg rounded-2xl shadow-s transition-all duration-300"

@@ -30,7 +30,7 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
   };
 
   return (
-    <div className="bg-secondary-bg w-full lg:w-1/2 rounded-2xl shadow-m flex flex-col h-[60vh] lg:h-full overflow-hidden shrink-0">
+    <div className="bg-secondary-bg w-full lg:w-1/2 rounded-2xl shadow-m flex flex-col lg:h-full lg:overflow-hidden shrink-0">
       {/* Header */}
       <div className="flex flex-wrap gap-3 items-center px-4 py-4 border-b border-border-color">
         <BsHouses className="w-7 h-7 text-primary-text shrink-0" />
@@ -57,7 +57,7 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
       </div>
 
       {/* Scrollable List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="lg:flex-1 lg:overflow-y-auto">
         <ul>
           {properties
             .sort((a, b) => a.name.localeCompare(b.name))
