@@ -68,7 +68,7 @@ export default function LeadList() {
         {/* Header INSIDE the scroll container */}
         <div
           id="lead-list-header"
-          className="sticky top-0 inset-m z-10 rounded-t-3xl backdrop-blur-md bg-secondary-bg/70
+          className="lg:sticky lg:top-0 inset-m z-10 rounded-t-3xl backdrop-blur-md bg-secondary-bg/70
                  border-b border-transparent
                  data-[scrolled=true]:border-border-color/60
                  data-[scrolled=true]:bg-secondary-bg/50

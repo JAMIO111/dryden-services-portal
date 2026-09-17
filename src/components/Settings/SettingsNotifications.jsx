@@ -64,7 +64,7 @@ const SettingsNotifications = () => {
         <div
           id="settings-header"
           className="
-            sticky top-0 z-11 p-3 pb-1 mx-0.5 rounded-t-2xl
+            lg:sticky lg:top-0 z-11 p-3 pb-1 mx-0.5 rounded-t-2xl
             backdrop-blur-md bg-secondary-bg/70
             border-b border-transparent
             data-[scrolled=true]:border-border-color/60
