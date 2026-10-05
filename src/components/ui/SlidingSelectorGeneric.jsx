@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 
 export default function SlidingSelector({
@@ -11,6 +11,15 @@ export default function SlidingSelector({
 }) {
   const containerRef = useRef(null);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+
+  const counts = useMemo(() => {
+    if (!notifications) return null;
+    let unread = 0;
+    for (const n of notifications) {
+      if (!n.read) unread++;
+    }
+    return { All: notifications.length, New: unread, Read: notifications.length - unread };
+  }, [notifications]);
 
   const updateIndicator = () => {
     const container = containerRef.current;
@@ -62,14 +71,7 @@ export default function SlidingSelector({
         const label = getLabel(option);
         const isActive = getValue(value) === optionValue;
 
-        const count =
-          option === "All"
-            ? notifications?.length
-            : option === "New"
-            ? notifications?.filter((n) => !n.read).length
-            : option === "Read"
-            ? notifications?.filter((n) => n.read).length
-            : 0;
+        const count = counts ? (counts[option] ?? 0) : 0;
 
         return (
           <button

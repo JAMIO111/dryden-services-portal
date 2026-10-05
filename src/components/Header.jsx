@@ -47,7 +47,7 @@ const Header = ({ onOpenMobileNav }) => {
           <div className="hidden sm:block">
             <HeaderIcon icon={GoMail} top={7} right={3} />
           </div>
-          <button onClick={() => openPane()}>
+          <button title="Notifications" onClick={() => openPane()}>
             <HeaderIcon
               showBadge={newNotifications > 0}
               icon={BsBell}

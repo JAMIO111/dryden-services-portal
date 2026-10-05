@@ -16,11 +16,9 @@ const NotificationCard = ({ notification, closePane, userId }) => {
   const queryClient = useQueryClient();
   return (
     <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.25 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
       className="flex bg-secondary-bg shadow-md gap-3 items-start p-3 border border-border-color rounded-xl">
       <div className="flex justify-center items-center border border-border-color rounded-lg h-10 aspect-square">
         {notification.avatar ? (
