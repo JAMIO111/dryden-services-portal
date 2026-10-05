@@ -171,15 +171,22 @@ const EmployeeForm = ({ employee }) => {
           : "A new employee has been successfully created.",
       });
 
-      await createNotification({
-        title: employee ? "Employee Updated" : "Employee Created",
-        body: employee
-          ? "has made amendments to an employee record:"
-          : "has added a new employee:",
-        docRef: `${saved?.first_name} ${saved?.surname}`, // <-- use fresh ID from DB
-        category: "Employees",
-        type: !!employee ? "update" : "new",
-      });
+      // The employee itself already saved successfully above - don't let a
+      // failure here (e.g. a transient error creating the notification)
+      // look like the whole save failed.
+      try {
+        await createNotification({
+          title: employee ? "Employee Updated" : "Employee Created",
+          body: employee
+            ? "has made amendments to an employee record:"
+            : "has added a new employee:",
+          docRef: `${saved?.first_name} ${saved?.surname}`, // <-- use fresh ID from DB
+          category: "Employees",
+          type: !!employee ? "update" : "new",
+        });
+      } catch (notifyError) {
+        console.error("Failed to create employee notification:", notifyError);
+      }
     } catch (error) {
       showToast({
         type: "error",

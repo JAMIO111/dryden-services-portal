@@ -419,24 +419,35 @@ const OwnerForm = () => {
                   ownerId = result?.id || id;
                 }
 
-                // 🔔 Notifications (now safe — DB is consistent)
-                await createNotification({
-                  title:
-                    id !== "New-Owner"
-                      ? "Existing Owner Updated."
-                      : "New Owner Created.",
-                  body:
-                    id !== "New-Owner"
-                      ? "updated the account of owner:"
-                      : "added a new owner:",
-                  metaData: {
-                    url: `/Client-Management/Owners/${ownerId}`,
-                    buttonText: "View Owner",
-                  },
-                  docRef: `${result.first_name} ${result.surname}`,
-                  category: "Owners",
-                  type: id !== "New-Owner" ? "update" : "new",
-                });
+                // 🔔 Notifications (now safe — DB is consistent). The owner
+                // itself already saved successfully above - don't let a
+                // failure here (e.g. a transient error creating the
+                // notification) look like the whole save failed, or block
+                // navigation/the success toast.
+                try {
+                  await createNotification({
+                    title:
+                      id !== "New-Owner"
+                        ? "Existing Owner Updated."
+                        : "New Owner Created.",
+                    body:
+                      id !== "New-Owner"
+                        ? "updated the account of owner:"
+                        : "added a new owner:",
+                    metaData: {
+                      url: `/Client-Management/Owners/${ownerId}`,
+                      buttonText: "View Owner",
+                    },
+                    docRef: `${result.first_name} ${result.surname}`,
+                    category: "Owners",
+                    type: id !== "New-Owner" ? "update" : "new",
+                  });
+                } catch (notifyError) {
+                  console.error(
+                    "Failed to create owner notification:",
+                    notifyError
+                  );
+                }
 
                 // 🧭 Navigate last
                 navigate("/Client-Management/Owners");

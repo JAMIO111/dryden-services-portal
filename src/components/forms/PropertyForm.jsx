@@ -706,22 +706,32 @@ const PropertyForm = () => {
 
                 navigate("/Client-Management/Properties");
 
-                // 2. Use the actual ID from the mutation result
-                await createNotification({
-                  title: payload.id
-                    ? `Existing Property Updated.`
-                    : `New Property Created.`,
-                  body: payload.id
-                    ? `updated the details of property:`
-                    : `added a new property:`,
-                  metaData: {
-                    url: `/Client-Management/Properties/${payload.name}`,
-                    buttonText: "View Property",
-                  },
-                  docRef: payload.name,
-                  category: "Properties",
-                  type: !!propertyId ? "update" : "new",
-                });
+                // 2. Use the actual ID from the mutation result. The
+                // property itself already saved successfully above - don't
+                // let a failure here (e.g. a transient error creating the
+                // notification) look like the whole save failed.
+                try {
+                  await createNotification({
+                    title: payload.id
+                      ? `Existing Property Updated.`
+                      : `New Property Created.`,
+                    body: payload.id
+                      ? `updated the details of property:`
+                      : `added a new property:`,
+                    metaData: {
+                      url: `/Client-Management/Properties/${payload.name}`,
+                      buttonText: "View Property",
+                    },
+                    docRef: payload.name,
+                    category: "Properties",
+                    type: !!propertyId ? "update" : "new",
+                  });
+                } catch (notifyError) {
+                  console.error(
+                    "Failed to create property notification:",
+                    notifyError,
+                  );
+                }
               } catch (error) {
                 console.error("Save Failed:", error);
 

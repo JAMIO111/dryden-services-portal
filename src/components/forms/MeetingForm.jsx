@@ -200,17 +200,27 @@ const MeetingForm = ({ leadId, leadTitle, closeForm }) => {
                 message: "The meeting has been successfully scheduled.",
               });
 
-              await createNotification({
-                title: "Meeting Scheduled",
-                body: "has scheduled a new meeting for lead:",
-                metaData: {
-                  url: `/Client-Management/Leads/${leadTitle}`,
-                  buttonText: "View Lead",
-                },
-                docRef: leadTitle,
-                category: "Meetings",
-                type: "new",
-              });
+              // The meeting itself already saved successfully above - don't
+              // let a failure here (e.g. a transient error creating the
+              // notification) look like the whole save failed.
+              try {
+                await createNotification({
+                  title: "Meeting Scheduled",
+                  body: "has scheduled a new meeting for lead:",
+                  metaData: {
+                    url: `/Client-Management/Leads/${leadTitle}`,
+                    buttonText: "View Lead",
+                  },
+                  docRef: leadTitle,
+                  category: "Meetings",
+                  type: "new",
+                });
+              } catch (notifyError) {
+                console.error(
+                  "Failed to create meeting notification:",
+                  notifyError
+                );
+              }
             } catch (error) {
               if (
                 error instanceof Error &&

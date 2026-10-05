@@ -145,15 +145,22 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
 
       closeModal();
 
-      await createNotification({
-        title: adHocJob ? "Ad-Hoc Job Updated" : "Ad-Hoc Job Created",
-        body: adHocJob
-          ? "has made amendments to a job:"
-          : "has entered a new job:",
-        docRef: adHocJobId,
-        category: "Ad-Hoc Jobs",
-        type: !!adHocJobId ? "update" : "new",
-      });
+      // The job itself already saved successfully above - don't let a
+      // failure here (e.g. a transient error creating the notification)
+      // look like the whole save failed.
+      try {
+        await createNotification({
+          title: adHocJob ? "Ad-Hoc Job Updated" : "Ad-Hoc Job Created",
+          body: adHocJob
+            ? "has made amendments to a job:"
+            : "has entered a new job:",
+          docRef: adHocJobId,
+          category: "Ad-Hoc Jobs",
+          type: !!adHocJobId ? "update" : "new",
+        });
+      } catch (notifyError) {
+        console.error("Failed to create ad-hoc job notification:", notifyError);
+      }
     } catch (error) {
       showToast({
         type: "error",

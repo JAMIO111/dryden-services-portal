@@ -79,31 +79,39 @@ const AbsenceForm = ({ absence }) => {
           : "A new absence has been created.",
       });
 
-      await createNotification({
-        title: absence ? "Absence Updated" : "New Absence",
-        body: absence
-          ? "has updated an employee absence"
-          : "has added a new employee absence",
-        category: "Absences",
-        type: absence ? "update" : "new",
-        docRef: `${
-          employees.find((emp) => emp.id === payload.employee_id)?.first_name
-        } ${
-          employees.find((emp) => emp.id === payload.employee_id)?.surname
-        } - ${payload.category} - ${new Date(
-          payload.start_date
-        ).toLocaleDateString("en-GB", {
-          weekday: "short",
-          year: "2-digit",
-          month: "short",
-          day: "numeric",
-        })} to ${new Date(payload.end_date).toLocaleDateString("en-GB", {
-          weekday: "short",
-          year: "2-digit",
-          month: "short",
-          day: "numeric",
-        })}`,
-      });
+      // The absence itself already saved successfully above - don't let a
+      // failure here (e.g. a transient error creating the notification)
+      // look like the whole save failed.
+      try {
+        await createNotification({
+          title: absence ? "Absence Updated" : "New Absence",
+          body: absence
+            ? "has updated an employee absence"
+            : "has added a new employee absence",
+          category: "Absences",
+          type: absence ? "update" : "new",
+          docRef: `${
+            employees.find((emp) => emp.id === payload.employee_id)
+              ?.first_name
+          } ${
+            employees.find((emp) => emp.id === payload.employee_id)?.surname
+          } - ${payload.category} - ${new Date(
+            payload.start_date
+          ).toLocaleDateString("en-GB", {
+            weekday: "short",
+            year: "2-digit",
+            month: "short",
+            day: "numeric",
+          })} to ${new Date(payload.end_date).toLocaleDateString("en-GB", {
+            weekday: "short",
+            year: "2-digit",
+            month: "short",
+            day: "numeric",
+          })}`,
+        });
+      } catch (notifyError) {
+        console.error("Failed to create absence notification:", notifyError);
+      }
 
       reset(defaultFormData);
       closeModal?.();
@@ -138,29 +146,41 @@ const AbsenceForm = ({ absence }) => {
         });
 
         closeModal?.();
-        await createNotification({
-          title: "Absence Deleted",
-          body: "has deleted an employee absence",
-          category: "Absences",
-          type: "delete",
-          docRef: `${
-            employees.find((emp) => emp.id === absence.employee_id)?.first_name
-          } ${
-            employees.find((emp) => emp.id === absence.employee_id)?.surname
-          } - ${absence.category} - ${new Date(
-            absence.start_date
-          ).toLocaleDateString("en-GB", {
-            weekday: "short",
-            year: "2-digit",
-            month: "short",
-            day: "numeric",
-          })} to ${new Date(absence.end_date).toLocaleDateString("en-GB", {
-            weekday: "short",
-            year: "2-digit",
-            month: "short",
-            day: "numeric",
-          })}`,
-        });
+
+        // The absence itself already deleted successfully above - don't let
+        // a failure here (e.g. a transient error creating the notification)
+        // look like the delete failed.
+        try {
+          await createNotification({
+            title: "Absence Deleted",
+            body: "has deleted an employee absence",
+            category: "Absences",
+            type: "delete",
+            docRef: `${
+              employees.find((emp) => emp.id === absence.employee_id)
+                ?.first_name
+            } ${
+              employees.find((emp) => emp.id === absence.employee_id)?.surname
+            } - ${absence.category} - ${new Date(
+              absence.start_date
+            ).toLocaleDateString("en-GB", {
+              weekday: "short",
+              year: "2-digit",
+              month: "short",
+              day: "numeric",
+            })} to ${new Date(absence.end_date).toLocaleDateString("en-GB", {
+              weekday: "short",
+              year: "2-digit",
+              month: "short",
+              day: "numeric",
+            })}`,
+          });
+        } catch (notifyError) {
+          console.error(
+            "Failed to create absence-deletion notification:",
+            notifyError
+          );
+        }
       } catch (error) {
         showToast({
           type: "error",

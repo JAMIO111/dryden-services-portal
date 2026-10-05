@@ -107,17 +107,27 @@ const CorrespondenceForm = ({ leadId, leadTitle }) => {
                 title: "Correspondence Added",
                 message: "The correspondence has been successfully added.",
               });
-              await createNotification({
-                title: "Correspondence Added",
-                body: "has added new correspondence for lead:",
-                metaData: {
-                  url: `/Client-Management/Leads/${leadTitle}`,
-                  buttonText: "View Lead",
-                },
-                docRef: leadTitle,
-                category: "Correspondence",
-                type: "new",
-              });
+              // The correspondence itself already saved successfully above -
+              // don't let a failure here (e.g. a transient error creating the
+              // notification) look like the whole save failed.
+              try {
+                await createNotification({
+                  title: "Correspondence Added",
+                  body: "has added new correspondence for lead:",
+                  metaData: {
+                    url: `/Client-Management/Leads/${leadTitle}`,
+                    buttonText: "View Lead",
+                  },
+                  docRef: leadTitle,
+                  category: "Correspondence",
+                  type: "new",
+                });
+              } catch (notifyError) {
+                console.error(
+                  "Failed to create correspondence notification:",
+                  notifyError
+                );
+              }
             } catch (error) {
               showToast({
                 type: "error",

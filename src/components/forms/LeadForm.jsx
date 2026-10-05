@@ -88,19 +88,26 @@ const LeadForm = ({ lead, navigate }) => {
           ? "The lead has been successfully updated."
           : "A new lead has been successfully created.",
       });
-      await createNotification({
-        title: lead ? "Lead Updated" : "Lead Created",
-        body: lead
-          ? "has made amendments to a lead:"
-          : "has entered a new lead:",
-        metaData: {
-          url: `/Client-Management/Leads/${newTitle}`,
-          buttonText: "View Lead",
-        },
-        docRef: newTitle,
-        category: "Leads",
-        type: lead ? "update" : "new",
-      });
+      // The lead itself already saved successfully above - don't let a
+      // failure here (e.g. a transient error creating the notification)
+      // look like the whole save failed, or block the modal from closing.
+      try {
+        await createNotification({
+          title: lead ? "Lead Updated" : "Lead Created",
+          body: lead
+            ? "has made amendments to a lead:"
+            : "has entered a new lead:",
+          metaData: {
+            url: `/Client-Management/Leads/${newTitle}`,
+            buttonText: "View Lead",
+          },
+          docRef: newTitle,
+          category: "Leads",
+          type: lead ? "update" : "new",
+        });
+      } catch (notifyError) {
+        console.error("Failed to create lead notification:", notifyError);
+      }
       closeModal();
     } catch (error) {
       showToast({
