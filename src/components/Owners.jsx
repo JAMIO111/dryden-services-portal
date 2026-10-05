@@ -12,7 +12,7 @@ const Owners = () => {
     location?.state?.owner ?? null
   );
   const [activeStatus, setActiveStatus] = useState("Active");
-  const { data: owners, isLoading } = useOwners();
+  const { data: owners, isLoading, isError } = useOwners();
   const { debouncedSearchTerm } = useGlobalSearch();
 
   useEffect(() => {
@@ -20,6 +20,16 @@ const Owners = () => {
   }, [debouncedSearchTerm, activeStatus]);
 
   if (isLoading) return <Spinner />;
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-full w-full bg-primary-bg">
+        <p className="text-error-color bg-tertiary-bg rounded-lg px-6 py-4">
+          Failed to load owners. Please try again.
+        </p>
+      </div>
+    );
+  }
 
   const filteredOwners = owners?.filter((owner) => {
     const fullName = `${owner.first_name} ${owner.surname}`.toLowerCase();

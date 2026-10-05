@@ -14,7 +14,7 @@ const LeadDetails = () => {
   const navigate = useNavigate();
   const { title } = useParams();
   const [selectedTab, setSelectedTab] = useState("Lead Details");
-  const { data: lead, isLoading } = useLeadByTitle(title);
+  const { data: lead, isLoading, isError } = useLeadByTitle(title);
 
   const statusColor = {
     New: "bg-pink-400/20 text-pink-500",
@@ -45,6 +45,24 @@ const LeadDetails = () => {
     container?.addEventListener("scroll", handleScroll);
     return () => container?.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full bg-primary-bg">
+        <p className="text-secondary-text animate-pulse">Loading lead...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-full bg-primary-bg">
+        <p className="text-error-color bg-tertiary-bg rounded-lg px-6 py-4">
+          Failed to load this lead. Please try again.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-stretch p-4 h-full gap-4 bg-primary-bg">
@@ -95,13 +113,7 @@ const LeadDetails = () => {
 
         {/* Scrollable Content */}
         <div className="space-y-4 p-4 pt-2">
-          {isLoading ? (
-            <div className="flex justify-center bg-tertiary-bg shadow-s rounded-2xl items-center h-40">
-              <p className="text-secondary-text animate-pulse">
-                Loading engagement items...
-              </p>
-            </div>
-          ) : engagementItems.length > 0 ? (
+          {engagementItems.length > 0 ? (
             engagementItems.map((item) =>
               item.type === "meeting" ? (
                 <div className="mb-5" key={item.id}>

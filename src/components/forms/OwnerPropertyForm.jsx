@@ -172,7 +172,8 @@ const OwnerPropertyForm = ({ owner, defaultProperties = [], onSave }) => {
 
             <button
               onClick={() => handleRemoveProperty(property.id)}
-              className="p-2 cursor-pointer hover:shadow-s rounded-lg text-icon-color hover:text-error-color mr-1.5">
+              className="p-2 cursor-pointer hover:shadow-s rounded-lg text-icon-color hover:text-error-color mr-1.5"
+              aria-label="Remove property">
               <IoTrashOutline className="h-5 w-5" />
             </button>
           </li>

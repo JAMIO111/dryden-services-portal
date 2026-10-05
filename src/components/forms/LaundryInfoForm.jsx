@@ -114,10 +114,10 @@ const hiredLaundryItems = [
 
 const LaundryInfoForm = ({ control, hiredLaundry, laundry }) => {
   return (
-    <div className="flex flex-row p-3 gap-5 max-h-[75vh]">
+    <div className="flex flex-col sm:flex-row p-3 gap-5 max-h-[75vh] w-full">
       {/* Categories Column */}
       {laundry && (
-        <div className="flex-1 bg-secondary-bg pl-3 pt-3 rounded-2xl shadow-s min-w-[400px] flex flex-col gap-2">
+        <div className="flex-1 bg-secondary-bg pl-3 pt-3 rounded-2xl shadow-s w-full sm:min-w-[400px] flex flex-col gap-2">
           <h2 className="font-semibold text-primary-text mb-2">
             Laundry Items
           </h2>
@@ -153,7 +153,7 @@ const LaundryInfoForm = ({ control, hiredLaundry, laundry }) => {
       )}
       {/* Hired Laundry Items Column */}
       {hiredLaundry && (
-        <div className="flex-1 bg-secondary-bg pl-3 pt-3 rounded-2xl shadow-s min-w-[400px] flex flex-col gap-2">
+        <div className="flex-1 bg-secondary-bg pl-3 pt-3 rounded-2xl shadow-s w-full sm:min-w-[400px] flex flex-col gap-2">
           <h2 className="font-semibold text-primary-text mb-2">
             Hired Laundry Items
           </h2>

@@ -46,7 +46,7 @@ const ToastNotification = ({ type, title, message, onClose, index }) => {
 
   const currentOption = options[type] || options.info;
   const baseClass =
-    "flex flex-row items-center bg-tertiary-bg shadow-s justify-between border-border-color border-1 rounded-xl px-4 py-2 w-120";
+    "flex flex-row items-center bg-tertiary-bg shadow-s justify-between border-border-color border-1 rounded-xl px-4 py-2 w-120 max-w-[calc(100vw-2rem)]";
   const baseButtonClass =
     "cursor-pointer border text-secondary-text hover:text-primary-text border-transparent rounded-lg p-1";
 

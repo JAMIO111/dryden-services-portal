@@ -13,6 +13,8 @@ const Accordion = ({ title, subtitle, children }) => {
         </div>
         <button
           onClick={() => setExpanded((prev) => !prev)}
+          aria-expanded={expanded}
+          aria-label={expanded ? "Collapse section" : "Expand section"}
           className={`flex items-center justify-center w-8 h-8 rounded-md text-secondary-text hover:bg-border-color/50 transition-colors cursor-pointer`}>
           <TbChevronDown
             className={`w-7 h-7 transition-transform ${iconClass}`}

@@ -360,7 +360,7 @@ const EmployeeForm = ({ employee }) => {
 
   return (
     <form
-      className="flex h-[80vh] w-full lg:w-[80vw] flex-row"
+      className="flex h-[80vh] w-full lg:w-[80vw] flex-col lg:flex-row overflow-y-auto"
       onSubmit={handleSubmit(handleSaveEmployee)}>
       <div className="flex flex-1 flex-col">
         <div className="flex flex-2 flex-col gap-4 overflow-y-auto p-6">

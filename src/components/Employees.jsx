@@ -125,7 +125,10 @@ const Employees = () => {
               onMouseDown={() => setShowHourlyRate(true)}
               onMouseUp={() => setShowHourlyRate(false)}
               onMouseLeave={() => setShowHourlyRate(false)}
-              className="p-1 cursor-pointer hover:bg-tertiary-bg rounded-md">
+              className="p-1 cursor-pointer hover:bg-tertiary-bg rounded-md"
+              aria-label={
+                showHourlyRate ? "Hourly rate shown" : "Hold to show hourly rate"
+              }>
               {showHourlyRate ? <BiSolidShow /> : <BiSolidHide />}
             </button>
           </div>

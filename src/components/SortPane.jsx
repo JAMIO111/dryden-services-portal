@@ -9,12 +9,13 @@ const SortPane = ({
   onClose,
 }) => {
   return (
-    <div className="border absolute bg-primary-bg text-primary-text z-1000 top-32 right-24 rounded-2xl border-border-color shadow-lg shadow-shadow-color w-100 h-fit">
+    <div className="border absolute bg-primary-bg text-primary-text z-1000 top-32 right-24 rounded-2xl border-border-color shadow-lg shadow-shadow-color w-100 max-w-[calc(100vw-2rem)] h-fit">
       <div className="flex px-3 py-1 bg-secondary-bg border-b border-border-color flex-row justify-between items-center rounded-t-2xl ">
         <h3 className="text-xl">Sort</h3>
         <button
           className="cursor-pointer hover:bg-primary-bg rounded-md hover:text-error-color p-1"
-          onClick={onClose}>
+          onClick={onClose}
+          aria-label="Close sort panel">
           <CgClose />
         </button>
       </div>

@@ -7,7 +7,7 @@ import { PiNumberThreeFill } from "react-icons/pi";
 
 const PropertyAddressForm = ({ control }) => {
   return (
-    <div className="flex flex-col gap-3 w-[600px]">
+    <div className="flex flex-col gap-3 w-full sm:w-[600px] max-w-full">
       {/*Property Name */}
       <Controller
         name="name"

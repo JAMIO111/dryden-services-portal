@@ -13,8 +13,9 @@ import PackagePill from "./PackagePill";
 
 const PropertyDetails = ({ property, selectedProperty }) => {
   const navigate = useNavigate();
-  const { data: owners, isLoading } = useOwnersByProperty(property?.id);
-  console.log("Owners:", owners);
+  const { data: owners, isLoading, isError } = useOwnersByProperty(
+    property?.id
+  );
 
   return (
     <div className="bg-secondary-bg flex-1 min-h-[60vh] lg:min-h-0 lg:h-full flex flex-col rounded-2xl shadow-m overflow-hidden">
@@ -136,7 +137,15 @@ const PropertyDetails = ({ property, selectedProperty }) => {
               <p className="text-xl text-primary-text font-semibold">
                 Property Owners
               </p>
-              {owners?.length > 0 ? (
+              {isLoading ? (
+                <div className="mt-3 flex items-center justify-center h-20 border border-dashed border-border-color rounded-xl bg-primary-bg">
+                  <p className="text-secondary-text">Loading owners...</p>
+                </div>
+              ) : isError ? (
+                <div className="mt-3 flex items-center justify-center h-20 border border-dashed border-border-color rounded-xl bg-primary-bg">
+                  <p className="text-error-color">Failed to load owners.</p>
+                </div>
+              ) : owners?.length > 0 ? (
                 owners.map((owner) => (
                   <div
                     key={owner.id}

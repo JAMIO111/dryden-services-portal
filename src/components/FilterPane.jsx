@@ -78,12 +78,13 @@ const FilterPane = ({ onClose }) => {
   return (
     <div
       ref={paneRef}
-      className="border absolute bg-primary-bg text-primary-text z-1000 top-32 rounded-2xl border-border-color shadow-lg shadow-shadow-color w-80 h-fit">
+      className="border absolute bg-primary-bg text-primary-text z-1000 top-32 rounded-2xl border-border-color shadow-lg shadow-shadow-color w-80 max-w-[calc(100vw-2rem)] h-fit">
       <div className="flex px-4 py-1 bg-secondary-bg border-b border-border-color flex-row justify-between items-center rounded-t-2xl ">
         <h3 className="text-xl">Filter</h3>
         <button
           className="hover:bg-primary-bg rounded-md cursor-pointer hover:text-error-color p-1"
-          onClick={onClose}>
+          onClick={onClose}
+          aria-label="Close filter panel">
           <CgClose />
         </button>
       </div>

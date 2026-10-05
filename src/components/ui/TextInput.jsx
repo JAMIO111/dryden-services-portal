@@ -1,5 +1,5 @@
 import { HiMiniXMark } from "react-icons/hi2";
-import { forwardRef } from "react";
+import { forwardRef, useId } from "react";
 import { MdErrorOutline } from "react-icons/md";
 
 const TextInput = forwardRef(
@@ -17,10 +17,13 @@ const TextInput = forwardRef(
       maxLength,
       suffix,
       textTransform = "none",
+      id,
       ...rest
     },
     ref
   ) => {
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
     const handleKeyDownNumeric = (e) => {
       if (
         [
@@ -71,7 +74,9 @@ const TextInput = forwardRef(
       <div className="flex flex-col gap-1 h-fit min-w-0 relative">
         {label && (
           <div className="flex items-center gap-1">
-            <label className="block font-medium text-primary-text">
+            <label
+              htmlFor={inputId}
+              className="block font-medium text-primary-text">
               {label}
             </label>
             {required && (
@@ -108,6 +113,7 @@ const TextInput = forwardRef(
           )}
 
           <input
+            id={inputId}
             onKeyDown={dataType === "number" ? handleKeyDownNumeric : undefined}
             ref={ref}
             type={dataType === "number" ? "text" : dataType}

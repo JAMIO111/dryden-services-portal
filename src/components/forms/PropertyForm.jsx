@@ -582,13 +582,15 @@ const PropertyForm = () => {
 
                   <button
                     onClick={() => openEditKeyCodeModal(index, field)}
-                    className="p-2 cursor-pointer text-icon-color hover:shadow-s rounded-lg hover:text-cta-color">
+                    className="p-2 cursor-pointer text-icon-color hover:shadow-s rounded-lg hover:text-cta-color"
+                    aria-label="Edit key code">
                     <BsPencil className="h-5 w-5" />
                   </button>
 
                   <button
                     onClick={() => removeKeyCode(index)}
-                    className="p-2 cursor-pointer hover:shadow-s text-icon-color rounded-lg hover:text-error-color">
+                    className="p-2 cursor-pointer hover:shadow-s text-icon-color rounded-lg hover:text-error-color"
+                    aria-label="Remove key code">
                     <IoTrashOutline className="h-5 w-5" />
                   </button>
                 </li>
