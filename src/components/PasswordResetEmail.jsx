@@ -26,10 +26,13 @@ const PasswordResetEmail = () => {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) {
+        console.error("resetPasswordForEmail error:", error);
         showToast({
           type: "error",
           title: "Reset Failed",
-          message: "We were unable to send the reset link.",
+          message:
+            error.message ||
+            "We were unable to send the reset link. Please try again.",
         });
       } else {
         showToast({
@@ -40,10 +43,11 @@ const PasswordResetEmail = () => {
         navigate("/reset-link-sent");
       }
     } catch (error) {
+      console.error("resetPasswordForEmail unexpected error:", error);
       showToast({
         type: "error",
         title: "Error",
-        message: "An error occurred. Please try again.",
+        message: error?.message || "An error occurred. Please try again.",
       });
     } finally {
       setLoading(false);
