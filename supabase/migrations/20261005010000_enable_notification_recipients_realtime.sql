@@ -1,0 +1,24 @@
+-- Required for the client's postgres_changes subscription
+-- (src/hooks/useNotificationsRealtime.jsx) to receive anything at all -
+-- Supabase only streams changes for tables added to this publication.
+alter publication supabase_realtime add table "Notification Recipients";
+
+-- IMPORTANT - verify manually before relying on this for privacy:
+-- Realtime enforces Row Level Security using the subscribing client's JWT.
+-- The client-side filter (recipient_id=eq.<their auth id>) only reduces
+-- what's sent when the policy already restricts it - on its own it is NOT
+-- a security boundary. If RLS is not enabled on "Notification Recipients",
+-- or no policy restricts SELECT to the row's own recipient, every
+-- connected client receives every row's changes. This repo has no
+-- migrations history, so the current policy state on this table couldn't
+-- be inspected before writing this migration - check the Supabase
+-- dashboard (Authentication > Policies) for "Notification Recipients"
+-- and add a policy such as:
+--
+--   create policy "Users can read their own notification recipients"
+--     on "Notification Recipients" for select
+--     to authenticated
+--     using (recipient_id = auth.uid());
+--
+-- if one restricting SELECT to recipient_id = auth.uid() doesn't already
+-- exist.

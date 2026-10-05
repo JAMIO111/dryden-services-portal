@@ -6,8 +6,10 @@ import Header from "./components/Header";
 import { SearchProvider } from "./contexts/SearchProvider.jsx";
 import { NotificationProvider } from "./contexts/NotificationProvider";
 import NotificationPane from "./components/NotificationPane";
+import { useNotificationsRealtime } from "./hooks/useNotificationsRealtime";
 function App() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  useNotificationsRealtime();
 
   return (
     <SearchProvider>
