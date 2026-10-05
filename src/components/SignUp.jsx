@@ -47,7 +47,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex flex-col items-start justify-center h-full w-120 p-10 gap-6">
+    <div className="flex flex-col items-start justify-center h-full w-full max-w-120 p-6 sm:p-10 gap-6">
       <img
         src="/Logo-black-on-yellow.png"
         alt="Logo"

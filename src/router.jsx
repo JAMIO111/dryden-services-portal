@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import RequireProfile from "./components/RequireProfile.jsx";
+import AuthErrorFallback from "./components/AuthErrorFallback.jsx";
 
 const App = lazy(() => import("./App.jsx"));
 const Dashboard = lazy(() => import("./components/dashboard/Dashboard.jsx"));
@@ -75,21 +76,26 @@ export const router = createBrowserRouter([
       {
         path: "signup",
         element: <SignUp />,
+        errorElement: <AuthErrorFallback />,
       },
       {
         path: "login",
         element: <Login />,
+        errorElement: <AuthErrorFallback />,
       },
       {
         path: "forgot-password",
         element: <PasswordResetEmail />,
+        errorElement: <AuthErrorFallback />,
       },
       {
         path: "reset-password",
         element: <ResetPassword />,
+        errorElement: <AuthErrorFallback />,
       },
       {
         path: "reset-link-sent",
+        errorElement: <AuthErrorFallback />,
         element: <ResetLinkSent />,
       },
     ],

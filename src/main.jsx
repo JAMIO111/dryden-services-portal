@@ -23,6 +23,33 @@ if (storedTheme === "dark" || (!storedTheme && darkQuery.matches)) {
 
 const queryClient = new QueryClient();
 
+// After a fresh deploy, a browser tab left open from before still points
+// at the old build's asset hashes. Navigating to a route whose chunk
+// isn't lazy-loaded yet then fails to fetch it (the old filename is
+// gone), which Vite surfaces as a "vite:preloadError" event rather than
+// a normal navigation - left unhandled, that's an uncaught render error
+// with no obvious cause. Recover automatically with a single reload,
+// which picks up the new build's index.html and correct chunk
+// references. Guarded so a genuinely broken deploy can't reload forever.
+const PRELOAD_RETRY_KEY = "vite-preload-reload-attempted";
+window.addEventListener("vite:preloadError", () => {
+  if (!sessionStorage.getItem(PRELOAD_RETRY_KEY)) {
+    sessionStorage.setItem(PRELOAD_RETRY_KEY, "1");
+    window.location.reload();
+  }
+});
+// Lazy route chunks only start loading once React Router actually
+// matches and renders that route, which happens well after the
+// document's own "load" event - so clearing the guard on "load" would
+// race ahead of the very failure it's meant to catch and let a
+// genuinely broken chunk reload forever. Clear it a few seconds after
+// load instead, enough time for a route chunk fetch to resolve either
+// way, so a different stale chunk hit later in the same tab (e.g. after
+// another deploy) still gets its own retry.
+window.addEventListener("load", () => {
+  setTimeout(() => sessionStorage.removeItem(PRELOAD_RETRY_KEY), 10000);
+});
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
