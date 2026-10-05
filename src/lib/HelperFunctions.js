@@ -76,6 +76,19 @@ export function normalize(date) {
 export const formatToDateString = (d) => {
   if (!d) return null;
 
+  // A date-only string ("YYYY-MM-DD") must not be passed through
+  // `new Date()`, which parses it as UTC midnight - reading the
+  // year/month/day back off that via local getters then shifts the date
+  // back a day for anyone in a timezone behind UTC. Parse the components
+  // directly instead of round-tripping through a Date in that case.
+  if (typeof d === "string") {
+    const match = d.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      const [, year, month, day] = match;
+      return `${year}-${month}-${day}`;
+    }
+  }
+
   const date = new Date(d);
 
   const year = date.getFullYear();

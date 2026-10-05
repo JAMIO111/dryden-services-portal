@@ -65,21 +65,42 @@ export const useUpsertBooking = () => {
         throw error;
       }
 
-      // === Generate sequential booking_id on INSERT only ===
-      let booking_id = bookingData.booking_id;
-      if (!id) {
-        const currentYear = new Date().getFullYear();
-        const yearSuffix = String(currentYear).slice(-2);
+      // === Update: no booking_id regeneration needed ===
+      if (id) {
+        const { data, error } = await supabase
+          .from("Bookings")
+          .update({ ...bookingData })
+          .eq("id", id)
+          .select()
+          .single();
 
+        if (error) throw error;
+        return data;
+      }
+
+      // === Insert: generate sequential booking_id, retrying on collision ===
+      // Reading the current max then incrementing is inherently racy if two
+      // bookings are created at nearly the same time - both can read the
+      // same "last" value and try to insert the same booking_id. This
+      // retries with a freshly re-read number if the insert collides,
+      // rather than silently creating a duplicate reference. This only
+      // fully closes the race if `booking_id` has a UNIQUE constraint in
+      // the database (so a collision actually fails instead of succeeding
+      // twice) - add one if it doesn't already exist.
+      const currentYear = new Date().getFullYear();
+      const yearSuffix = String(currentYear).slice(-2);
+      const maxAttempts = 5;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const { data: lastBooking, error: refError } = await supabase
           .from("Bookings")
           .select("booking_id")
           .like("booking_id", `BKG-${yearSuffix}-%`)
           .order("booking_id", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        if (refError && refError.code !== "PGRST116") throw refError;
+        if (refError) throw refError;
 
         let nextNumber = 1;
         if (lastBooking?.booking_id) {
@@ -87,26 +108,24 @@ export const useUpsertBooking = () => {
           if (match) nextNumber = parseInt(match[1], 10) + 1;
         }
 
-        const nextNumberStr = String(nextNumber).padStart(4, "0");
-        booking_id = `BKG-${yearSuffix}-${nextNumberStr}`;
+        const booking_id = `BKG-${yearSuffix}-${String(nextNumber).padStart(4, "0")}`;
+
+        const { data, error } = await supabase
+          .from("Bookings")
+          .insert({ ...bookingData, booking_id, created_by: profile.id })
+          .select()
+          .single();
+
+        if (!error) return data;
+
+        const isBookingIdCollision =
+          error.code === "23505" && error.message?.includes("booking_id");
+
+        if (!isBookingIdCollision || attempt === maxAttempts - 1) {
+          throw error;
+        }
+        // otherwise loop and try the next number
       }
-
-      // === Upsert ===
-      const { data, error } = id
-        ? await supabase
-            .from("Bookings")
-            .update({ ...bookingData, booking_id })
-            .eq("id", id)
-            .select()
-            .single()
-        : await supabase
-            .from("Bookings")
-            .insert({ ...bookingData, booking_id, created_by: profile.id })
-            .select()
-            .single();
-
-      if (error) throw error;
-      return data;
     },
 
     onSuccess: (data) => {

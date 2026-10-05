@@ -40,9 +40,9 @@ export const useUpsertAdHocJob = () => {
         .like("ad_hoc_job_id", `JOB-${yearSuffix}-%`)
         .order("ad_hoc_job_id", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (refError && refError.code !== "PGRST116") throw refError;
+      if (refError) throw refError;
 
       let nextNumber = 1;
       if (lastJob?.ad_hoc_job_id) {
@@ -79,7 +79,7 @@ export const useUpsertAdHocJob = () => {
              Block ONLY if start OR end matches
           */
           if (type === "Laundry") {
-            const { data: clash } = await supabase
+            const { data: clash, error: clashError } = await supabase
               .from("AdHocJobs")
               .select("id")
               .eq("property_id", property_id)
@@ -87,9 +87,18 @@ export const useUpsertAdHocJob = () => {
               .or(
                 `start_date.eq.${jobDates.start_date},end_date.eq.${jobDates.end_date}`,
               )
-              .eq("deleted_at", null)
+              .is("deleted_at", null)
               .limit(1)
-              .single();
+              .maybeSingle();
+
+            if (clashError) {
+              showToast({
+                type: "error",
+                title: "Conflict Check Failed",
+                message: `Could not verify Laundry job conflicts for ${new Date(jobDates.start_date).toLocaleDateString()}. Skipping to be safe.`,
+              });
+              continue;
+            }
 
             if (clash) {
               showToast({
@@ -103,15 +112,24 @@ export const useUpsertAdHocJob = () => {
 
           /* ---- Non-laundry conflict ---- */
           if (type !== "Laundry") {
-            const { data: clash } = await supabase
+            const { data: clash, error: clashError } = await supabase
               .from("AdHocJobs")
               .select("id")
               .eq("property_id", property_id)
               .eq("type", type)
               .eq("single_date", jobDates.single_date)
-              .eq("deleted_at", null)
+              .is("deleted_at", null)
               .limit(1)
-              .single();
+              .maybeSingle();
+
+            if (clashError) {
+              showToast({
+                type: "error",
+                title: "Conflict Check Failed",
+                message: `Could not verify job conflicts for ${date.toLocaleDateString()}. Skipping to be safe.`,
+              });
+              continue;
+            }
 
             if (clash) {
               showToast({
@@ -147,15 +165,11 @@ export const useUpsertAdHocJob = () => {
       /* --------------------------------
          SINGLE JOB
       -------------------------------- */
-      const ad_hoc_job_id = id
-        ? adHocJobData.ad_hoc_job_id
-        : `JOB-${yearSuffix}-${String(nextNumber).padStart(3, "0")}`;
-
       const jobDates =
         type === "Laundry"
           ? {
-              start_date: start_date ? new Date(start_date) : single_date,
-              end_date: end_date ? new Date(end_date) : single_date,
+              start_date: toDateOnly(start_date || single_date),
+              end_date: toDateOnly(end_date || single_date),
               single_date: null,
             }
           : {
@@ -166,7 +180,7 @@ export const useUpsertAdHocJob = () => {
 
       /* ---- Laundry conflict ---- */
       if (type === "Laundry" && !id) {
-        const { data: clash } = await supabase
+        const { data: clash, error: clashError } = await supabase
           .from("AdHocJobs")
           .select("id")
           .eq("property_id", property_id)
@@ -174,9 +188,11 @@ export const useUpsertAdHocJob = () => {
           .or(
             `start_date.eq.${jobDates.start_date},end_date.eq.${jobDates.end_date}`,
           )
-          .eq("deleted_at", null)
+          .is("deleted_at", null)
           .limit(1)
-          .single();
+          .maybeSingle();
+
+        if (clashError) throw clashError;
 
         if (clash) {
           showToast({
@@ -190,15 +206,17 @@ export const useUpsertAdHocJob = () => {
 
       /* ---- Non-laundry conflict ---- */
       if (type !== "Laundry" && !id) {
-        const { data: clash } = await supabase
+        const { data: clash, error: clashError } = await supabase
           .from("AdHocJobs")
           .select("id")
           .eq("property_id", property_id)
           .eq("type", type)
           .eq("single_date", jobDates.single_date)
-          .eq("deleted_at", null)
+          .is("deleted_at", null)
           .limit(1)
-          .single();
+          .maybeSingle();
+
+        if (clashError) throw clashError;
 
         if (clash) {
           showToast({
@@ -210,26 +228,68 @@ export const useUpsertAdHocJob = () => {
         }
       }
 
-      /* ---- Insert / Update ---- */
-      const { data, error } = id
-        ? await supabase
-            .from("AdHocJobs")
-            .update({ ...adHocJobData, ad_hoc_job_id })
-            .eq("id", id)
-            .select()
-            .single()
-        : await supabase
-            .from("AdHocJobs")
-            .insert({
-              ...adHocJobData,
-              ad_hoc_job_id,
-              created_by: profile.id,
-            })
-            .select()
-            .single();
+      /* ---- Update: no ad_hoc_job_id regeneration needed ---- */
+      if (id) {
+        const { data, error } = await supabase
+          .from("AdHocJobs")
+          .update({ ...adHocJobData })
+          .eq("id", id)
+          .select()
+          .single();
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      }
+
+      /* ---- Insert: generate ad_hoc_job_id, retrying on collision ----
+         Same read-max-then-increment race as the booking_id generator
+         above - retry with a freshly re-read number if the insert
+         collides, rather than silently creating a duplicate reference.
+         Only fully closes the race if ad_hoc_job_id has a UNIQUE
+         constraint in the database. */
+      const maxAttempts = 5;
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        let attemptNumber = nextNumber;
+        if (attempt > 0) {
+          const { data: lastJob, error: refError } = await supabase
+            .from("AdHocJobs")
+            .select("ad_hoc_job_id")
+            .like("ad_hoc_job_id", `JOB-${yearSuffix}-%`)
+            .order("ad_hoc_job_id", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (refError) throw refError;
+
+          attemptNumber = 1;
+          if (lastJob?.ad_hoc_job_id) {
+            const match = lastJob.ad_hoc_job_id.match(/JOB-\d{2}-(\d{3})/);
+            if (match) attemptNumber = parseInt(match[1], 10) + 1;
+          }
+        }
+
+        const ad_hoc_job_id = `JOB-${yearSuffix}-${String(attemptNumber).padStart(3, "0")}`;
+
+        const { data, error } = await supabase
+          .from("AdHocJobs")
+          .insert({
+            ...adHocJobData,
+            ad_hoc_job_id,
+            created_by: profile.id,
+          })
+          .select()
+          .single();
+
+        if (!error) return data;
+
+        const isJobIdCollision =
+          error.code === "23505" && error.message?.includes("ad_hoc_job_id");
+
+        if (!isJobIdCollision || attempt === maxAttempts - 1) {
+          throw error;
+        }
+        // otherwise loop and try the next number
+      }
     },
 
     onSuccess: (data) => {

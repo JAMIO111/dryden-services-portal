@@ -32,6 +32,7 @@ import { useUpsertBooking } from "@/hooks/useUpsertBooking";
 import ToggleButton from "../ui/ToggleButton";
 import { useToast } from "../../contexts/ToastProvider";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { formatToDateString } from "@/lib/HelperFunctions";
 
 const defaultFormData = {
   booking_ref: "",
@@ -105,17 +106,6 @@ const BookingForm = () => {
   }, [bookingId, booking, reset]);
 
   const handleSaveBooking = async (data, exit = true) => {
-    const formatForDB = (d) => {
-      if (!d) return null;
-
-      const date = new Date(d);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-
-      return `${year}-${month}-${day}`;
-    };
-
     try {
       const { bookingDates, ...rest } = data;
 
@@ -133,14 +123,14 @@ const BookingForm = () => {
           ? {
               id: watch("id"),
               ...rest,
-              arrival_date: formatForDB(bookingDates?.startDate),
-              departure_date: formatForDB(bookingDates?.endDate),
+              arrival_date: formatToDateString(bookingDates?.startDate),
+              departure_date: formatToDateString(bookingDates?.endDate),
               nights,
             }
           : {
               ...rest,
-              arrival_date: formatForDB(bookingDates?.startDate),
-              departure_date: formatForDB(bookingDates?.endDate),
+              arrival_date: formatToDateString(bookingDates?.startDate),
+              departure_date: formatToDateString(bookingDates?.endDate),
               nights,
             };
 
@@ -156,21 +146,30 @@ const BookingForm = () => {
             : "New booking successfully entered.",
       });
 
-      await createNotification({
-        title:
-          bookingId !== "New-Booking" ? "Booking Updated" : "Booking Created",
-        body:
-          bookingId !== "New-Booking"
-            ? "has made ammendments to a booking:"
-            : "has entered a new booking:",
-        metaData: {
-          url: `/Jobs/Bookings/${result.booking_id}`,
-          buttonText: "View Booking",
-        },
-        docRef: result.booking_id,
-        category: "Bookings",
-        type: bookingId !== "New-Booking" ? "update" : "new",
-      });
+      // The booking itself already saved successfully above - don't let a
+      // failure here (e.g. a transient error creating the notification)
+      // look like the whole save failed, or block the user from exiting.
+      try {
+        await createNotification({
+          title:
+            bookingId !== "New-Booking"
+              ? "Booking Updated"
+              : "Booking Created",
+          body:
+            bookingId !== "New-Booking"
+              ? "has made ammendments to a booking:"
+              : "has entered a new booking:",
+          metaData: {
+            url: `/Jobs/Bookings/${result.booking_id}`,
+            buttonText: "View Booking",
+          },
+          docRef: result.booking_id,
+          category: "Bookings",
+          type: bookingId !== "New-Booking" ? "update" : "new",
+        });
+      } catch (notifyError) {
+        console.error("Failed to create booking notification:", notifyError);
+      }
 
       if (exit) {
         navigate("/Jobs/Bookings");
@@ -186,6 +185,13 @@ const BookingForm = () => {
           type: "error",
           title: "Booking Overlap",
           message: `Failed to save changes: ${error.message}`,
+        });
+      } else {
+        showToast({
+          type: "error",
+          title: "Save Failed",
+          message:
+            error.message || "Something went wrong while saving this booking.",
         });
       }
     }

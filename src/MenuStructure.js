@@ -61,14 +61,8 @@ export const menuStructure = [
         name: "Employees",
         path: "/Human-Resources/Employees",
       },
-      {
-        name: "Holidays",
-        path: "/Human-Resources/Holidays",
-      },
-      {
-        name: "Training",
-        path: "/Human-Resources/Training",
-      },
+      // "Holidays" and "Training" removed - no matching routes/pages exist
+      // for them, so they 404'd. Re-add once those pages are built.
     ],
   },
   {
