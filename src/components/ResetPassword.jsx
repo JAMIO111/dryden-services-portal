@@ -4,6 +4,7 @@ import supabase from "../supabase-client";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/contexts/ToastProvider";
+import { useAuth } from "../contexts/AuthProvider";
 import { CiLock } from "react-icons/ci";
 
 const ResetPassword = () => {
@@ -13,6 +14,7 @@ const ResetPassword = () => {
   const [sessionChecked, setSessionChecked] = useState(false);
   const [hasValidSession, setHasValidSession] = useState(false);
   const { showToast } = useToast();
+  const { clearPasswordRecovery } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -53,6 +55,11 @@ const ResetPassword = () => {
         message: "Your password has been reset.",
       });
 
+      // updateUser() doesn't sign the recovery session out or fire a fresh
+      // SIGNED_IN event, so without this the recovery flag would stick
+      // around and bounce the user straight back to /reset-password the
+      // next time they hit a gated route.
+      clearPasswordRecovery();
       navigate("/login");
     } catch (err) {
       showToast({

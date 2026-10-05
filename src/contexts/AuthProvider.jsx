@@ -1,12 +1,22 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import supabase from "../supabase-client";
-import { router } from "../router.jsx";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(undefined); // `undefined` = loading
   const [error, setError] = useState(null); // Optional error state
+  // A password recovery link can land the browser somewhere other than
+  // /reset-password (e.g. if the Supabase project's allowed Redirect URLs
+  // don't include it, it silently falls back to the default Site URL) -
+  // since that still establishes a valid session, every gate that decides
+  // "where does a logged-in user go" (HomeRedirect, ProtectedRoute) needs
+  // to know this is a recovery session, not a normal login, and send them
+  // to /reset-password instead of the dashboard. This is read alongside
+  // `user` in the same render pass those gates already use, so there's no
+  // race between "user is now truthy -> go to dashboard" rendering before
+  // a separate imperative redirect gets a chance to run.
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -33,19 +43,17 @@ export const AuthProvider = ({ children }) => {
         try {
           console.log("Auth event:", _event);
           console.log("Session:", session);
-          setUser(session?.user || null);
 
-          // A password recovery link can land the browser somewhere other
-          // than /reset-password (e.g. if the Supabase project's allowed
-          // Redirect URLs don't include it, it silently falls back to the
-          // default Site URL) - since that still establishes a valid
-          // session, the app would otherwise treat the user as simply
-          // logged in and send them to the dashboard. Force them to the
-          // reset-password screen whenever this event fires, regardless
-          // of where they actually landed.
           if (_event === "PASSWORD_RECOVERY") {
-            router.navigate("/reset-password");
+            setIsPasswordRecovery(true);
+          } else if (_event === "SIGNED_OUT" || _event === "SIGNED_IN") {
+            // A fresh sign-in or sign-out means whatever recovery flow was
+            // in progress is over - stop steering the user back to
+            // /reset-password.
+            setIsPasswordRecovery(false);
           }
+
+          setUser(session?.user || null);
         } catch (err) {
           console.error("Error handling auth event:", err);
           setUser(null);
@@ -66,8 +74,11 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  const clearPasswordRecovery = () => setIsPasswordRecovery(false);
+
   return (
-    <AuthContext.Provider value={{ user, error }}>
+    <AuthContext.Provider
+      value={{ user, error, isPasswordRecovery, clearPasswordRecovery }}>
       {children}
     </AuthContext.Provider>
   );

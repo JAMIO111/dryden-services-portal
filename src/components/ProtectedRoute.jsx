@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthProvider";
 import Spinner from "./LoadingSpinner";
 
 const ProtectedRoute = () => {
-  const { user } = useAuth();
+  const { user, isPasswordRecovery } = useAuth();
 
   if (user === undefined)
     return (
@@ -11,6 +11,13 @@ const ProtectedRoute = () => {
         <Spinner />
       </div>
     ); // Optional: handle loading state
+
+  // A password recovery session establishes a valid user, but it should
+  // never be able to browse the app proper until the password is actually
+  // reset - keep it penned on /reset-password.
+  if (isPasswordRecovery) {
+    return <Navigate to="/reset-password" replace />;
+  }
 
   return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
