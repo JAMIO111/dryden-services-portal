@@ -1,5 +1,5 @@
 // NotificationContext.jsx
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 
 const NotificationContext = createContext();
 
@@ -17,9 +17,13 @@ export const NotificationProvider = ({ children }) => {
     setContent(null);
   }, []);
 
+  const value = useMemo(
+    () => ({ isOpen, content, openPane, closePane }),
+    [isOpen, content, openPane, closePane]
+  );
+
   return (
-    <NotificationContext.Provider
-      value={{ isOpen, content, openPane, closePane }}>
+    <NotificationContext.Provider value={value}>
       {children}
     </NotificationContext.Provider>
   );

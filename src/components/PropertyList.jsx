@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { BsHouses, BsHouseAdd } from "react-icons/bs";
 import { HiOutlineHomeModern } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,18 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
   const handleNewEntry = () => {
     navigate(`/Client-Management/Properties/New-Property`);
   };
+
+  // Copy before sorting - properties is the React Query cache's own array,
+  // and Array.prototype.sort mutates in place, which would corrupt the
+  // shared cache for every other component reading the same query.
+  const filteredProperties = useMemo(() => {
+    return [...properties]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((property) => {
+        if (activeStatus === "All") return true;
+        return property.is_active === true;
+      });
+  }, [properties, activeStatus]);
 
   const getPackageStyles = (packageName) => {
     if (!packageName) return "";
@@ -59,14 +71,7 @@ const PropertyList = ({ onSelectProperty, selectedProperty, properties }) => {
       {/* Scrollable List */}
       <div className="lg:flex-1 lg:overflow-y-auto">
         <ul>
-          {properties
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .filter((property) => {
-              if (activeStatus === "All") return true;
-              // Ensure is_active is truthy for active filter
-              return property.is_active === true;
-            })
-            .map((property) => (
+          {filteredProperties.map((property) => (
               <li
                 key={property.id}
                 className={`flex flex-col sm:flex-row border-b p-3 sm:p-2 sm:pr-5 border-border-color items-stretch sm:items-center cursor-pointer transition-colors ${

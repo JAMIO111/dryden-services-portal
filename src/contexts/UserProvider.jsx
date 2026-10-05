@@ -1,5 +1,12 @@
 // UserProvider.js
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import supabase from "../supabase-client";
 import { useAuth } from "./AuthProvider";
 
@@ -107,27 +114,33 @@ export const UserProvider = ({ children }) => {
   /* -----------------------------
      Update current profile
   ----------------------------- */
-  const updateProfile = async (updates) => {
-    if (!profile?.id) return;
+  const updateProfile = useCallback(
+    async (updates) => {
+      if (!profile?.id) return;
 
-    const optimisticProfile = { ...profile, ...updates };
-    setProfile(optimisticProfile);
-    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(optimisticProfile));
+      const optimisticProfile = { ...profile, ...updates };
+      setProfile(optimisticProfile);
+      localStorage.setItem(
+        PROFILE_CACHE_KEY,
+        JSON.stringify(optimisticProfile)
+      );
 
-    const { error } = await supabase
-      .from("Employees")
-      .update(updates)
-      .eq("id", profile.id);
+      const { error } = await supabase
+        .from("Employees")
+        .update(updates)
+        .eq("id", profile.id);
 
-    if (error) {
-      console.error("Error updating profile:", error);
-    }
-  };
+      if (error) {
+        console.error("Error updating profile:", error);
+      }
+    },
+    [profile]
+  );
 
   /* -----------------------------
      Manual refresh helpers
   ----------------------------- */
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     if (!authUser) return;
 
     const { data, error } = await supabase
@@ -145,9 +158,9 @@ export const UserProvider = ({ children }) => {
 
     setProfile(data);
     localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(data));
-  };
+  }, [authUser]);
 
-  const refreshOrgUsers = async () => {
+  const refreshOrgUsers = useCallback(async () => {
     const { data, error } = await supabase
       .from("Employees")
       .select(
@@ -162,21 +175,30 @@ export const UserProvider = ({ children }) => {
 
     setOrgUsers(data);
     localStorage.setItem(ORG_USERS_CACHE_KEY, JSON.stringify(data));
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      profile,
+      orgUsers,
+      isLoading,
+      updateProfile,
+      refreshProfile,
+      refreshOrgUsers,
+      setProfile,
+    }),
+    [
+      profile,
+      orgUsers,
+      isLoading,
+      updateProfile,
+      refreshProfile,
+      refreshOrgUsers,
+    ]
+  );
 
   return (
-    <UserContext.Provider
-      value={{
-        profile,
-        orgUsers,
-        isLoading,
-        updateProfile,
-        refreshProfile,
-        refreshOrgUsers,
-        setProfile,
-      }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={value}>{children}</UserContext.Provider>
   );
 };
 

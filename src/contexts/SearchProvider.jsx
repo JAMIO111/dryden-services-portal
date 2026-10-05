@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { useDebouncedValue } from "../hooks/useDebounce";
 import { useSearchParams, useLocation } from "react-router-dom";
 
@@ -23,11 +23,15 @@ export const SearchProvider = ({ children }) => {
 
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 750);
 
+  // Memoize so consumers that only care about debouncedSearchTerm don't
+  // re-render on every keystroke-triggered provider re-render.
+  const value = useMemo(
+    () => ({ searchTerm, setSearchTerm, debouncedSearchTerm }),
+    [searchTerm, debouncedSearchTerm]
+  );
+
   return (
-    <SearchContext.Provider
-      value={{ searchTerm, setSearchTerm, debouncedSearchTerm }}>
-      {children}
-    </SearchContext.Provider>
+    <SearchContext.Provider value={value}>{children}</SearchContext.Provider>
   );
 };
 

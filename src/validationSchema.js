@@ -73,9 +73,18 @@ export const PropertyFormSchema = z.object({
         )
         .join(" "),
     ),
-  bedrooms: z.number(),
-  sleeps: z.number(),
-  bathrooms: z.number(),
+  bedrooms: z
+    .number({ invalid_type_error: "Bedrooms must be a number" })
+    .int()
+    .min(0, { message: "Bedrooms cannot be negative" }),
+  sleeps: z
+    .number({ invalid_type_error: "Sleeps must be a number" })
+    .int()
+    .min(0, { message: "Sleeps cannot be negative" }),
+  bathrooms: z
+    .number({ invalid_type_error: "Bathrooms must be a number" })
+    .int()
+    .min(0, { message: "Bathrooms cannot be negative" }),
 
   line_1: z
     .string({ required_error: "Address line 1 is required" })
@@ -432,34 +441,48 @@ export const EmployeeFormSchema = z.object({
   is_cscs: z.boolean(),
 });
 
-export const AbsenceFormSchema = z.object({
-  employee_id: z
-    .string({
-      required_error: "Select an employee",
-      invalid_type_error: "Select an employee",
-    })
-    .min(1, "Select an employee"),
-  category: z.enum(
-    [
-      "Annual Leave",
-      "Sickness",
-      "Maternity",
-      "Paternity",
-      "Unpaid Leave",
-      "Medical Leave",
-      "Bereavement",
-      "Jury Duty",
-      "Other",
-    ],
-    {
-      required_error: "Select an absence category",
-      invalid_type_error: "Select an absence category",
-    },
-  ),
-  start_date: z.date(),
-  end_date: z.date(),
-  reason: z.string().max(200).optional(),
-});
+export const AbsenceFormSchema = z
+  .object({
+    employee_id: z
+      .string({
+        required_error: "Select an employee",
+        invalid_type_error: "Select an employee",
+      })
+      .min(1, "Select an employee"),
+    category: z.enum(
+      [
+        "Annual Leave",
+        "Sickness",
+        "Maternity",
+        "Paternity",
+        "Unpaid Leave",
+        "Medical Leave",
+        "Bereavement",
+        "Jury Duty",
+        "Other",
+      ],
+      {
+        required_error: "Select an absence category",
+        invalid_type_error: "Select an absence category",
+      },
+    ),
+    start_date: z.date(),
+    end_date: z.date(),
+    reason: z.string().max(200).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.start_date &&
+      data.end_date &&
+      data.end_date < data.start_date
+    ) {
+      ctx.addIssue({
+        path: ["end_date"],
+        code: z.ZodIssueCode.custom,
+        message: "End date cannot be before the start date.",
+      });
+    }
+  });
 
 export const AdHocJobFormSchema = z
   .object({
@@ -498,6 +521,18 @@ export const AdHocJobFormSchema = z
           path: ["end_date"],
           code: z.ZodIssueCode.custom,
           message: "Delivery end date is required.",
+        });
+      }
+
+      if (
+        data.start_date &&
+        data.end_date &&
+        data.end_date < data.start_date
+      ) {
+        ctx.addIssue({
+          path: ["end_date"],
+          code: z.ZodIssueCode.custom,
+          message: "Delivery end date cannot be before the start date.",
         });
       }
     }

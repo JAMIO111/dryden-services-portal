@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { MdPeopleOutline } from "react-icons/md";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import CTAButton from "./CTAButton";
@@ -34,10 +34,16 @@ const OwnerList = ({
     }
   }, [selectedOwner, owners]);
 
-  const filteredOwners =
-    activeStatus === "Active"
-      ? owners.filter((owner) => owner.is_active)
-      : owners;
+  // Copy before sorting - owners is the React Query cache's own array, and
+  // Array.prototype.sort mutates in place, which would corrupt the shared
+  // cache for every other component reading the same query.
+  const filteredOwners = useMemo(() => {
+    const base =
+      activeStatus === "Active"
+        ? owners.filter((owner) => owner.is_active)
+        : owners;
+    return [...base].sort((a, b) => a.first_name.localeCompare(b.first_name));
+  }, [owners, activeStatus]);
 
   return (
     <div className="bg-secondary-bg w-full lg:w-1/4 p-0.5 rounded-2xl shadow-m flex flex-col lg:h-full lg:overflow-hidden relative shrink-0">
@@ -86,54 +92,52 @@ const OwnerList = ({
               </div>
             </div>
           ) : (
-            filteredOwners
-              ?.sort((a, b) => a.first_name.localeCompare(b.first_name))
-              .map((owner) => (
-                <li
-                  key={owner.id}
-                  className="relative flex items-center p-3 cursor-pointer"
-                  onClick={() => onSelectOwner(owner)}
-                  onDoubleClick={() =>
-                    navigate(`/Client-Management/Owners/${owner.id}`)
-                  }>
-                  {/* Owner Image */}
-                  <div className="relative mr-4">
-                    {owner.avatar ? (
-                      <img
-                        src={owner.avatar}
-                        alt={owner.first_name}
-                        className="w-12 h-12 rounded-lg border border-border-color object-cover"
-                      />
-                    ) : (
-                      <div
-                        className={`${
-                          selectedOwner?.id === owner.id
-                            ? "bg-tertiary-bg"
-                            : "bg-primary-bg"
-                        } w-12 h-12 flex items-center justify-center rounded-lg border border-border-color`}>
-                        <span className="text-secondary-text">
-                          {owner.first_name.charAt(0)}
-                        </span>
-                        <span className="text-secondary-text">
-                          {owner.surname.charAt(0)}
-                        </span>
-                      </div>
-                    )}
+            filteredOwners.map((owner) => (
+              <li
+                key={owner.id}
+                className="relative flex items-center p-3 cursor-pointer"
+                onClick={() => onSelectOwner(owner)}
+                onDoubleClick={() =>
+                  navigate(`/Client-Management/Owners/${owner.id}`)
+                }>
+                {/* Owner Image */}
+                <div className="relative mr-4">
+                  {owner.avatar ? (
+                    <img
+                      src={owner.avatar}
+                      alt={owner.first_name}
+                      className="w-12 h-12 rounded-lg border border-border-color object-cover"
+                    />
+                  ) : (
                     <div
-                      className={`absolute rounded-full w-3 h-3 ${
-                        owner.is_active ? "bg-green-500" : "bg-red-500"
-                      } -bottom-0.5 -right-0.5`}></div>
-                  </div>
+                      className={`${
+                        selectedOwner?.id === owner.id
+                          ? "bg-tertiary-bg"
+                          : "bg-primary-bg"
+                      } w-12 h-12 flex items-center justify-center rounded-lg border border-border-color`}>
+                      <span className="text-secondary-text">
+                        {owner.first_name.charAt(0)}
+                      </span>
+                      <span className="text-secondary-text">
+                        {owner.surname.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                  <div
+                    className={`absolute rounded-full w-3 h-3 ${
+                      owner.is_active ? "bg-green-500" : "bg-red-500"
+                    } -bottom-0.5 -right-0.5`}></div>
+                </div>
 
-                  {/* Owner Details */}
-                  <div>
-                    <p className="text-primary-text font-semibold">
-                      {owner.first_name} {owner.surname}
-                    </p>
-                    <p className="text-sm text-secondary-text">{owner.role}</p>
-                  </div>
-                </li>
-              ))
+                {/* Owner Details */}
+                <div>
+                  <p className="text-primary-text font-semibold">
+                    {owner.first_name} {owner.surname}
+                  </p>
+                  <p className="text-sm text-secondary-text">{owner.role}</p>
+                </div>
+              </li>
+            ))
           )}
         </ul>
       </div>

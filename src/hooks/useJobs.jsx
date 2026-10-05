@@ -57,23 +57,40 @@ export function useJobs(startDate, endDate) {
 
       if (keyErr) throw keyErr;
 
-      // 4. Fetch the next booking per property after each departure
-      const nextBookingsMap = {};
-      await Promise.all(
-        bookings.map(async (booking) => {
-          const { data: nextData, error: nextErr } = await supabase
-            .from("Bookings")
-            .select("*")
-            .eq("property_id", booking.property_id)
-            .gte("arrival_date", booking.departure_date)
-            .is("deleted_at", null)
-            .order("arrival_date", { ascending: true })
-            .limit(1);
-
-          if (nextErr) throw nextErr;
-          nextBookingsMap[booking.id] = nextData?.[0] ?? null;
-        }),
+      // 4. Fetch the next booking per property after each departure - one
+      // batched query covering every property in this window instead of
+      // one round-trip per booking (was N+1: 50 bookings -> 50 queries).
+      const minDeparture = bookings.reduce(
+        (min, b) => (b.departure_date < min ? b.departure_date : min),
+        bookings[0].departure_date,
       );
+
+      const { data: candidateBookings, error: nextErr } = await supabase
+        .from("Bookings")
+        .select("*")
+        .in("property_id", propertyIds)
+        .gte("arrival_date", minDeparture)
+        .is("deleted_at", null)
+        .order("arrival_date", { ascending: true });
+
+      if (nextErr) throw nextErr;
+
+      // Group by property, already sorted ascending by arrival_date (from
+      // the query above), so each booking just needs the first candidate
+      // for its own property with arrival_date >= its departure_date -
+      // same "next booking" semantics as the original per-booking query.
+      const candidatesByProperty = {};
+      for (const candidate of candidateBookings ?? []) {
+        (candidatesByProperty[candidate.property_id] ??= []).push(candidate);
+      }
+
+      const nextBookingsMap = {};
+      for (const booking of bookings) {
+        const candidates = candidatesByProperty[booking.property_id] ?? [];
+        nextBookingsMap[booking.id] =
+          candidates.find((c) => c.arrival_date >= booking.departure_date) ??
+          null;
+      }
 
       // 5. Build jobs array
       const jobs = bookings.map((booking) => {

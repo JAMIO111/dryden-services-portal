@@ -6,6 +6,7 @@ import {
   createContext,
   useRef,
   useEffect,
+  useMemo,
 } from "react";
 import { createPortal } from "react-dom";
 import { CgClose } from "react-icons/cg";
@@ -77,8 +78,13 @@ export const ModalProvider = ({ children }) => {
     };
   }, [modalContent, closeModal]);
 
+  const value = useMemo(
+    () => ({ openModal, closeModal }),
+    [openModal, closeModal]
+  );
+
   return (
-    <ModalContext.Provider value={{ openModal, closeModal }}>
+    <ModalContext.Provider value={value}>
       {children}
       {modalContent &&
         createPortal(

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import supabase from "../supabase-client";
 import { useUser } from "./UserProvider";
 
@@ -32,8 +32,10 @@ export const OrganisationProvider = ({ children }) => {
     fetchOrganisation();
   }, [profile]);
 
+  const value = useMemo(() => ({ organisation }), [organisation]);
+
   return (
-    <OrganisationContext.Provider value={{ organisation }}>
+    <OrganisationContext.Provider value={value}>
       {children}
     </OrganisationContext.Provider>
   );
