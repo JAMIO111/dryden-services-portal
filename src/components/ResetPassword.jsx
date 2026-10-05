@@ -25,12 +25,35 @@ const ResetPassword = () => {
   } = useForm();
 
   useEffect(() => {
-    // The recovery link's code is exchanged for a session automatically
-    // during Supabase client init (see flowType: "pkce" in
-    // supabase-client.js), so by the time getSession() resolves here we
-    // know whether the link was actually valid - don't let the user fill
-    // in and submit a form that can only fail at the very end.
-    supabase.auth.getSession().then(({ data }) => {
+    const checkSession = async () => {
+      // The PKCE code-verifier needed to exchange a `?code=` recovery link
+      // lives in the localStorage of whichever browser *requested* the
+      // reset - it never reaches a different browser/device, so a link
+      // requested on a laptop and opened on a phone (or vice versa, or
+      // opened via an email app's separate in-app browser) silently fails
+      // to establish a session. A `token_hash` link doesn't have that
+      // problem - verifyOtp() exchanges it directly, no local state
+      // needed - so handle that format too if present, in addition to the
+      // automatic PKCE/implicit handling Supabase's client already does
+      // during init (see flowType: "pkce" in supabase-client.js).
+      const params = new URLSearchParams(window.location.search);
+      const tokenHash = params.get("token_hash");
+      const type = params.get("type");
+
+      if (tokenHash && type === "recovery") {
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: "recovery",
+        });
+        if (error) {
+          console.error("verifyOtp error:", error);
+        }
+        // Drop the token from the URL so refreshing the page doesn't try
+        // to re-verify an already-consumed one-time token.
+        window.history.replaceState({}, "", "/reset-password");
+      }
+
+      const { data } = await supabase.auth.getSession();
       setHasValidSession(!!data.session);
       setSessionChecked(true);
       if (!data.session) {
@@ -40,7 +63,9 @@ const ResetPassword = () => {
           message: "Your password reset link is invalid or expired.",
         });
       }
-    });
+    };
+
+    checkSession();
   }, []);
 
   const resetPassword = async ({ password }) => {

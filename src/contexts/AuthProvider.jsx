@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import supabase from "../supabase-client";
+import { useToast } from "./ToastProvider";
 
 const AuthContext = createContext();
 
@@ -17,8 +18,23 @@ export const AuthProvider = ({ children }) => {
   // race between "user is now truthy -> go to dashboard" rendering before
   // a separate imperative redirect gets a chance to run.
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
+    // If a recovery/PKCE code is still sitting in the URL once init
+    // finishes, Supabase's client never attempted the exchange at all -
+    // it only does so when it finds a matching code-verifier in this
+    // browser's localStorage, which is only ever present in the browser
+    // that originally requested the link. Clicking the email link on a
+    // different device/browser (very common on mobile, e.g. an email
+    // app's separate in-app browser) silently fails this way, with no
+    // error - the user just ends up wherever an unauthenticated visitor
+    // goes, with no idea why. Captured before any async work so it
+    // reflects the URL exactly as the page was loaded.
+    const hadRecoveryLink =
+      new URLSearchParams(window.location.search).has("code") ||
+      window.location.hash.includes("type=recovery");
+
     const initAuth = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
@@ -28,6 +44,18 @@ export const AuthProvider = ({ children }) => {
           setError(error);
         } else {
           setUser(data.session?.user || null);
+          if (hadRecoveryLink && !data.session?.user) {
+            // Could be a password reset or a signup confirmation link -
+            // both use the same PKCE "?code=" shape, and in this failure
+            // case no session ever gets established to tell them apart,
+            // so keep the wording flow-agnostic.
+            showToast({
+              type: "error",
+              title: "Link Didn't Work",
+              message:
+                "This usually happens when a confirmation link is opened in a different browser or device than the one used to request it. Please request a new link and open it in that same browser.",
+            });
+          }
         }
       } catch (err) {
         console.error("Unexpected error during getSession:", err);
