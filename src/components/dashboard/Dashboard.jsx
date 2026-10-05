@@ -1,28 +1,26 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useUser } from "@/contexts/UserProvider";
 import DateRangePicker from "@components/ui/DateRangePicker";
-import { getGreeting } from "@/lib/HelperFunctions";
+import {
+  getGreeting,
+  getStartOfMonth,
+  getEndOfMonth,
+} from "@/lib/HelperFunctions";
 import StackedBarChart from "@components/charts/StackedBarChart";
 import { useBookingVolume } from "@/hooks/useBookingVolume";
 import { getPeriodLabel } from "@/lib/utils";
 import { CgClose } from "react-icons/cg";
 
 const Dashboard = () => {
-  const { profile, orgUsers } = useUser();
+  const { profile } = useUser();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const today = useMemo(() => new Date(), []);
-  const end = useMemo(() => {
-    const s = new Date(today);
-    s.setDate(today.getDate() + 14);
-    return s;
-  }, [today]);
 
-  console.log("Org Users in Dashboard:", orgUsers);
-  console.log("Profile in Dashboard:", profile);
-
-  const [selectedRange, setSelectedRange] = useState({
-    startDate: today,
-    endDate: end,
+  // Every mount (i.e. every time the user navigates to the dashboard)
+  // should default to the current month, not whatever range was left
+  // selected last time.
+  const [selectedRange, setSelectedRange] = useState(() => {
+    const now = new Date();
+    return { startDate: getStartOfMonth(now), endDate: getEndOfMonth(now) };
   });
 
   const memoisedRange = useMemo(
@@ -30,20 +28,10 @@ const Dashboard = () => {
     [selectedRange.startDate, selectedRange.endDate]
   );
 
-  console.log("memoisedRange:", memoisedRange);
-
   const { data } = useBookingVolume(
     memoisedRange.startDate,
     memoisedRange.endDate
   );
-
-  console.log("Booking Volume Data:", data);
-
-  useEffect(() => {
-    const end = new Date();
-    end.setDate(today.getDate() + 14);
-    setSelectedRange({ startDate: today, endDate: end });
-  }, [today]);
 
   return (
     <div className="h-full w-full">

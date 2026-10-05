@@ -113,11 +113,11 @@ function getEndOfWeek(date, weekStartsOn = 1) {
   return normalize(end);
 }
 
-function getStartOfMonth(date) {
+export function getStartOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
-function getEndOfMonth(date) {
+export function getEndOfMonth(date) {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
 
