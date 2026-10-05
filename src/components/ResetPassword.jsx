@@ -10,7 +10,8 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [recoveryToken, setRecoveryToken] = useState(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [hasValidSession, setHasValidSession] = useState(false);
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -22,7 +23,14 @@ const ResetPassword = () => {
   } = useForm();
 
   useEffect(() => {
+    // The recovery link's code is exchanged for a session automatically
+    // during Supabase client init (see flowType: "pkce" in
+    // supabase-client.js), so by the time getSession() resolves here we
+    // know whether the link was actually valid - don't let the user fill
+    // in and submit a form that can only fail at the very end.
     supabase.auth.getSession().then(({ data }) => {
+      setHasValidSession(!!data.session);
+      setSessionChecked(true);
       if (!data.session) {
         showToast({
           type: "error",
@@ -56,6 +64,47 @@ const ResetPassword = () => {
       setLoading(false);
     }
   };
+
+  if (!sessionChecked) {
+    return (
+      <div className="flex flex-col items-start justify-center h-full w-120 p-10 gap-6">
+        <img
+          src="/Logo-black-on-yellow.png"
+          alt="Logo"
+          className="w-14 absolute top-5 left-5 rounded-lg mb-4 border border-primary-text/50"
+        />
+        <h2 className="text-left text-md font-light text-secondary-text">
+          Checking your reset link...
+        </h2>
+      </div>
+    );
+  }
+
+  if (!hasValidSession) {
+    return (
+      <div className="flex flex-col items-start justify-center h-full w-120 p-10 gap-6">
+        <img
+          src="/Logo-black-on-yellow.png"
+          alt="Logo"
+          className="w-14 absolute top-5 left-5 rounded-lg mb-4 border border-primary-text/50"
+        />
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl text-left text-primary-text font-semibold">
+            Link Invalid or Expired
+          </h1>
+          <h2 className="text-left text-md font-light text-secondary-text">
+            This password reset link is no longer valid. Request a new one to
+            continue.
+          </h2>
+        </div>
+        <Link
+          to="/forgot-password"
+          className="bg-cta-btn-bg border border-cta-btn-border hover:border-cta-btn-border-hover hover:bg-cta-btn-bg-hover text-primary-text p-2 rounded-lg cursor-pointer text-lg px-4">
+          Request a New Link
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-start justify-center h-full w-120 p-10 gap-6">

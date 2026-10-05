@@ -4,6 +4,10 @@ const supabaseURL = import.meta.env.VITE_SUPABASE_URL;
 
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 
-const supabase = createClient(supabaseURL, supabaseKey);
+const supabase = createClient(supabaseURL, supabaseKey, {
+  auth: {
+    flowType: "pkce",
+  },
+});
 
 export default supabase;
