@@ -6,7 +6,6 @@ import { useModal } from "../contexts/ModalContext";
 import CostInputForm from "./CostInputForm";
 import { CiViewTable } from "react-icons/ci";
 import { IoAddOutline } from "react-icons/io5";
-import { convertCurrency } from "../api/uniRateExchangeApi";
 
 const CostData = ({ ncRef }) => {
   const { data, isLoading, error } = useQuery({
