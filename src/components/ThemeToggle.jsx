@@ -1,4 +1,3 @@
-import React from "react";
 import useTheme from "../hooks/useTheme";
 import { BsSun, BsMoonStars } from "react-icons/bs";
 
@@ -20,7 +19,7 @@ const ThemeToggle = ({ menuExpanded }) => {
       title={`Toggle ${theme === "light" ? "Dark" : "Light"} Mode`}
       className={`flex justify-between items-center rounded-full border-primary-bg border bg-primary-text cursor-pointer ${
         menuExpanded
-          ? "flex-row w-32 mx-auto p-1"
+          ? "flex-row w-32 ml-2 p-1"
           : "flex-col p-0.5 w-fit h-17 mx-auto"
       }`}
       onClick={handleToggle}>
