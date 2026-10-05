@@ -59,6 +59,11 @@ const NotificationCard = ({ notification, closePane, userId }) => {
           {notification.body}{" "}
           <span className="font-semibold text-sm">{notification.doc_ref}</span>
         </p>
+        {notification?.meta_data?.changeSummary && (
+          <p className="text-xs text-secondary-text/80 mt-1">
+            {notification.meta_data.changeSummary}
+          </p>
+        )}
         <div className="flex w-full justify-start items-center mt-2 gap-3">
           {!isEmptyObject(notification?.meta_data) && (
             <CTAButton

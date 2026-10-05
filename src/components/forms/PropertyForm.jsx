@@ -25,8 +25,11 @@ import { usePropertyByName } from "@/hooks/usePropertyByName";
 import { useUpsertProperty } from "@/hooks/useUpsertProperty";
 import { usePackages } from "@/hooks/useManagementPackages";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useLogChange } from "@/hooks/useLogChange";
 import { useModal } from "@/contexts/ModalContext";
 import { useToast } from "@/contexts/ToastProvider";
+import { buildFieldChanges, summarizeChanges } from "@/lib/changeLog";
+import { PROPERTY_CHANGE_FIELDS } from "@/lib/changeLogFields";
 
 /* Components */
 import CTAButton from "../CTAButton";
@@ -75,6 +78,7 @@ const PropertyForm = () => {
   const { name } = useParams();
   const { showToast } = useToast();
   const { createNotification } = useCreateNotification();
+  const { logChange } = useLogChange();
   const { data: property, isLoading } = usePropertyByName(
     name !== "New-Property" ? name : null,
   );
@@ -686,6 +690,11 @@ const PropertyForm = () => {
 
                 console.log("Payload Data:", payload);
 
+                const isUpdate = !!payload.id;
+                const changes = isUpdate
+                  ? buildFieldChanges(property, payload, PROPERTY_CHANGE_FIELDS)
+                  : [];
+
                 // 1. Capture mutation result so we get the real property ID
                 const result = await upsertProperty.mutateAsync({
                   propertyData: payload,
@@ -695,6 +704,21 @@ const PropertyForm = () => {
 
                 // These are the IDs involved
                 const propertyId = result?.id || payload.id; // Correct ID for both create + update
+
+                // The property itself already saved successfully above -
+                // don't let a failure logging the change (e.g. a transient
+                // error) look like the whole save failed.
+                if (isUpdate && changes.length > 0) {
+                  try {
+                    await logChange({
+                      tableName: "Properties",
+                      recordId: propertyId,
+                      changes,
+                    });
+                  } catch (logError) {
+                    console.error("Failed to log property change:", logError);
+                  }
+                }
 
                 showToast({
                   type: "success",
@@ -721,6 +745,9 @@ const PropertyForm = () => {
                     metaData: {
                       url: `/Client-Management/Properties/${payload.name}`,
                       buttonText: "View Property",
+                      ...(changes.length > 0
+                        ? { changeSummary: summarizeChanges(changes) }
+                        : {}),
                     },
                     docRef: payload.name,
                     category: "Properties",

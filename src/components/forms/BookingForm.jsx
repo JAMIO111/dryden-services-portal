@@ -32,7 +32,10 @@ import { useUpsertBooking } from "@/hooks/useUpsertBooking";
 import ToggleButton from "../ui/ToggleButton";
 import { useToast } from "../../contexts/ToastProvider";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useLogChange } from "@/hooks/useLogChange";
 import { formatToDateString } from "@/lib/HelperFunctions";
+import { buildFieldChanges, summarizeChanges } from "@/lib/changeLog";
+import { BOOKING_CHANGE_FIELDS } from "@/lib/changeLogFields";
 
 const defaultFormData = {
   booking_ref: "",
@@ -62,6 +65,7 @@ const BookingForm = () => {
   const { data: properties } = useProperties();
   const { showToast } = useToast();
   const { createNotification } = useCreateNotification();
+  const { logChange } = useLogChange();
 
   const upsertBooking = useUpsertBooking();
 
@@ -134,6 +138,11 @@ const BookingForm = () => {
               nights,
             };
 
+      const isUpdate = bookingId !== "New-Booking";
+      const changes = isUpdate
+        ? buildFieldChanges(booking, payload, BOOKING_CHANGE_FIELDS)
+        : [];
+
       const result = await upsertBooking.mutateAsync(payload);
 
       showToast({
@@ -145,6 +154,21 @@ const BookingForm = () => {
             ? "The booking has been successfully updated."
             : "New booking successfully entered.",
       });
+
+      // The booking itself already saved successfully above - don't let a
+      // failure logging the change (e.g. a transient error) look like the
+      // whole save failed.
+      if (isUpdate && changes.length > 0) {
+        try {
+          await logChange({
+            tableName: "Bookings",
+            recordId: result.id,
+            changes,
+          });
+        } catch (logError) {
+          console.error("Failed to log booking change:", logError);
+        }
+      }
 
       // The booking itself already saved successfully above - don't let a
       // failure here (e.g. a transient error creating the notification)
@@ -162,6 +186,9 @@ const BookingForm = () => {
           metaData: {
             url: `/Jobs/Bookings/${result.booking_id}`,
             buttonText: "View Booking",
+            ...(changes.length > 0
+              ? { changeSummary: summarizeChanges(changes) }
+              : {}),
           },
           docRef: result.booking_id,
           category: "Bookings",

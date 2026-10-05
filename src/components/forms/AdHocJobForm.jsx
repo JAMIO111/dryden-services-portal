@@ -17,6 +17,9 @@ import RecurrenceForm from "./RecurrenceForm";
 import { useModal } from "@/contexts/ModalContext";
 import { FaRegNoteSticky } from "react-icons/fa6";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useLogChange } from "@/hooks/useLogChange";
+import { buildFieldChanges, summarizeChanges } from "@/lib/changeLog";
+import { AD_HOC_JOB_CHANGE_FIELDS } from "@/lib/changeLogFields";
 
 const defaultFormData = {
   type: "Clean",
@@ -43,6 +46,7 @@ const toDateOnly = (date) => {
 
 const AdHocJobForm = ({ adHocJob, navigate }) => {
   const { createNotification } = useCreateNotification();
+  const { logChange } = useLogChange();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const upsertAdHocJob = useUpsertAdHocJob();
@@ -114,20 +118,41 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
     }
 
     try {
+      const adHocJobData = {
+        ...data,
+        single_date: toDateOnly(data.single_date),
+        start_date: toDateOnly(data.start_date),
+        end_date: toDateOnly(data.end_date),
+        ...(adHocJob?.id ? { id: adHocJob.id } : {}),
+      };
+
+      const changes = adHocJob
+        ? buildFieldChanges(adHocJob, adHocJobData, AD_HOC_JOB_CHANGE_FIELDS)
+        : [];
+
       // Wrap in object matching hook signature
       const result = await upsertAdHocJob.mutateAsync({
-        adHocJobData: {
-          ...data,
-          single_date: toDateOnly(data.single_date),
-          start_date: toDateOnly(data.start_date),
-          end_date: toDateOnly(data.end_date),
-          ...(adHocJob?.id ? { id: adHocJob.id } : {}),
-        },
+        adHocJobData,
         recurrenceDates,
       });
 
       // Use the correct ID: new or existing
       const adHocJobId = adHocJob ? adHocJob?.id : result?.ad_hoc_job_id;
+
+      // The job itself already saved successfully above - don't let a
+      // failure logging the change (e.g. a transient error) look like the
+      // whole save failed.
+      if (adHocJob && changes.length > 0) {
+        try {
+          await logChange({
+            tableName: "AdHocJobs",
+            recordId: adHocJobId,
+            changes,
+          });
+        } catch (logError) {
+          console.error("Failed to log ad-hoc job change:", logError);
+        }
+      }
 
       reset(defaultFormData);
 
@@ -154,6 +179,10 @@ const AdHocJobForm = ({ adHocJob, navigate }) => {
           body: adHocJob
             ? "has made amendments to a job:"
             : "has entered a new job:",
+          metaData:
+            changes.length > 0
+              ? { changeSummary: summarizeChanges(changes) }
+              : {},
           docRef: adHocJobId,
           category: "Ad-Hoc Jobs",
           type: !!adHocJobId ? "update" : "new",

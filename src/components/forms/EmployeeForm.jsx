@@ -30,7 +30,13 @@ import { TfiEmail } from "react-icons/tfi";
 import { useToast } from "../../contexts/ToastProvider";
 import { useModal } from "@/contexts/ModalContext";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useLogChange } from "@/hooks/useLogChange";
 import { useEmployeeWithContracts } from "@/hooks/useEmployeeWithContracts";
+import { buildFieldChanges, summarizeChanges } from "@/lib/changeLog";
+import {
+  EMPLOYEE_CHANGE_FIELDS,
+  EMPLOYEE_NOTIFICATION_SAFE_FIELDS,
+} from "@/lib/changeLogFields";
 
 const defaultFormData = {
   id: null,
@@ -55,6 +61,7 @@ const defaultFormData = {
 const EmployeeForm = ({ employee }) => {
   const [view, setView] = useState("history");
   const { createNotification } = useCreateNotification();
+  const { logChange } = useLogChange();
   const queryClient = useQueryClient();
   const upsertEmployee = useUpsertEmployee();
   const updateContract = useUpdateContract();
@@ -158,6 +165,10 @@ const EmployeeForm = ({ employee }) => {
       // add ID when editing
       if (employee?.id) payload.id = employee.id;
 
+      const changes = employee
+        ? buildFieldChanges(employee, payload, EMPLOYEE_CHANGE_FIELDS)
+        : [];
+
       // Save employee and get the returned row
       const saved = await upsertEmployee.mutateAsync(payload);
 
@@ -172,14 +183,38 @@ const EmployeeForm = ({ employee }) => {
       });
 
       // The employee itself already saved successfully above - don't let a
+      // failure logging the change (e.g. a transient error) look like the
+      // whole save failed.
+      if (employee && changes.length > 0) {
+        try {
+          await logChange({
+            tableName: "Employees",
+            recordId: employee.id,
+            changes,
+          });
+        } catch (logError) {
+          console.error("Failed to log employee change:", logError);
+        }
+      }
+
+      // The employee itself already saved successfully above - don't let a
       // failure here (e.g. a transient error creating the notification)
       // look like the whole save failed.
       try {
+        // Notifications broadcast to the whole org - DOB/NI number are
+        // logged above for audit purposes but never included here.
+        const notifiableChanges = changes.filter(
+          (c) => c.field in EMPLOYEE_NOTIFICATION_SAFE_FIELDS
+        );
         await createNotification({
           title: employee ? "Employee Updated" : "Employee Created",
           body: employee
             ? "has made amendments to an employee record:"
             : "has added a new employee:",
+          metaData:
+            notifiableChanges.length > 0
+              ? { changeSummary: summarizeChanges(notifiableChanges) }
+              : {},
           docRef: `${saved?.first_name} ${saved?.surname}`, // <-- use fresh ID from DB
           category: "Employees",
           type: !!employee ? "update" : "new",

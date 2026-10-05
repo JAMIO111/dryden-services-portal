@@ -18,6 +18,9 @@ import { useUpsertOwner } from "@/hooks/useUpsertOwner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../contexts/ToastProvider";
 import { useCreateNotification } from "@/hooks/useCreateNotification";
+import { useLogChange } from "@/hooks/useLogChange";
+import { buildFieldChanges, summarizeChanges } from "@/lib/changeLog";
+import { OWNER_CHANGE_FIELDS } from "@/lib/changeLogFields";
 import { useFieldArray } from "react-hook-form";
 import OwnerPropertyForm from "./OwnerPropertyForm";
 import { usePropertiesByOwner } from "@/hooks/usePropertiesByOwner";
@@ -32,6 +35,7 @@ const OwnerForm = () => {
   const location = useLocation();
   const { showToast } = useToast();
   const { createNotification } = useCreateNotification();
+  const { logChange } = useLogChange();
   const { data: owner, isLoading: isOwnerLoading } = useOwnerById(
     id !== "New-Owner" ? id : null
   );
@@ -388,6 +392,10 @@ const OwnerForm = () => {
             callbackFn={handleSubmit(async (data) => {
               try {
                 const payload = id !== "New-Owner" ? { id, ...data } : data;
+                const isUpdate = id !== "New-Owner";
+                const changes = isUpdate
+                  ? buildFieldChanges(owner, payload, OWNER_CHANGE_FIELDS)
+                  : [];
 
                 let result;
                 let ownerId;
@@ -419,6 +427,21 @@ const OwnerForm = () => {
                   ownerId = result?.id || id;
                 }
 
+                // The owner itself already saved successfully above - don't
+                // let a failure logging the change (e.g. a transient error)
+                // look like the whole save failed.
+                if (isUpdate && changes.length > 0) {
+                  try {
+                    await logChange({
+                      tableName: "Owners",
+                      recordId: ownerId,
+                      changes,
+                    });
+                  } catch (logError) {
+                    console.error("Failed to log owner change:", logError);
+                  }
+                }
+
                 // 🔔 Notifications (now safe — DB is consistent). The owner
                 // itself already saved successfully above - don't let a
                 // failure here (e.g. a transient error creating the
@@ -437,6 +460,9 @@ const OwnerForm = () => {
                     metaData: {
                       url: `/Client-Management/Owners/${ownerId}`,
                       buttonText: "View Owner",
+                      ...(changes.length > 0
+                        ? { changeSummary: summarizeChanges(changes) }
+                        : {}),
                     },
                     docRef: `${result.first_name} ${result.surname}`,
                     category: "Owners",
