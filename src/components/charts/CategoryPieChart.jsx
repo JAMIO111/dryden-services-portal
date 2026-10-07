@@ -56,7 +56,7 @@ export default function CategoryPieChart({
 
   if (!data || data.length === 0) {
     return (
-      <Card className="h-full flex flex-col overflow-hidden">
+      <Card className="h-full shadow-m flex flex-col overflow-hidden">
         <CardHeader className="flex w-full justify-between flex-shrink-0 h-14 px-6">
           <div className="flex flex-col gap-1">
             <CardTitle className="text-primary-text text-lg">{title}</CardTitle>
@@ -73,7 +73,7 @@ export default function CategoryPieChart({
   }
 
   return (
-    <Card className="h-full flex flex-col overflow-hidden">
+    <Card className="h-full shadow-m flex flex-col overflow-hidden">
       <CardHeader className="flex w-full justify-between flex-shrink-0 h-14 px-6">
         <div className="flex flex-col gap-1">
           <CardTitle className="text-primary-text text-lg">{title}</CardTitle>
