@@ -1,5 +1,3 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-
 import {
   Card,
   CardDescription,
@@ -7,15 +5,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-
-const truncateLabel = (value, maxLength = 16) =>
-  value && value.length > maxLength ? `${value.slice(0, maxLength - 1)}…` : value;
-
 /**
- * Generic horizontal bar chart for comparing a magnitude across categories
- * (e.g. bookings per property). Horizontal layout reads better than rotated
- * x-axis labels once category names get longer than a word or two.
+ * Horizontal "ranked list" bar chart for comparing a magnitude across
+ * categories (e.g. bookings per property). Plain HTML/CSS rather than an
+ * SVG chart library axis - Recharts' categorical YAxis sizes its tick
+ * labels off its own internal width estimate, which doesn't reliably
+ * respect a configured width or a custom tickFormatter once labels vary
+ * in length, so longer property names were getting clipped unpredictably.
+ * A CSS `truncate` + native `title` tooltip is a simpler, guaranteed-
+ * correct way to keep full names readable (on hover) while never
+ * overflowing the row.
  */
 export default function CategoryBarChart({
   data,
@@ -46,8 +45,7 @@ export default function CategoryBarChart({
   }
 
   const chartData = data.slice(0, maxCategories);
-  const rowHeight = 32;
-  const chartHeight = Math.max(chartData.length * rowHeight, 160);
+  const maxValue = Math.max(...chartData.map((entry) => entry[dataKey]), 1);
 
   return (
     <Card className="h-full shadow-m flex flex-col overflow-hidden">
@@ -59,30 +57,32 @@ export default function CategoryBarChart({
           </CardDescription>
         </div>
       </CardHeader>
-      <div className="flex-1 min-h-0 overflow-y-auto px-2">
-        <ChartContainer
-          config={{ [dataKey]: { label: valueLabel, color } }}
-          style={{ height: chartHeight, width: "100%" }}>
-          <BarChart
-            data={chartData}
-            layout="vertical"
-            margin={{ top: 8, right: 24, left: 8, bottom: 8 }}>
-            <CartesianGrid
-              stroke="var(--color-border-color)"
-              horizontal={false}
-            />
-            <XAxis type="number" allowDecimals={false} />
-            <YAxis
-              type="category"
-              dataKey={categoryKey}
-              width={112}
-              tick={{ fontSize: 12 }}
-              tickFormatter={truncateLabel}
-            />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <Bar dataKey={dataKey} fill={color} radius={[0, 4, 4, 0]} />
-          </BarChart>
-        </ChartContainer>
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 flex flex-col gap-3">
+        {chartData.map((entry) => {
+          const value = entry[dataKey];
+          // Floor so a near-zero value still renders a visible sliver.
+          const widthPct = Math.max((value / maxValue) * 100, 4);
+
+          return (
+            <div
+              key={entry[categoryKey]}
+              className="flex items-center gap-3"
+              title={`${entry[categoryKey]}: ${value} ${valueLabel.toLowerCase()}`}>
+              <span className="w-32 sm:w-40 shrink-0 truncate text-sm text-secondary-text">
+                {entry[categoryKey]}
+              </span>
+              <div className="flex-1 h-5 bg-primary-bg rounded-md overflow-hidden">
+                <div
+                  className="h-full rounded-md transition-all"
+                  style={{ width: `${widthPct}%`, backgroundColor: color }}
+                />
+              </div>
+              <span className="w-8 shrink-0 text-right text-sm font-medium text-primary-text tabular-nums">
+                {value}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </Card>
   );

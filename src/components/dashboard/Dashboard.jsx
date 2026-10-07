@@ -20,6 +20,17 @@ import { BsHouses } from "react-icons/bs";
 import { MdPeopleOutline, MdOutlinePublishedWithChanges } from "react-icons/md";
 import { IoCalendarOutline } from "react-icons/io5";
 
+// Validated against the dataviz skill's palette checker (lightness band,
+// chroma floor, CVD separation) - semantic colors for package tiers, not
+// the app's generic categorical chart palette, since these names carry
+// their own meaning independent of category order.
+const PACKAGE_COLORS = {
+  Gold: "#ca8a04",
+  Silver: "#3e7cae",
+  Bronze: "#b45309",
+  Unmanaged: "var(--chart-1)",
+};
+
 const Dashboard = () => {
   const { profile } = useUser();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
@@ -64,7 +75,7 @@ const Dashboard = () => {
     if (!properties) return [];
 
     const counts = properties.reduce((acc, property) => {
-      const name = property.Packages?.name || "No Package";
+      const name = property.Packages?.name || "Unmanaged";
       acc[name] = (acc[name] || 0) + 1;
       return acc;
     }, {});
@@ -162,6 +173,7 @@ const Dashboard = () => {
                   nameKey="name"
                   title="Properties by Package"
                   subtitle="Current portfolio"
+                  colorMap={PACKAGE_COLORS}
                 />
               </div>
             </div>

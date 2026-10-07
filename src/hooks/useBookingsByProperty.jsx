@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
+import { formatToDateString } from "../lib/HelperFunctions";
 
 export const useBookingsByProperty = (startDate, endDate) => {
   return useQuery({
@@ -7,12 +8,15 @@ export const useBookingsByProperty = (startDate, endDate) => {
     queryFn: async () => {
       if (!startDate || !endDate) return [];
 
+      // startDate/endDate are typically Date objects; a raw Date serializes
+      // via .gte()/.lte() as its toString() form, which Postgres can't
+      // parse as a date filter. Normalize to "YYYY-MM-DD" first.
       const { data: bookings, error } = await supabase
         .from("Bookings")
         .select("id, property_id, Properties(name)")
         .is("deleted_at", null)
-        .gte("departure_date", startDate)
-        .lte("departure_date", endDate);
+        .gte("departure_date", formatToDateString(startDate))
+        .lte("departure_date", formatToDateString(endDate));
 
       if (error) throw error;
 

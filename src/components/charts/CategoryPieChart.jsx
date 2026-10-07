@@ -32,17 +32,27 @@ const CATEGORICAL_COLORS = [
  * of categories (e.g. properties by management package). Keep category
  * counts low - this isn't meant for high-cardinality breakdowns.
  */
-export default function CategoryPieChart({ data, title, subtitle, dataKey, nameKey }) {
+export default function CategoryPieChart({
+  data,
+  title,
+  subtitle,
+  dataKey,
+  nameKey,
+  colorMap,
+}) {
   const chartConfig = useMemo(() => {
     if (!data?.length) return {};
     return data.reduce((acc, entry, index) => {
-      acc[entry[nameKey]] = {
-        label: entry[nameKey],
-        color: CATEGORICAL_COLORS[index % CATEGORICAL_COLORS.length],
+      const name = entry[nameKey];
+      acc[name] = {
+        label: name,
+        color:
+          colorMap?.[name] ||
+          CATEGORICAL_COLORS[index % CATEGORICAL_COLORS.length],
       };
       return acc;
     }, {});
-  }, [data, nameKey]);
+  }, [data, nameKey, colorMap]);
 
   if (!data || data.length === 0) {
     return (

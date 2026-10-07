@@ -1,16 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
+import { formatToDateString } from "../lib/HelperFunctions";
 
-const parseISO = (value) => {
-  // generateMonthKeys is called with whatever startDate/endDate the caller
-  // passed into the hook - that's a Date object from every current call
-  // site (getStartOfMonth/getEndOfMonth), not an ISO string. Calling
-  // .split on a Date threw here, silently failing the whole query (no
-  // catch logs it - React Query just leaves `data` undefined forever).
-  if (value instanceof Date) {
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
-  }
-  const [y, m, d] = value.split("-").map(Number);
+const parseISO = (iso) => {
+  const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d); // local midnight, no UTC shift
 };
 
@@ -39,12 +32,22 @@ export const useBookingVolume = (startDate, endDate) => {
     queryFn: async () => {
       if (!startDate || !endDate) return [];
 
+      // Every caller passes Date objects (getStartOfMonth/getEndOfMonth),
+      // but a raw Date serializes via .gte()/.lte() as its toString() form
+      // ("Sat Nov 01 2025 00:00:00 GMT+0000 (...)"), which Postgres can't
+      // parse as a date filter - the query was failing silently against
+      // the real database (mocked tests never caught this since a mock
+      // doesn't validate the query string). Normalize to "YYYY-MM-DD"
+      // before it touches the query.
+      const startISO = formatToDateString(startDate);
+      const endISO = formatToDateString(endDate);
+
       const { data: bookings, error } = await supabase
         .from("Bookings")
         .select("id, departure_date")
         .is("deleted_at", null)
-        .gte("departure_date", startDate) // ISO string works perfectly in SQL
-        .lte("departure_date", endDate);
+        .gte("departure_date", startISO)
+        .lte("departure_date", endISO);
 
       if (error) throw error;
 
@@ -60,7 +63,7 @@ export const useBookingVolume = (startDate, endDate) => {
       }, {});
 
       // Generate full month range
-      const monthKeys = generateMonthKeys(startDate, endDate);
+      const monthKeys = generateMonthKeys(startISO, endISO);
 
       return monthKeys.map((month) => ({
         month,
