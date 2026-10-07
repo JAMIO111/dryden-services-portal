@@ -1,8 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase-client";
 
-const parseISO = (iso) => {
-  const [y, m, d] = iso.split("-").map(Number);
+const parseISO = (value) => {
+  // generateMonthKeys is called with whatever startDate/endDate the caller
+  // passed into the hook - that's a Date object from every current call
+  // site (getStartOfMonth/getEndOfMonth), not an ISO string. Calling
+  // .split on a Date threw here, silently failing the whole query (no
+  // catch logs it - React Query just leaves `data` undefined forever).
+  if (value instanceof Date) {
+    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+  const [y, m, d] = value.split("-").map(Number);
   return new Date(y, m - 1, d); // local midnight, no UTC shift
 };
 

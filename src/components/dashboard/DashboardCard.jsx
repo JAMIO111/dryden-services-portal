@@ -49,6 +49,14 @@ const DashboardCard = ({
 
   const currentColor = colorMap[color] || colorMap["cta-color"];
 
+  // Hooks must run unconditionally on every render - these used to sit
+  // after the isLoading early return below, which called them zero times
+  // while loading and once loaded, tripping React's "Expected static flag
+  // was missing" internal error once the branch changed.
+  const { organisation } = useOrganisation();
+  const navigate = useNavigate();
+  const base_currency = organisation?.base_currency || "GBP";
+
   if (isLoading) {
     return (
       <div className="flex relative flex-row justify-start p-4 h-full w-full rounded-2xl shadow-s bg-secondary-bg">
@@ -64,10 +72,6 @@ const DashboardCard = ({
       </div>
     );
   }
-
-  const { organisation } = useOrganisation();
-  const navigate = useNavigate();
-  const base_currency = organisation?.base_currency || "GBP";
 
   function getCurrencyFormatter(currencyCode) {
     const currency = currencyCodes[currencyCode];

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useUser } from "@/contexts/UserProvider";
 import DateRangePicker from "@components/ui/DateRangePicker";
 import {
@@ -6,10 +6,19 @@ import {
   getStartOfMonth,
   getEndOfMonth,
 } from "@/lib/HelperFunctions";
-import StackedBarChart from "@components/charts/StackedBarChart";
+import BookingVolumeChart from "@components/charts/StackedBarChart";
+import CategoryBarChart from "@components/charts/CategoryBarChart";
+import CategoryPieChart from "@components/charts/CategoryPieChart";
+import DashboardCard from "@components/dashboard/DashboardCard";
 import { useBookingVolume } from "@/hooks/useBookingVolume";
+import { useBookingsByProperty } from "@/hooks/useBookingsByProperty";
+import { useProperties } from "@/hooks/useProperties";
+import { useOwners } from "@/hooks/useOwners";
 import { getPeriodLabel } from "@/lib/utils";
 import { CgClose } from "react-icons/cg";
+import { BsHouses } from "react-icons/bs";
+import { MdPeopleOutline, MdOutlinePublishedWithChanges } from "react-icons/md";
+import { IoCalendarOutline } from "react-icons/io5";
 
 const Dashboard = () => {
   const { profile } = useUser();
@@ -28,9 +37,59 @@ const Dashboard = () => {
     [selectedRange.startDate, selectedRange.endDate]
   );
 
-  const { data } = useBookingVolume(
+  // Fixed trailing 12-month window, deliberately independent of the date
+  // filter above - this chart is meant to always show the same "last 12
+  // months" trend regardless of what range the rest of the dashboard is
+  // scoped to.
+  const last12MonthsRange = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+    return { startDate: getStartOfMonth(start), endDate: getEndOfMonth(now) };
+  }, []);
+
+  const { data: last12MonthsData } = useBookingVolume(
+    last12MonthsRange.startDate,
+    last12MonthsRange.endDate
+  );
+
+  const { data: bookingsByProperty } = useBookingsByProperty(
     memoisedRange.startDate,
     memoisedRange.endDate
+  );
+
+  const { data: properties, isLoading: isPropertiesLoading } = useProperties();
+  const { data: owners, isLoading: isOwnersLoading } = useOwners();
+
+  const packageBreakdown = useMemo(() => {
+    if (!properties) return [];
+
+    const counts = properties.reduce((acc, property) => {
+      const name = property.Packages?.name || "No Package";
+      acc[name] = (acc[name] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(counts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [properties]);
+
+  const activePropertiesCount = useMemo(
+    () => properties?.filter((p) => p.is_active).length,
+    [properties]
+  );
+
+  const activeOwnersCount = useMemo(
+    () => owners?.filter((o) => o.is_active).length,
+    [owners]
+  );
+
+  const bookingsThisMonth =
+    last12MonthsData?.[last12MonthsData.length - 1]?.bookings;
+
+  const totalBookingsLast12Months = last12MonthsData?.reduce(
+    (sum, month) => sum + month.bookings,
+    0
   );
 
   return (
@@ -88,44 +147,33 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="flex flex-col lg:flex-row gap-3 p-3 flex-grow overflow-y-auto lg:overflow-hidden">
-          <div className="flex flex-col gap-3 flex-1 lg:flex-6 lg:min-h-0">
+          <div className="flex flex-col gap-3 flex-1 lg:flex-8 lg:min-h-0">
             <div className="flex flex-col lg:flex-row gap-3 flex-1">
               <div className="min-h-64 lg:min-h-0 lg:flex-3">
-                <StackedBarChart
-                  data={data}
-                  subtitle={`Changeovers for ${getPeriodLabel(
-                    memoisedRange.startDate,
-                    memoisedRange.endDate,
-                    "current"
-                  )}`}
+                <BookingVolumeChart
+                  data={last12MonthsData}
+                  subtitle="Last 12 months"
                 />
               </div>
               <div className="min-h-64 lg:min-h-0 lg:flex-2">
-                <StackedBarChart
-                  data={data}
-                  subtitle={`Changeovers for ${getPeriodLabel(
-                    memoisedRange.startDate,
-                    memoisedRange.endDate,
-                    "current"
-                  )}`}
+                <CategoryPieChart
+                  data={packageBreakdown}
+                  dataKey="count"
+                  nameKey="name"
+                  title="Properties by Package"
+                  subtitle="Current portfolio"
                 />
               </div>
             </div>
             <div className="flex flex-col lg:flex-row gap-3 flex-1">
-              <div className="min-h-64 lg:min-h-0 lg:flex-2">
-                <StackedBarChart
-                  data={data}
-                  subtitle={`Changeovers for ${getPeriodLabel(
-                    memoisedRange.startDate,
-                    memoisedRange.endDate,
-                    "current"
-                  )}`}
-                />
-              </div>
-              <div className="min-h-64 lg:min-h-0 lg:flex-3">
-                <StackedBarChart
-                  data={data}
-                  subtitle={`Changeovers for ${getPeriodLabel(
+              <div className="min-h-64 lg:min-h-0 flex-1">
+                <CategoryBarChart
+                  data={bookingsByProperty}
+                  dataKey="bookings"
+                  categoryKey="property"
+                  valueLabel="Bookings"
+                  title="Bookings by Property"
+                  subtitle={`Top properties for ${getPeriodLabel(
                     memoisedRange.startDate,
                     memoisedRange.endDate,
                     "current"
@@ -134,7 +182,41 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="hidden lg:block lg:flex-4"></div>
+          <div className="flex flex-row flex-wrap lg:flex-col gap-3 lg:flex-4 lg:overflow-y-auto">
+            <div className="h-28 w-full shrink-0">
+              <DashboardCard
+                title="Active Properties"
+                value={activePropertiesCount}
+                icon={BsHouses}
+                isLoading={isPropertiesLoading}
+                link="/Client-Management/Properties"
+              />
+            </div>
+            <div className="h-28 w-full shrink-0">
+              <DashboardCard
+                title="Active Owners"
+                value={activeOwnersCount}
+                icon={MdPeopleOutline}
+                isLoading={isOwnersLoading}
+                link="/Client-Management/Owners"
+              />
+            </div>
+            <div className="h-28 w-full shrink-0">
+              <DashboardCard
+                title="Bookings This Month"
+                value={bookingsThisMonth}
+                icon={MdOutlinePublishedWithChanges}
+                link="/Jobs/Bookings"
+              />
+            </div>
+            <div className="h-28 w-full shrink-0">
+              <DashboardCard
+                title="Bookings (Last 12 Months)"
+                value={totalBookingsLast12Months}
+                icon={IoCalendarOutline}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

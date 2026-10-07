@@ -19,16 +19,13 @@ import {
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function BookingVolumeChart({ data, subtitle }) {
-  if (!data || !Array.isArray(data)) {
-    return (
-      <div className="h-full flex justify-center items-center rounded-2xl shadow-m bg-secondary-bg text-secondary-text">
-        No date range selected
-      </div>
-    );
-  }
-
-  // Sort data by date (optional)
+  // Hooks must run unconditionally on every render - this used to sit after
+  // an early return below, which call it zero times while data was still
+  // loading and once it had arrived, tripping React's "Expected static
+  // flag was missing" internal error once the branch changed.
   const sortedData = useMemo(() => {
+    if (!data || !Array.isArray(data)) return [];
+
     return data.slice().sort((a, b) => {
       const [monthA, yearA] = a.month.split(" ");
       const [monthB, yearB] = b.month.split(" ");
@@ -38,6 +35,14 @@ export default function BookingVolumeChart({ data, subtitle }) {
       );
     });
   }, [data]);
+
+  if (!data || !Array.isArray(data)) {
+    return (
+      <div className="h-full flex justify-center items-center rounded-2xl shadow-m bg-secondary-bg text-secondary-text">
+        No date range selected
+      </div>
+    );
+  }
 
   function TooltipContentWrapper({ active, payload, label }) {
     if (!active || !payload || !payload.length) return null;
